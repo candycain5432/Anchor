@@ -51,7 +51,8 @@
   [data-theme="dark"] .app { background: var(--parchment); }
   [data-theme="dark"] .verse-card,
   [data-theme="dark"] .answer-card,
-  [data-theme="dark"] .reflect-card {
+  [data-theme="dark"] .reflect-card,
+  [data-theme="dark"] .readings-card {
     background: var(--card);
     border-color: var(--line);
   }
@@ -273,6 +274,43 @@
     font-weight: 500;
     letter-spacing: 0.04em;
   }
+
+  .readings-card {
+    background: linear-gradient(135deg, #fff 0%, #f9f7f3 100%);
+    border: 1px solid var(--gold-soft);
+    padding: 18px 18px 4px;
+  }
+  .reading-item { border-bottom: 1px solid var(--line); }
+  .reading-item:last-child { border-bottom: none; }
+  .reading-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    gap: 12px;
+  }
+  .reading-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .reading-cite  { font-size: 11.5px; color: var(--gold); margin-top: 2px; font-weight: 500; }
+  .reading-chevron {
+    color: var(--gold);
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    transition: transform 0.22s ease;
+  }
+  .reading-item.open .reading-chevron { transform: rotate(90deg); }
+  .reading-body {
+    display: none;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--ink);
+    padding-bottom: 16px;
+  }
+  .reading-item.open .reading-body { display: block; }
 
   .feast-card { display: flex; padding: 0; overflow: hidden; min-height: 108px; }
   .feast-art {
@@ -825,6 +863,17 @@
   .cmodal-handle {
     width: 40px; height: 4px; border-radius: 999px;
     background: var(--line); margin: 12px auto 0; flex-shrink: 0;
+    cursor: grab; touch-action: none;
+  }
+  .cmodal-handle:active { cursor: grabbing; }
+  /* Fullscreen — applied to the container so the sheet can stretch to fill it */
+  .cmodal.fullscreen-mode {
+    align-items: stretch;
+  }
+  .cmodal.fullscreen-mode .cmodal-sheet {
+    max-height: 100%;
+    height: 100%;
+    border-radius: 0;
   }
   .cmodal-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -943,6 +992,13 @@
           <div class="feast-label">Feast Day</div>
           <h3 class="feast-name" id="feast-name">St. Anselm</h3>
           <div class="feast-title" id="feast-title">Doctor of the Church</div>
+        </div>
+      </div>
+
+      <div class="card readings-card">
+        <div class="card-label">Mass Readings</div>
+        <div id="readings-list">
+          <div style="font-size:13px;color:var(--ink-mute);padding:6px 0 14px">Loading today's readings…</div>
         </div>
       </div>
 
@@ -1301,6 +1357,8 @@
     item.addEventListener('click', () => switchTo(item.dataset.nav));
   });
 
+  document.querySelectorAll('.bell').forEach(b => b.addEventListener('click', openNotificationCenter));
+
   // ---- AI Chat ----
   const chatMessages = document.getElementById('chat-messages');
   const chatInput    = document.getElementById('chat-input');
@@ -1493,8 +1551,96 @@
   }
 
   function closeCModal() {
-    document.getElementById('cmodal').classList.remove('open');
+    document.getElementById('cmodal').classList.remove('open', 'fullscreen-mode');
   }
+
+  // ---- Bottom sheet drag (handle bar) ----
+  (function () {
+    const cmodal = document.getElementById('cmodal');
+    const sheet  = document.querySelector('.cmodal-sheet');
+    const handle = document.querySelector('.cmodal-handle');
+    let startY = 0, lastY = 0, startH = 0, dragging = false;
+
+    function getY(e) { return e.touches ? e.touches[0].clientY : e.clientY; }
+
+    function setSheetH(h) {
+      const vh = window.innerHeight;
+      const capped = Math.min(Math.max(h, 120), vh);
+      sheet.style.height    = capped + 'px';
+      sheet.style.maxHeight = 'none';
+      // Remove corner radius as it approaches full screen
+      const r = capped >= vh - 2 ? '0' : '24px 24px 0 0';
+      sheet.style.borderRadius = r;
+    }
+
+    function resetSheet() {
+      sheet.style.transition   = '';
+      sheet.style.transform    = '';
+      sheet.style.height       = '';
+      sheet.style.maxHeight    = '';
+      sheet.style.borderRadius = '';
+    }
+
+    function onStart(e) {
+      dragging = true;
+      startY = lastY = getY(e);
+      startH = sheet.offsetHeight;
+      sheet.style.transition = 'none';
+      document.addEventListener('touchmove', onMove, { passive: false });
+    }
+
+    function onMove(e) {
+      if (!dragging) return;
+      e.preventDefault();
+      lastY = getY(e);
+      const dy = lastY - startY;
+
+      if (dy < 0) {
+        // Dragging up — grow the sheet live
+        setSheetH(startH - dy);
+        sheet.style.transform = 'translateY(0)';
+      } else {
+        // Dragging down — slide the sheet down
+        setSheetH(startH);
+        sheet.style.transform = `translateY(${dy}px)`;
+      }
+    }
+
+    function onEnd() {
+      if (!dragging) return;
+      dragging = false;
+      document.removeEventListener('touchmove', onMove);
+      const dy  = lastY - startY;
+      const vh  = window.innerHeight;
+      const cur = sheet.offsetHeight;
+
+      sheet.style.transition = 'height .25s cubic-bezier(.4,0,.2,1), transform .25s cubic-bezier(.4,0,.2,1), border-radius .25s ease';
+
+      if (dy > 90) {
+        // Swipe down far enough — dismiss
+        sheet.style.transform = 'translateY(110%)';
+        setTimeout(() => {
+          resetSheet();
+          cmodal.classList.remove('open');
+        }, 270);
+      } else if (dy < 0 && cur > vh * 0.72) {
+        // Dragged up past 72 % of screen — snap to full height
+        setSheetH(vh);
+        sheet.style.transform = 'translateY(0)';
+        setTimeout(() => { sheet.style.transition = ''; }, 260);
+      } else {
+        // Snap back to original content height
+        sheet.style.transform = 'translateY(0)';
+        setTimeout(() => { resetSheet(); }, 260);
+      }
+    }
+
+    handle.addEventListener('touchstart', onStart, { passive: true });
+    document.addEventListener('touchend',  onEnd);
+    handle.addEventListener('mousedown', onStart);
+    document.addEventListener('mousemove', e => { if (dragging) onMove(e); });
+    document.addEventListener('mouseup',   ()  => { if (dragging) onEnd(); });
+  })();
 
   // ---- Prayer Data ----
   const PRAYERS = {
@@ -1559,10 +1705,127 @@
     return 'Luminous';
   }
 
+  // ---- Interactive Rosary ----
+  let iRosaryStates = new Array(61).fill(false);
+
+  function openRosary() {
+    iRosaryStates = new Array(61).fill(false);
+    openCModal('The Holy Rosary', irBuildHTML(), false);
+    document.getElementById('cmodal').classList.add('fullscreen-mode');
+  }
+
+  function irBuildHTML() {
+    const set = getMysterySet();
+    // Larger oval so 55 beads have ~20px centre-to-centre spacing
+    const N = 55, cx = 150, cy = 230, rx = 122, ry = 212;
+    const connY = cy + ry; // bottom of oval — tail hangs from here
+
+    const loopBeads = [];
+    for (let i = 0; i < N; i++) {
+      const a = Math.PI / 2 - (2 * Math.PI * (i + 0.5) / N);
+      loopBeads.push({ x: cx + rx * Math.cos(a), y: cy + ry * Math.sin(a), lg: i % 11 === 0, idx: i });
+    }
+    const tail = [
+      { x: cx, y: connY + 28, lg: false, idx: 55 },
+      { x: cx, y: connY + 56, lg: true,  idx: 56 },
+      { x: cx, y: connY + 82, lg: false, idx: 57 },
+      { x: cx, y: connY + 102, lg: false, idx: 58 },
+      { x: cx, y: connY + 122, lg: false, idx: 59 },
+    ];
+    const crossY = connY + 150;
+    const vbH   = crossY + 42;
+
+    function bead(x, y, lg, idx) {
+      const r = lg ? 10 : 7, hit = lg ? 18 : 14;
+      return `<g onclick="irTap(${idx})" style="cursor:pointer">` +
+        `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${hit}" fill="transparent"/>` +
+        `<circle id="irb-${idx}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" ` +
+          `style="fill:var(--card);stroke:var(--ink-soft);stroke-width:1.5"/>` +
+        `</g>`;
+    }
+
+    let svg = `<svg viewBox="0 0 300 ${vbH}" style="width:100%;display:block" xmlns="http://www.w3.org/2000/svg">`;
+    svg += `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="none" style="stroke:var(--line);stroke-width:1.2"/>`;
+    svg += `<line x1="${cx}" y1="${connY}" x2="${cx}" y2="${crossY - 4}" style="stroke:var(--line);stroke-width:1.2"/>`;
+    loopBeads.forEach(b => { svg += bead(b.x, b.y, b.lg, b.idx); });
+    tail.forEach(b => { svg += bead(b.x, b.y, b.lg, b.idx); });
+    const cw = 12, ch = 22, bar = 9;
+    svg += `<g id="irb-60" onclick="irTap(60)" style="cursor:pointer">` +
+      `<rect x="${cx - cw / 2}" y="${crossY}" width="${cw}" height="${ch}" rx="2" style="fill:var(--gold-soft);stroke:var(--gold);stroke-width:1.5"/>` +
+      `<rect x="${cx - bar}" y="${crossY + 8}" width="${bar * 2}" height="7" rx="1.5" style="fill:var(--gold-soft);stroke:var(--gold);stroke-width:1.5"/>` +
+      `</g>`;
+    svg += `</svg>`;
+
+    return `<div>
+      <div style="text-align:center;margin-bottom:6px">
+        <span style="font-size:11px;font-weight:700;letter-spacing:0.18em;color:var(--gold);text-transform:uppercase">${set} Mysteries</span>
+      </div>
+      ${svg}
+      <div id="ir-label" style="text-align:center;padding:10px 0 4px;min-height:40px;font-size:13.5px;color:var(--ink-soft);line-height:1.5">Tap a bead to mark it as prayed</div>
+      <div style="display:flex;gap:10px;margin-top:4px">
+        <button class="btn btn-outline" onclick="irReset()" style="flex:1;font-size:13px">Reset</button>
+        <button class="btn btn-gold" onclick="openRosaryGuide()" style="flex:1;font-size:13px">Mystery Guide</button>
+      </div>
+    </div>`;
+  }
+
+  const IR_LABELS = {
+    60: "✝  Sign of the Cross & Apostles' Creed",
+    55: 'Beginning of the Rosary',
+    56: '🙏  Our Father',
+    57: '🕊  Hail Mary — for Faith',
+    58: '🕊  Hail Mary — for Hope',
+    59: '🕊  Hail Mary — for Charity',
+  };
+
+  function irTap(idx) {
+    iRosaryStates[idx] = !iRosaryStates[idx];
+    const prayed = iRosaryStates[idx];
+    const el = document.getElementById(`irb-${idx}`);
+    if (el) {
+      if (idx === 60) {
+        const f = prayed ? '#c9a449' : 'var(--gold-soft)', s = prayed ? '#a07830' : 'var(--gold)';
+        el.querySelectorAll('rect').forEach(r => { r.style.fill = f; r.style.stroke = s; });
+      } else {
+        el.style.fill   = prayed ? '#c9a449' : 'var(--card)';
+        el.style.stroke = prayed ? '#a07830' : 'var(--ink-soft)';
+      }
+    }
+    const label = document.getElementById('ir-label');
+    if (label) {
+      let text = IR_LABELS[idx];
+      if (text === undefined) {
+        if (idx % 11 === 0) {
+          const m = ROSARY_MYSTERIES[getMysterySet()];
+          const decade = (idx / 11) | 0;
+          text = m && m[decade] ? `🙏  Our Father · ${m[decade][0]}` : '🙏  Our Father';
+        } else {
+          text = '🕊  Hail Mary, full of grace…';
+        }
+      }
+      label.textContent = (prayed ? '✓  ' : '') + text;
+    }
+  }
+
+  function irReset() {
+    iRosaryStates = new Array(61).fill(false);
+    for (let i = 0; i < 60; i++) {
+      const el = document.getElementById(`irb-${i}`);
+      if (el) { el.style.fill = 'var(--card)'; el.style.stroke = 'var(--ink-soft)'; }
+    }
+    const crossEl = document.getElementById('irb-60');
+    if (crossEl) {
+      crossEl.querySelectorAll('rect').forEach(r => { r.style.fill = 'var(--gold-soft)'; r.style.stroke = 'var(--gold)'; });
+    }
+    const label = document.getElementById('ir-label');
+    if (label) label.textContent = 'Tap a bead to mark it as prayed';
+  }
+
+  // ---- Rosary Text Guide ----
   let rosarySteps = [];
   let rosaryIdx = 0;
 
-  function openRosary() {
+  function openRosaryGuide() {
     const set = getMysterySet();
     rosarySteps = [
       {
@@ -1608,246 +1871,496 @@
     updateRosaryBtns();
   }
 
-  // ---- Liturgical Calendar (local, no CORS issues) ----
-  function getEaster(year) {
-    const a = year % 19, b = Math.floor(year / 100), c = year % 100;
-    const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
-    const g = Math.floor((b - f + 1) / 3);
-    const h = (19 * a + b - d - g + 15) % 30;
-    const i = Math.floor(c / 4), k = c % 4;
-    const l = (32 + 2 * e + 2 * i - h - k) % 7;
-    const m = Math.floor((a + 11 * h + 22 * l) / 451);
-    const month = Math.floor((h + l - 7 * m + 114) / 31);
-    const day   = ((h + l - 7 * m + 114) % 31) + 1;
-    return new Date(year, month - 1, day);
-  }
-
-  function addDays(date, n) {
-    const d = new Date(date); d.setDate(d.getDate() + n); return d;
-  }
-
-  function sameDay(a, b) {
-    return a.getFullYear() === b.getFullYear() &&
-           a.getMonth()    === b.getMonth()    &&
-           a.getDate()     === b.getDate();
-  }
-
-  function getAdvent1(year) {
-    const dec25 = new Date(year, 11, 25);
-    const dow = dec25.getDay();
-    const fourthAdventSun = addDays(dec25, -(dow === 0 ? 7 : dow));
-    return addDays(fourthAdventSun, -21);
-  }
-
-  function getLiturgicalSeason(date, easter) {
-    const y = date.getFullYear();
-    const ash = addDays(easter, -46);
-    const pentecost = addDays(easter, 49);
-    const advent1 = getAdvent1(y);
-    const epiphany = new Date(y, 0, 13); // Baptism of the Lord approx
-    if (date <= epiphany) return 'Christmas Season';
-    if (date >= ash && date < easter) return 'Lent';
-    if (date >= easter && date <= pentecost) return 'Eastertide';
-    if (date >= advent1) return 'Advent';
-    return 'Ordinary Time';
-  }
-
-  const FIXED_FEASTS = {
-    '1-1':  { title: 'Mary, Mother of God', rank: 'Solemnity' },
-    '1-6':  { title: 'Epiphany of the Lord', rank: 'Solemnity' },
-    '1-17': { title: 'Saint Anthony the Abbot', rank: 'Memorial' },
-    '1-20': { title: 'Saint Fabian & Saint Sebastian', rank: 'Memorial' },
-    '1-21': { title: 'Saint Agnes', rank: 'Memorial' },
-    '1-24': { title: 'Saint Francis de Sales', rank: 'Memorial' },
-    '1-25': { title: 'Conversion of Saint Paul', rank: 'Feast' },
-    '1-26': { title: 'Saints Timothy and Titus', rank: 'Memorial' },
-    '1-28': { title: 'Saint Thomas Aquinas', rank: 'Memorial' },
-    '2-2':  { title: 'Presentation of the Lord', rank: 'Feast' },
-    '2-5':  { title: 'Saint Agatha', rank: 'Memorial' },
-    '2-6':  { title: 'Saints Paul Miki and Companions', rank: 'Memorial' },
-    '2-10': { title: 'Saint Scholastica', rank: 'Memorial' },
-    '2-11': { title: 'Our Lady of Lourdes', rank: 'Optional Memorial' },
-    '2-14': { title: 'Saints Cyril and Methodius', rank: 'Memorial' },
-    '2-22': { title: 'Chair of Saint Peter', rank: 'Feast' },
-    '3-7':  { title: 'Saints Perpetua and Felicity', rank: 'Memorial' },
-    '3-17': { title: 'Saint Patrick', rank: 'Optional Memorial' },
-    '3-19': { title: 'Saint Joseph, Spouse of the Blessed Virgin Mary', rank: 'Solemnity' },
-    '3-25': { title: 'Annunciation of the Lord', rank: 'Solemnity' },
-    '4-7':  { title: 'Saint John Baptist de la Salle', rank: 'Memorial' },
-    '4-11': { title: 'Saint Stanislaus', rank: 'Memorial' },
-    '4-21': { title: 'Saint Anselm', rank: 'Optional Memorial' },
-    '4-22': { title: 'Saints Soter and Caius', rank: 'Optional Memorial' },
-    '4-23': { title: 'Saint George', rank: 'Optional Memorial' },
-    '4-24': { title: 'Saint Fidelis of Sigmaringen', rank: 'Memorial' },
-    '4-25': { title: 'Saint Mark the Evangelist', rank: 'Feast' },
-    '4-28': { title: 'Saint Peter Chanel', rank: 'Optional Memorial' },
-    '4-29': { title: 'Saint Catherine of Siena', rank: 'Memorial' },
-    '5-1':  { title: 'Saint Joseph the Worker', rank: 'Optional Memorial' },
-    '5-2':  { title: 'Saint Athanasius', rank: 'Memorial' },
-    '5-3':  { title: 'Saints Philip and James', rank: 'Feast' },
-    '5-13': { title: 'Our Lady of Fatima', rank: 'Optional Memorial' },
-    '5-14': { title: 'Saint Matthias the Apostle', rank: 'Feast' },
-    '5-26': { title: 'Saint Philip Neri', rank: 'Memorial' },
-    '5-31': { title: 'Visitation of the Blessed Virgin Mary', rank: 'Feast' },
-    '6-1':  { title: 'Saint Justin Martyr', rank: 'Memorial' },
-    '6-3':  { title: 'Saint Charles Lwanga and Companions', rank: 'Memorial' },
-    '6-5':  { title: 'Saint Boniface', rank: 'Memorial' },
-    '6-11': { title: 'Saint Barnabas the Apostle', rank: 'Memorial' },
-    '6-13': { title: 'Saint Anthony of Padua', rank: 'Memorial' },
-    '6-21': { title: 'Saint Aloysius Gonzaga', rank: 'Memorial' },
-    '6-24': { title: 'Nativity of Saint John the Baptist', rank: 'Solemnity' },
-    '6-28': { title: 'Saint Irenaeus', rank: 'Memorial' },
-    '6-29': { title: 'Saints Peter and Paul, Apostles', rank: 'Solemnity' },
-    '7-3':  { title: 'Saint Thomas the Apostle', rank: 'Feast' },
-    '7-11': { title: 'Saint Benedict of Nursia', rank: 'Memorial' },
-    '7-15': { title: 'Saint Bonaventure', rank: 'Memorial' },
-    '7-16': { title: 'Our Lady of Mount Carmel', rank: 'Optional Memorial' },
-    '7-22': { title: 'Saint Mary Magdalene', rank: 'Feast' },
-    '7-25': { title: 'Saint James the Apostle', rank: 'Feast' },
-    '7-26': { title: 'Saints Joachim and Anne', rank: 'Memorial' },
-    '7-29': { title: 'Saints Martha, Mary, and Lazarus', rank: 'Memorial' },
-    '7-31': { title: 'Saint Ignatius of Loyola', rank: 'Memorial' },
-    '8-1':  { title: 'Saint Alphonsus Liguori', rank: 'Memorial' },
-    '8-4':  { title: 'Saint John Vianney', rank: 'Memorial' },
-    '8-6':  { title: 'Transfiguration of the Lord', rank: 'Feast' },
-    '8-8':  { title: 'Saint Dominic', rank: 'Memorial' },
-    '8-10': { title: 'Saint Lawrence', rank: 'Feast' },
-    '8-11': { title: 'Saint Clare of Assisi', rank: 'Memorial' },
-    '8-14': { title: 'Saint Maximilian Kolbe', rank: 'Memorial' },
-    '8-15': { title: 'Assumption of the Blessed Virgin Mary', rank: 'Solemnity' },
-    '8-20': { title: 'Saint Bernard of Clairvaux', rank: 'Memorial' },
-    '8-21': { title: 'Saint Pius X', rank: 'Memorial' },
-    '8-22': { title: 'Queenship of the Blessed Virgin Mary', rank: 'Memorial' },
-    '8-24': { title: 'Saint Bartholomew the Apostle', rank: 'Feast' },
-    '8-27': { title: 'Saint Monica', rank: 'Memorial' },
-    '8-28': { title: 'Saint Augustine of Hippo', rank: 'Memorial' },
-    '8-29': { title: 'Passion of Saint John the Baptist', rank: 'Memorial' },
-    '9-3':  { title: 'Saint Gregory the Great', rank: 'Memorial' },
-    '9-8':  { title: 'Nativity of the Blessed Virgin Mary', rank: 'Feast' },
-    '9-13': { title: 'Saint John Chrysostom', rank: 'Memorial' },
-    '9-14': { title: 'Exaltation of the Holy Cross', rank: 'Feast' },
-    '9-15': { title: 'Our Lady of Sorrows', rank: 'Memorial' },
-    '9-16': { title: 'Saints Cornelius and Cyprian', rank: 'Memorial' },
-    '9-21': { title: 'Saint Matthew the Apostle', rank: 'Feast' },
-    '9-23': { title: 'Saint Pius of Pietrelcina (Padre Pio)', rank: 'Memorial' },
-    '9-27': { title: 'Saint Vincent de Paul', rank: 'Memorial' },
-    '9-29': { title: 'Saints Michael, Gabriel, and Raphael', rank: 'Feast' },
-    '9-30': { title: 'Saint Jerome', rank: 'Memorial' },
-    '10-1': { title: 'Saint Thérèse of the Child Jesus', rank: 'Memorial' },
-    '10-2': { title: 'Guardian Angels', rank: 'Memorial' },
-    '10-4': { title: 'Saint Francis of Assisi', rank: 'Memorial' },
-    '10-7': { title: 'Our Lady of the Rosary', rank: 'Memorial' },
-    '10-15': { title: 'Saint Teresa of Ávila', rank: 'Memorial' },
-    '10-17': { title: 'Saint Ignatius of Antioch', rank: 'Memorial' },
-    '10-18': { title: 'Saint Luke the Evangelist', rank: 'Feast' },
-    '10-22': { title: 'Saint John Paul II', rank: 'Optional Memorial' },
-    '10-28': { title: 'Saints Simon and Jude, Apostles', rank: 'Feast' },
-    '11-1': { title: 'All Saints', rank: 'Solemnity' },
-    '11-2': { title: 'All Souls', rank: 'Commemoration' },
-    '11-4': { title: 'Saint Charles Borromeo', rank: 'Memorial' },
-    '11-9': { title: 'Dedication of the Lateran Basilica', rank: 'Feast' },
-    '11-10': { title: 'Saint Leo the Great', rank: 'Memorial' },
-    '11-11': { title: 'Saint Martin of Tours', rank: 'Memorial' },
-    '11-12': { title: 'Saint Josaphat', rank: 'Memorial' },
-    '11-17': { title: 'Saint Elizabeth of Hungary', rank: 'Memorial' },
-    '11-21': { title: 'Presentation of the Blessed Virgin Mary', rank: 'Memorial' },
-    '11-22': { title: 'Saint Cecilia', rank: 'Memorial' },
-    '11-30': { title: 'Saint Andrew the Apostle', rank: 'Feast' },
-    '12-3': { title: 'Saint Francis Xavier', rank: 'Memorial' },
-    '12-6': { title: 'Saint Nicholas', rank: 'Optional Memorial' },
-    '12-7': { title: 'Saint Ambrose', rank: 'Memorial' },
-    '12-8': { title: 'Immaculate Conception of the Blessed Virgin Mary', rank: 'Solemnity' },
-    '12-12': { title: 'Our Lady of Guadalupe', rank: 'Feast' },
-    '12-13': { title: 'Saint Lucy', rank: 'Memorial' },
-    '12-14': { title: 'Saint John of the Cross', rank: 'Memorial' },
-    '12-25': { title: 'Nativity of the Lord', rank: 'Solemnity' },
-    '12-26': { title: 'Saint Stephen', rank: 'Feast' },
-    '12-27': { title: 'Saint John the Apostle and Evangelist', rank: 'Feast' },
-    '12-28': { title: 'Holy Innocents', rank: 'Feast' },
+  // ---- Static saint fallback (one per calendar day; used when API returns a feria) ----
+  const SAINT_FALLBACK = {
+    '01-01':['Mary, Mother of God','Solemnity'],
+    '01-02':['Basil the Great & Gregory Nazianzen','Doctors of the Church'],
+    '01-03':['Most Holy Name of Jesus','Feast'],
+    '01-04':['Elizabeth Ann Seton','Saint'],
+    '01-05':['John Neumann','Saint'],
+    '01-06':['André Bessette','Blessed'],
+    '01-07':['Raymond of Peñafort','Saint'],
+    '01-08':['Apollinaris the Apologist','Saint'],
+    '01-09':['Adrian of Canterbury','Saint'],
+    '01-10':['Gregory of Nyssa','Bishop'],
+    '01-11':['Theodosius the Cenobiarch','Saint'],
+    '01-12':['Marguerite Bourgeoys','Saint'],
+    '01-13':['Hilary of Poitiers','Doctor of the Church'],
+    '01-14':['Felix of Nola','Martyr'],
+    '01-15':['Paul the Hermit','Saint'],
+    '01-16':['Honoratus of Arles','Bishop'],
+    '01-17':['Anthony of Egypt','Abbot'],
+    '01-18':['Priscilla of Rome','Martyr'],
+    '01-19':['Wulfstan of Worcester','Bishop'],
+    '01-20':['Fabian & Sebastian','Martyrs'],
+    '01-21':['Agnes of Rome','Virgin & Martyr'],
+    '01-22':['Vincent of Saragossa','Martyr'],
+    '01-23':['Marianne Cope','Saint'],
+    '01-24':['Francis de Sales','Doctor of the Church'],
+    '01-25':['Conversion of Saint Paul','Feast'],
+    '01-26':['Timothy & Titus','Bishops'],
+    '01-27':['Angela Merici','Saint'],
+    '01-28':['Thomas Aquinas','Doctor of the Church'],
+    '01-29':['Gildas the Wise','Abbot'],
+    '01-30':['Martina of Rome','Martyr'],
+    '01-31':['John Bosco','Priest'],
+    '02-01':['Brigid of Ireland','Abbess'],
+    '02-02':['Presentation of the Lord','Feast'],
+    '02-03':['Blaise of Sebaste','Bishop & Martyr'],
+    '02-04':['Andrew Corsini','Bishop'],
+    '02-05':['Agatha of Sicily','Virgin & Martyr'],
+    '02-06':['Paul Miki & Companions','Martyrs'],
+    '02-07':['Colette of Corbie','Saint'],
+    '02-08':['Jerome Emiliani','Saint'],
+    '02-09':['Apollonia of Alexandria','Martyr'],
+    '02-10':['Scholastica','Virgin'],
+    '02-11':['Our Lady of Lourdes','Memorial'],
+    '02-12':['Julian the Hospitaller','Saint'],
+    '02-13':['Catherine de Ricci','Saint'],
+    '02-14':['Cyril & Methodius','Apostles of the Slavs'],
+    '02-15':['Claude de la Colombière','Saint'],
+    '02-16':['Juliana of Nicomedia','Martyr'],
+    '02-17':['Seven Holy Founders of the Servites','Saints'],
+    '02-18':['Flavian of Constantinople','Martyr'],
+    '02-19':['Conrad of Piacenza','Hermit'],
+    '02-20':['Jacinta & Francisco Marto','Seers of Fatima'],
+    '02-21':['Peter Damian','Doctor of the Church'],
+    '02-22':['Chair of Saint Peter','Feast'],
+    '02-23':['Polycarp of Smyrna','Bishop & Martyr'],
+    '02-24':['Matthias the Apostle','Apostle'],
+    '02-25':['Walburga','Abbess'],
+    '02-26':['Porphyry of Gaza','Bishop'],
+    '02-27':['Gabriel of Our Lady of Sorrows','Passionist'],
+    '02-28':['Romanus of Condat','Abbot'],
+    '02-29':['Oswald of Worcester','Bishop'],
+    '03-01':['David of Wales','Bishop'],
+    '03-02':['Agnes of Bohemia','Blessed'],
+    '03-03':['Katharine Drexel','Saint'],
+    '03-04':['Casimir of Poland','Prince'],
+    '03-05':['John Joseph of the Cross','Priest'],
+    '03-06':['Colette of Corbie','Reformer'],
+    '03-07':['Perpetua & Felicity','Martyrs'],
+    '03-08':['John of God','Founder'],
+    '03-09':['Frances of Rome','Saint'],
+    '03-10':['John Ogilvie','Martyr'],
+    '03-11':['Sophronius of Jerusalem','Patriarch'],
+    '03-12':['Maximilian of Lorch','Bishop & Martyr'],
+    '03-13':['Leander of Seville','Archbishop'],
+    '03-14':['Matilda of Saxony','Queen'],
+    '03-15':['Louise de Marillac','Saint'],
+    '03-16':['Heribert of Cologne','Archbishop'],
+    '03-17':['Patrick of Ireland','Bishop'],
+    '03-18':['Cyril of Jerusalem','Doctor of the Church'],
+    '03-19':['Joseph, Husband of Mary','Solemnity'],
+    '03-20':['Cuthbert of Lindisfarne','Bishop'],
+    '03-21':['Nicholas of Flüe','Hermit'],
+    '03-22':['Nicholas Owen','Martyr'],
+    '03-23':['Turibius de Mogrovejo','Archbishop'],
+    '03-24':['Oscar Romero','Bishop & Martyr'],
+    '03-25':['Annunciation of the Lord','Solemnity'],
+    '03-26':['Ludger of Münster','Bishop'],
+    '03-27':['Rupert of Salzburg','Bishop'],
+    '03-28':['Stephen Harding','Abbot'],
+    '03-29':['Berthold of Mount Carmel','Prior General'],
+    '03-30':['John Climacus','Abbot'],
+    '03-31':['Benjamin of Persia','Martyr'],
+    '04-01':['Hugh of Grenoble','Bishop'],
+    '04-02':['Francis of Paola','Hermit'],
+    '04-03':['Richard of Chichester','Bishop'],
+    '04-04':['Isidore of Seville','Doctor of the Church'],
+    '04-05':['Vincent Ferrer','Friar Preacher'],
+    '04-06':['William of Eskill','Abbot'],
+    '04-07':['John Baptist de la Salle','Founder'],
+    '04-08':['Walter of Pontoise','Abbot'],
+    '04-09':['Casilda of Toledo','Virgin'],
+    '04-10':['Fulbert of Chartres','Bishop'],
+    '04-11':['Stanislaus of Kraków','Bishop & Martyr'],
+    '04-12':['Julius I','Pope'],
+    '04-13':['Martin I','Pope & Martyr'],
+    '04-14':['Lydwine of Schiedam','Mystic'],
+    '04-15':['Damien of Molokai','Blessed'],
+    '04-16':['Bernadette Soubirous','Saint'],
+    '04-17':['Robert of Molesme','Abbot'],
+    '04-18':['Apollonius the Apologist','Martyr'],
+    '04-19':['Leo IX','Pope'],
+    '04-20':['Agnes of Montepulciano','Virgin'],
+    '04-21':['Anselm of Canterbury','Doctor of the Church'],
+    '04-22':['Theodore of Sykeon','Bishop'],
+    '04-23':['George of Lydda','Martyr'],
+    '04-24':['Fidelis of Sigmaringen','Martyr'],
+    '04-25':['Mark the Evangelist','Feast'],
+    '04-26':['Our Lady of Good Counsel','Memorial'],
+    '04-27':['Zita of Lucca','Saint'],
+    '04-28':['Louis de Montfort','Priest'],
+    '04-29':['Catherine of Siena','Doctor of the Church'],
+    '04-30':['Pius V','Pope'],
+    '05-01':['Joseph the Worker','Feast'],
+    '05-02':['Athanasius of Alexandria','Doctor of the Church'],
+    '05-03':['Philip & James','Apostles'],
+    '05-04':['Florian of Lorch','Martyr'],
+    '05-05':['Angelus of Jerusalem','Martyr'],
+    '05-06':['Dominic Savio','Saint'],
+    '05-07':['Rose Venerini','Saint'],
+    '05-08':['Peter of Tarentaise','Bishop'],
+    '05-09':['Pachomius of Egypt','Abbot'],
+    '05-10':['Antoninus of Florence','Archbishop'],
+    '05-11':['Ignatius of Laconi','Capuchin'],
+    '05-12':['Nereus & Achilleus','Martyrs'],
+    '05-13':['Our Lady of Fatima','Memorial'],
+    '05-14':['Matthias the Apostle','Feast'],
+    '05-15':['Isidore the Farmer','Saint'],
+    '05-16':['Andrew Bobola','Martyr'],
+    '05-17':['Paschal Baylon','Friar Minor'],
+    '05-18':['John I','Pope & Martyr'],
+    '05-19':['Dunstan of Canterbury','Archbishop'],
+    '05-20':['Bernardino of Siena','Friar Minor'],
+    '05-21':['Christopher Magallanes & Companions','Martyrs'],
+    '05-22':['Rita of Cascia','Saint'],
+    '05-23':['William of Rochester','Martyr'],
+    '05-24':['Mary Help of Christians','Memorial'],
+    '05-25':['Bede the Venerable','Doctor of the Church'],
+    '05-26':['Philip Neri','Priest'],
+    '05-27':['Augustine of Canterbury','Bishop'],
+    '05-28':['Germain of Paris','Bishop'],
+    '05-29':['Maximino of Trier','Bishop'],
+    '05-30':['Joan of Arc','Virgin & Martyr'],
+    '05-31':['Visitation of Mary','Feast'],
+    '06-01':['Justin Martyr','Martyr'],
+    '06-02':['Marcellinus & Peter','Martyrs'],
+    '06-03':['Charles Lwanga & Companions','Martyrs'],
+    '06-04':['Quirinus of Siscia','Martyr'],
+    '06-05':['Boniface of Mainz','Bishop & Martyr'],
+    '06-06':['Norbert of Xanten','Bishop'],
+    '06-07':['Robert of Newminster','Abbot'],
+    '06-08':['Médard of Noyon','Bishop'],
+    '06-09':['Ephrem the Syrian','Doctor of the Church'],
+    '06-10':['Landericus of Paris','Bishop'],
+    '06-11':['Barnabas the Apostle','Feast'],
+    '06-12':['Onuphrius the Great','Hermit'],
+    '06-13':['Anthony of Padua','Doctor of the Church'],
+    '06-14':['Methodius of Constantinople','Patriarch'],
+    '06-15':['Vitus of Sicily','Martyr'],
+    '06-16':['Benno of Meissen','Bishop'],
+    '06-17':['Albert Chmielowski','Blessed'],
+    '06-18':['Elizabeth of Schönau','Mystic'],
+    '06-19':['Romuald of Ravenna','Abbot'],
+    '06-20':['Silverius I','Pope & Martyr'],
+    '06-21':['Aloysius Gonzaga','Patron of Youth'],
+    '06-22':['Thomas More & John Fisher','Martyrs'],
+    '06-23':['Joseph Cafasso','Priest'],
+    '06-24':['Birth of John the Baptist','Solemnity'],
+    '06-25':['William of Vercelli','Abbot'],
+    '06-26':['Josemaría Escrivá','Priest'],
+    '06-27':['Cyril of Alexandria','Doctor of the Church'],
+    '06-28':['Irenaeus of Lyon','Bishop & Martyr'],
+    '06-29':['Peter & Paul','Apostles'],
+    '06-30':['First Martyrs of Rome','Martyrs'],
+    '07-01':['Junipero Serra','Blessed'],
+    '07-02':['Bernardino Realino','Jesuit'],
+    '07-03':['Thomas the Apostle','Feast'],
+    '07-04':['Elizabeth of Portugal','Queen'],
+    '07-05':['Anthony Zaccaria','Priest'],
+    '07-06':['Maria Goretti','Virgin & Martyr'],
+    '07-07':['Palladius of Ireland','Bishop'],
+    '07-08':['Edgar the Peaceful','King'],
+    '07-09':['Augustine Zhao Rong & Companions','Martyrs'],
+    '07-10':['Canute IV of Denmark','Martyr'],
+    '07-11':['Benedict of Nursia','Father of Western Monasticism'],
+    '07-12':['John Gualbert','Abbot'],
+    '07-13':['Henry II','Holy Roman Emperor'],
+    '07-14':['Kateri Tekakwitha','Blessed'],
+    '07-15':['Bonaventure','Doctor of the Church'],
+    '07-16':['Our Lady of Mount Carmel','Memorial'],
+    '07-17':['Alexius of Rome','Saint'],
+    '07-18':['Frederick of Utrecht','Bishop & Martyr'],
+    '07-19':['Macrina the Younger','Virgin'],
+    '07-20':['Apollinaris of Ravenna','Bishop & Martyr'],
+    '07-21':['Lawrence of Brindisi','Doctor of the Church'],
+    '07-22':['Mary Magdalene','Feast'],
+    '07-23':['Bridget of Sweden','Mystic'],
+    '07-24':['Sharbel Makhluf','Hermit'],
+    '07-25':['James the Greater','Apostle'],
+    '07-26':['Joachim & Anne','Parents of Mary'],
+    '07-27':['Pantaleon of Nicomedia','Martyr'],
+    '07-28':['Nazarius & Celsus','Martyrs'],
+    '07-29':['Martha, Mary & Lazarus','Saints'],
+    '07-30':['Peter Chrysologus','Doctor of the Church'],
+    '07-31':['Ignatius of Loyola','Founder'],
+    '08-01':['Alphonsus Liguori','Doctor of the Church'],
+    '08-02':['Eusebius of Vercelli','Bishop'],
+    '08-03':['Lydia Purpuraria','Saint'],
+    '08-04':['John Vianney','Patron of Parish Priests'],
+    '08-05':['Dedication of St. Mary Major','Memorial'],
+    '08-06':['Transfiguration of the Lord','Feast'],
+    '08-07':['Sixtus II & Companions','Martyrs'],
+    '08-08':['Dominic de Guzmán','Founder'],
+    '08-09':['Teresa Benedicta of the Cross','Martyr'],
+    '08-10':['Lawrence of Rome','Deacon & Martyr'],
+    '08-11':['Clare of Assisi','Virgin'],
+    '08-12':['Jane Frances de Chantal','Founder'],
+    '08-13':['Pontian & Hippolytus','Martyrs'],
+    '08-14':['Maximilian Kolbe','Martyr'],
+    '08-15':['Assumption of Mary','Solemnity'],
+    '08-16':['Stephen I of Hungary','King'],
+    '08-17':['Hyacinth of Kraków','Friar Preacher'],
+    '08-18':['Helena of Constantinople','Empress'],
+    '08-19':['John Eudes','Priest'],
+    '08-20':['Bernard of Clairvaux','Doctor of the Church'],
+    '08-21':['Pius X','Pope'],
+    '08-22':['Queenship of Mary','Memorial'],
+    '08-23':['Rose of Lima','Virgin'],
+    '08-24':['Bartholomew the Apostle','Feast'],
+    '08-25':['Louis IX of France','King'],
+    '08-26':['Blessed Dominic of the Mother of God','Blessed'],
+    '08-27':['Monica of Hippo','Saint'],
+    '08-28':['Augustine of Hippo','Doctor of the Church'],
+    '08-29':['Passion of John the Baptist','Memorial'],
+    '08-30':['Jeanne Jugan','Blessed'],
+    '08-31':['Aidan of Lindisfarne','Bishop'],
+    '09-01':['Giles of Provence','Abbot'],
+    '09-02':['Ingrid of Sweden','Blessed'],
+    '09-03':['Gregory the Great','Doctor of the Church'],
+    '09-04':['Rosalia of Palermo','Virgin'],
+    '09-05':['Teresa of Calcutta','Saint'],
+    '09-06':['Bega of Northumbria','Virgin'],
+    '09-07':['Regina of Alise','Martyr'],
+    '09-08':['Birth of Mary','Feast'],
+    '09-09':['Peter Claver','Priest'],
+    '09-10':['Nicholas of Tolentino','Priest'],
+    '09-11':['Protus & Hyacinth','Martyrs'],
+    '09-12':['Most Holy Name of Mary','Memorial'],
+    '09-13':['John Chrysostom','Doctor of the Church'],
+    '09-14':['Exaltation of the Holy Cross','Feast'],
+    '09-15':['Our Lady of Sorrows','Memorial'],
+    '09-16':['Cornelius & Cyprian','Martyrs'],
+    '09-17':['Robert Bellarmine','Doctor of the Church'],
+    '09-18':['Joseph of Cupertino','Priest'],
+    '09-19':['Januarius of Benevento','Martyr'],
+    '09-20':['Andrew Kim Taegon & Companions','Martyrs'],
+    '09-21':['Matthew the Apostle','Feast'],
+    '09-22':['Maurice of the Theban Legion','Martyr'],
+    '09-23':['Padre Pio of Pietrelcina','Priest'],
+    '09-24':['Our Lady of Mercy','Memorial'],
+    '09-25':['Sergius of Radonezh','Abbot'],
+    '09-26':['Cosmas & Damian','Martyrs'],
+    '09-27':['Vincent de Paul','Priest'],
+    '09-28':['Wenceslaus of Bohemia','Martyr'],
+    '09-29':['Michael, Gabriel & Raphael','Archangels'],
+    '09-30':['Jerome of Stridon','Doctor of the Church'],
+    '10-01':['Thérèse of Lisieux','Doctor of the Church'],
+    '10-02':['Guardian Angels','Memorial'],
+    '10-03':['Thomas of Hereford','Bishop'],
+    '10-04':['Francis of Assisi','Founder'],
+    '10-05':['Faustina Kowalska','Apostle of Divine Mercy'],
+    '10-06':['Bruno of Cologne','Founder'],
+    '10-07':['Our Lady of the Rosary','Memorial'],
+    '10-08':['Pelagia the Penitent','Saint'],
+    '10-09':['Denis of Paris & Companions','Martyrs'],
+    '10-10':['Francis Borgia','Jesuit'],
+    '10-11':['John XXIII','Pope'],
+    '10-12':['Wilfrid of York','Bishop'],
+    '10-13':['Edward the Confessor','King'],
+    '10-14':['Callistus I','Pope & Martyr'],
+    '10-15':['Teresa of Ávila','Doctor of the Church'],
+    '10-16':['Hedwig of Silesia','Duchess'],
+    '10-17':['Ignatius of Antioch','Bishop & Martyr'],
+    '10-18':['Luke the Evangelist','Feast'],
+    '10-19':['John de Brébeuf & Isaac Jogues','Martyrs'],
+    '10-20':['Paul of the Cross','Founder'],
+    '10-21':['Hilarion of Gaza','Abbot'],
+    '10-22':['John Paul II','Pope'],
+    '10-23':['John of Capistrano','Friar Minor'],
+    '10-24':['Anthony Mary Claret','Bishop'],
+    '10-25':['Crispin & Crispinian','Martyrs'],
+    '10-26':['Evaristus I','Pope & Martyr'],
+    '10-27':['Bartholomew of Braga','Archbishop'],
+    '10-28':['Simon & Jude','Apostles'],
+    '10-29':['Narcissus of Jerusalem','Bishop'],
+    '10-30':['Alphonsus Rodriguez','Jesuit Brother'],
+    '10-31':['Wolfgang of Regensburg','Bishop'],
+    '11-01':['All Saints','Solemnity'],
+    '11-02':['All Souls','Commemoration'],
+    '11-03':['Martin de Porres','Lay Brother'],
+    '11-04':['Charles Borromeo','Archbishop'],
+    '11-05':['Elizabeth & Zechariah','Parents of John the Baptist'],
+    '11-06':['Leonard of Noblac','Hermit'],
+    '11-07':['Willibald of Eichstätt','Bishop'],
+    '11-08':['Four Crowned Martyrs','Martyrs'],
+    '11-09':['Dedication of the Lateran Basilica','Feast'],
+    '11-10':['Leo the Great','Doctor of the Church'],
+    '11-11':['Martin of Tours','Bishop'],
+    '11-12':['Josaphat Kuntsevych','Bishop & Martyr'],
+    '11-13':['Frances Xavier Cabrini','Saint'],
+    '11-14':['Laurence O\'Toole','Archbishop'],
+    '11-15':['Albert the Great','Doctor of the Church'],
+    '11-16':['Gertrude the Great','Mystic'],
+    '11-17':['Elizabeth of Hungary','Princess'],
+    '11-18':['Rose Philippine Duchesne','Blessed'],
+    '11-19':['Mechtilde of Hackeborn','Mystic'],
+    '11-20':['Edmund the Martyr','King & Martyr'],
+    '11-21':['Presentation of Mary','Memorial'],
+    '11-22':['Cecilia of Rome','Virgin & Martyr'],
+    '11-23':['Clement I & Columban','Saints'],
+    '11-24':['Andrew Dung-Lac & Companions','Martyrs'],
+    '11-25':['Catherine of Alexandria','Virgin & Martyr'],
+    '11-26':['Leonard of Port Maurice','Priest'],
+    '11-27':['Virgil of Salzburg','Bishop'],
+    '11-28':['James of the Marches','Friar Minor'],
+    '11-29':['Saturninus of Toulouse','Bishop & Martyr'],
+    '11-30':['Andrew the Apostle','Feast'],
+    '12-01':['Edmund Campion','Martyr'],
+    '12-02':['Bibiana of Rome','Martyr'],
+    '12-03':['Francis Xavier','Apostle of the East'],
+    '12-04':['John Damascene','Doctor of the Church'],
+    '12-05':['Sabas the Sanctified','Abbot'],
+    '12-06':['Nicholas of Myra','Bishop'],
+    '12-07':['Ambrose of Milan','Doctor of the Church'],
+    '12-08':['Immaculate Conception','Solemnity'],
+    '12-09':['Juan Diego Cuauhtlatoatzin','Saint'],
+    '12-10':['Our Lady of Loreto','Memorial'],
+    '12-11':['Damasus I','Pope'],
+    '12-12':['Our Lady of Guadalupe','Feast'],
+    '12-13':['Lucy of Syracuse','Virgin & Martyr'],
+    '12-14':['John of the Cross','Doctor of the Church'],
+    '12-15':['Mary di Rosa','Founder'],
+    '12-16':['Adelaide of Italy','Empress'],
+    '12-17':['Lazarus of Bethany','Bishop'],
+    '12-18':['Flannan of Killaloe','Bishop'],
+    '12-19':['Urban V','Pope'],
+    '12-20':['Dominic of Silos','Abbot'],
+    '12-21':['Peter Canisius','Doctor of the Church'],
+    '12-22':['Zosimus of Syracuse','Bishop'],
+    '12-23':['John of Kanty','Priest'],
+    '12-24':['Charbel Makhluf','Hermit'],
+    '12-25':['Nativity of the Lord','Solemnity'],
+    '12-26':['Stephen, First Martyr','Feast'],
+    '12-27':['John the Evangelist','Feast'],
+    '12-28':['Holy Innocents','Feast'],
+    '12-29':['Thomas Becket','Bishop & Martyr'],
+    '12-30':['Egwin of Worcester','Bishop'],
+    '12-31':['Sylvester I','Pope'],
   };
 
-  const MOVEABLE_OFFSETS = [
-    { n: -46, title: 'Ash Wednesday',                        rank: 'Ash Wednesday' },
-    { n:  -7, title: 'Palm Sunday of the Lord\'s Passion',   rank: 'Solemnity' },
-    { n:  -3, title: 'Holy Thursday',                        rank: 'Solemnity' },
-    { n:  -2, title: 'Good Friday',                          rank: 'Solemnity' },
-    { n:  -1, title: 'Holy Saturday',                        rank: 'Solemnity' },
-    { n:   0, title: 'Easter Sunday',                        rank: 'Solemnity' },
-    { n:   1, title: 'Easter Monday',                        rank: 'Solemnity' },
-    { n:   7, title: 'Divine Mercy Sunday',                  rank: 'Feast' },
-    { n:  39, title: 'Ascension of the Lord',                rank: 'Solemnity' },
-    { n:  49, title: 'Pentecost Sunday',                     rank: 'Solemnity' },
-    { n:  56, title: 'Trinity Sunday',                       rank: 'Solemnity' },
-    { n:  60, title: 'Corpus Christi',                       rank: 'Solemnity' },
-    { n:  68, title: 'The Most Sacred Heart of Jesus',       rank: 'Solemnity' },
-  ];
-
-  function getTodaysFeast(date) {
-    const y = date.getFullYear();
-    const easter = getEaster(y);
-
-    for (const f of MOVEABLE_OFFSETS) {
-      if (sameDay(date, addDays(easter, f.n))) return { title: f.title, rank: f.rank, season: getLiturgicalSeason(date, easter) };
-    }
-
-    const key = `${date.getMonth() + 1}-${date.getDate()}`;
-    if (FIXED_FEASTS[key]) return { ...FIXED_FEASTS[key], season: getLiturgicalSeason(date, easter) };
-
-    return { title: null, rank: null, season: getLiturgicalSeason(date, easter) };
+  function getSaintFallback() {
+    const now = new Date();
+    const key = String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    const entry = SAINT_FALLBACK[key];
+    return entry ? { name: entry[0], title: entry[1] } : { name: 'A Holy Saint', title: 'Saint' };
   }
 
-  function getLiturgicalDayDesc(date, easter) {
-    const y = date.getFullYear();
-    const season = getLiturgicalSeason(date, easter);
-    const ords = ['','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th',
-      '11th','12th','13th','14th','15th','16th','17th','18th','19th','20th',
-      '21st','22nd','23rd','24th','25th','26th','27th','28th','29th','30th',
-      '31st','32nd','33rd','34th'];
-
-    if (season === 'Eastertide') {
-      const days = Math.round((date - easter) / 86400000) + 1;
-      return `Day ${days} of Eastertide`;
-    }
-
-    if (season === 'Lent') {
-      if (sameDay(date, addDays(easter, -46))) return 'Ash Wednesday';
-      if (sameDay(date, addDays(easter,  -7))) return 'Palm Sunday';
-      if (sameDay(date, addDays(easter,  -6))) return 'Holy Monday';
-      if (sameDay(date, addDays(easter,  -5))) return 'Holy Tuesday';
-      if (sameDay(date, addDays(easter,  -4))) return 'Holy Wednesday';
-      if (sameDay(date, addDays(easter,  -3))) return 'Holy Thursday';
-      if (sameDay(date, addDays(easter,  -2))) return 'Good Friday';
-      if (sameDay(date, addDays(easter,  -1))) return 'Holy Saturday';
-      const ash = addDays(easter, -46);
-      const days = Math.round((date - ash) / 86400000) + 1;
-      return `Day ${days} of Lent`;
-    }
-
-    if (season === 'Advent') {
-      const advent1 = getAdvent1(y);
-      const days = Math.round((date - advent1) / 86400000);
-      const week = Math.min(Math.floor(days / 7) + 1, 4);
-      return `${ords[week]} Week of Advent`;
-    }
-
-    if (season === 'Christmas Season') return 'Christmas Season';
-
-    // Ordinary Time — compute week number
-    const jan6 = new Date(y, 0, 6);
-    const jan6dow = jan6.getDay();
-    const baptism = jan6dow === 0 ? addDays(jan6, 7) : addDays(jan6, 7 - jan6dow);
-    const ash = addDays(easter, -46);
-    const pentecost = addDays(easter, 49);
-
-    let week;
-    if (date >= baptism && date < ash) {
-      week = Math.floor(Math.round((date - baptism) / 86400000) / 7) + 2;
+  // ---- Liturgical Calendar API (cpbjr.github.io — GitHub Pages, CORS enabled) ----
+  function _mapApiLiturgicalData(data) {
+    const rankMap = {
+      SOLEMNITY: 'Solemnity', FEAST: 'Feast',
+      MEMORIAL: 'Memorial', OPTIONAL_MEMORIAL: 'Optional Memorial',
+      COMMEMORATION: 'Commemoration',
+    };
+    const season = data.season || 'Ordinary Time';
+    const cel = data.celebration;
+    const apiRank = cel && rankMap[cel.type];
+    let feast, litDay;
+    if (apiRank) {
+      // Named feast, memorial, or solemnity
+      feast = { title: cel.name, rank: apiRank, season };
+      litDay = season;
+    } else if (cel && cel.name) {
+      // Feria or other unlisted type — show the day name, no rank label
+      feast = { title: cel.name, rank: '', season };
+      litDay = season;
     } else {
-      const weeksBeforeAsh = Math.floor(Math.round((ash - baptism) / 86400000) / 7) + 1;
-      week = weeksBeforeAsh + Math.floor(Math.round((date - pentecost) / 86400000) / 7) + 1;
-      week = Math.min(week, 34);
+      feast = { title: null, rank: null, season };
+      litDay = season;
     }
-    return `${ords[week] || week + 'th'} Week of Ordinary Time`;
+    return { feast, litDay };
+  }
+
+  async function fetchLiturgicalData() {
+    const today = new Date().toDateString();
+    const cacheKey = 'litDataV2_' + today;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try { return JSON.parse(cached); } catch {}
+    }
+    const now = new Date();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const url = `https://cpbjr.github.io/catholic-readings-api/liturgical-calendar/${now.getFullYear()}/${mm}-${dd}.json`;
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`Liturgical API error ${r.status}`);
+    const data = await r.json();
+    const result = _mapApiLiturgicalData(data);
+    localStorage.setItem(cacheKey, JSON.stringify(result));
+    return result;
+  }
+
+  // ---- Daily Mass Readings (cpbjr references + bible-api.com text) ----
+  async function fetchDailyReadings() {
+    const today = new Date().toDateString();
+    const cacheKey = 'readingsV2_' + today;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) { try { return JSON.parse(cached); } catch {} }
+
+    const now = new Date();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const refUrl = `https://cpbjr.github.io/catholic-readings-api/readings/${now.getFullYear()}/${mm}-${dd}.json`;
+    const refRes = await fetch(refUrl);
+    if (!refRes.ok) throw new Error('Reading references not found');
+    const refData = await refRes.json();
+    const { firstReading, psalm, gospel } = refData.readings;
+
+    async function getVerseText(ref) {
+      try {
+        const r = await fetch(`https://bible-api.com/${encodeURIComponent(ref)}?translation=web`);
+        if (!r.ok) return '';
+        const d = await r.json();
+        return (d.text || '').trim();
+      } catch { return ''; }
+    }
+
+    const [frText, psText, gsText] = await Promise.all([
+      getVerseText(firstReading),
+      getVerseText(psalm),
+      getVerseText(gospel),
+    ]);
+
+    const result = {
+      sections: [
+        { label: 'First Reading',      cite: firstReading, text: frText },
+        { label: 'Responsorial Psalm', cite: psalm,        text: psText },
+        { label: 'Gospel',             cite: gospel,       text: gsText },
+      ],
+      usccbLink: refData.usccbLink || '',
+    };
+    localStorage.setItem(cacheKey, JSON.stringify(result));
+    return result;
+  }
+
+  function toggleReading(i) {
+    document.getElementById('ri-' + i)?.classList.toggle('open');
+  }
+
+  function loadReadingsCard() {
+    const list = document.getElementById('readings-list');
+    if (!list) return;
+
+    fetchDailyReadings().then(d => {
+      const chevronSVG = `<svg class="reading-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+      list.innerHTML = d.sections.map((s, i) => `
+        <div class="reading-item" id="ri-${i}">
+          <div class="reading-header" onclick="toggleReading(${i})">
+            <div>
+              <div class="reading-label">${s.label}</div>
+              ${s.cite ? `<div class="reading-cite">${s.cite}</div>` : ''}
+            </div>
+            ${chevronSVG}
+          </div>
+          <div class="reading-body">${s.text || `<em style="color:var(--ink-soft);font-size:14px">${s.cite}</em>`}</div>
+        </div>`).join('') +
+        (d.usccbLink ? `<a href="${d.usccbLink}" target="_blank" rel="noopener" style="display:block;font-size:11.5px;color:var(--gold);text-align:right;padding:10px 0 2px;font-weight:600;letter-spacing:0.03em;text-decoration:none">Full readings at USCCB ↗</a>` : '');
+    }).catch(() => {
+      if (list) list.innerHTML = '<p style="font-size:13px;color:var(--ink-soft);padding:4px 0 14px">Unable to load readings. Check your connection.</p>';
+    });
   }
 
   // ---- Home Screen: Dynamic Data ----
@@ -1898,6 +2411,9 @@
     // Daily reflection (cached per day)
     loadDailyReflection();
 
+    // Mass readings (cached per day)
+    loadReadingsCard();
+
     // Verse of the day
     try {
       const vr = await fetch('https://beta.ourmanna.com/api/v1/get/?format=json');
@@ -1908,26 +2424,26 @@
       if (vCite && vd.verse?.details?.reference) vCite.textContent = '— ' + vd.verse.details.reference;
     } catch {}
 
-    // Feast day + liturgical day description (computed locally — accurate & offline)
-    const easter = getEaster(now.getFullYear());
-    const feast  = getTodaysFeast(now);
-    const litDay = getLiturgicalDayDesc(now, easter);
+    // Feast day + liturgical day description (from API, falls back offline)
+    const { feast, litDay } = await fetchLiturgicalData();
     const fName  = document.getElementById('feast-name');
     const fTitle = document.getElementById('feast-title');
     const hSub   = document.getElementById('home-subgreet');
-    if (feast.title) {
+    if (feast.title && feast.rank) {
       if (fName)  fName.textContent  = feast.title;
-      if (fTitle) fTitle.textContent = feast.rank || '';
+      if (fTitle) fTitle.textContent = feast.rank;
       if (hSub)   hSub.textContent   = `${litDay} · ${feast.title}`;
     } else {
-      if (fName)  fName.textContent  = feast.season || 'Ordinary Time';
-      if (fTitle) fTitle.textContent = litDay;
-      if (hSub)   hSub.textContent   = litDay;
+      const fb = getSaintFallback();
+      if (fName)  fName.textContent  = fb.name;
+      if (fTitle) fTitle.textContent = fb.title;
+      if (hSub)   hSub.textContent   = feast.title || litDay || feast.season || '';
     }
 
-    // Keep saint chip label in sync with today's feast
+    // Keep saint chip label in sync with today's saint
     const saintChip = document.getElementById('chip-saint');
-    if (saintChip && feast.title) saintChip.textContent = `✦ ${feast.title}`;
+    const chipName = (feast.title && feast.rank) ? feast.title : getSaintFallback().name;
+    if (saintChip) saintChip.textContent = `✦ ${chipName}`;
   }
 
   // ---- Saints Screen ----
@@ -1938,52 +2454,65 @@
     if (saintsLoaded) return;
     saintsLoaded = true;
 
-    const now = new Date();
     const nameEl  = document.getElementById('saint-today-name');
     const titleEl = document.getElementById('saint-today-title');
     const bioEl   = document.getElementById('saint-bio-text');
 
-    // Feast from local calendar — no network required
-    const feast = getTodaysFeast(now);
-    const saintName = feast.title;
-
-    if (saintName && nameEl) {
-      nameEl.textContent = saintName;
-      nameEl.classList.remove('skel');
-      if (titleEl) titleEl.textContent = feast.rank || feast.season || '';
-      currentSaint.name = saintName;
-
-      // Wikipedia bio — try multiple name forms to avoid disambiguation pages
-      const strippedName = saintName
-        .replace(/^(Saints?|Sts?\.|Blesseds?|Bl\.)\s+/i, '')
-        .replace(/\s*\(.*?\)/g, '')
-        .split(',')[0].split(' and ')[0].trim();
-
-      async function tryWiki(name) {
+    async function tryWiki(name) {
+      try {
         const r = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name)}`);
         if (!r.ok) return null;
         const d = await r.json();
         if (d.type === 'disambiguation' || (d.extract || '').toLowerCase().includes('may refer to')) return null;
         return d.extract || null;
-      }
+      } catch { return null; }
+    }
 
-      if (bioEl) {
-        bioEl.textContent = 'Loading biography…';
-        try {
-          const bio =
-            await tryWiki('Saint ' + strippedName) ||
-            await tryWiki(strippedName) ||
-            await tryWiki(saintName);
-          bioEl.textContent = bio || 'No Wikipedia biography found for this feast.';
-          currentSaint.bio = bio || '';
-        } catch {
-          bioEl.textContent = 'Biography unavailable at this time.';
+    async function searchWiki(query) {
+      try {
+        const r = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*&srlimit=3`);
+        if (!r.ok) return null;
+        const d = await r.json();
+        for (const result of (d.query?.search || [])) {
+          const bio = await tryWiki(result.title);
+          if (bio) return bio;
         }
-      }
+        return null;
+      } catch { return null; }
+    }
+
+    async function loadBio(displayName) {
+      if (!bioEl) return;
+      bioEl.textContent = 'Loading biography…';
+      const stripped = displayName
+        .replace(/^(Saints?|Sts?\.|Blesseds?|Bl\.)\s+/i, '')
+        .replace(/\s*\(.*?\)/g, '')
+        .split(',')[0].split(' & ')[0].split(' and ')[0].trim();
+      const bio =
+        await tryWiki('Saint ' + stripped) ||
+        await tryWiki(stripped) ||
+        await tryWiki(displayName) ||
+        await searchWiki(stripped + ' saint Catholic');
+      bioEl.textContent = bio || 'No biography found for this saint.';
+      currentSaint.bio = bio || '';
+    }
+
+    const { feast } = await fetchLiturgicalData();
+
+    if (feast.title && feast.rank && nameEl) {
+      // Recognized feast, memorial, or solemnity — full saint display + Wikipedia
+      nameEl.textContent = feast.title;
+      nameEl.classList.remove('skel');
+      if (titleEl) titleEl.textContent = feast.rank;
+      currentSaint.name = feast.title;
+      await loadBio(feast.title);
     } else {
-      if (nameEl) { nameEl.textContent = feast.season || 'Ordinary Time'; nameEl.classList.remove('skel'); }
-      if (titleEl) titleEl.textContent = '';
-      if (bioEl)   bioEl.textContent = 'No particular feast or memorial is assigned to today in the Ordinary Form of the Roman Rite.';
+      // Feria or no feast — use static saint fallback + Wikipedia
+      const fb = getSaintFallback();
+      if (nameEl) { nameEl.textContent = fb.name; nameEl.classList.remove('skel'); }
+      if (titleEl) titleEl.textContent = fb.title;
+      currentSaint.name = fb.name;
+      await loadBio(fb.name);
     }
   }
 
@@ -2029,24 +2558,30 @@
   async function loadNearbyChurches() {
     const content = document.getElementById('mass-content');
     if (!content) return;
-    content.innerHTML = '<p style="font-size:13px;color:var(--ink-soft);padding:6px 0">Getting your location…</p>';
 
-    let lat, lon;
-    try {
-      const pos = await new Promise((res, rej) =>
-        navigator.geolocation.getCurrentPosition(res, rej, { timeout: 10000 })
-      );
-      lat = pos.coords.latitude;
-      lon = pos.coords.longitude;
-      localStorage.setItem('churchLat', lat);
-      localStorage.setItem('churchLon', lon);
-    } catch (err) {
-      const msg = err.code === 1
-        ? 'Location access denied — enable it in browser settings.'
-        : 'Could not get location. Try again.';
-      content.innerHTML = `<p style="font-size:13px;color:var(--ink-soft);padding:6px 0">${msg}</p>
-        <button class="btn btn-gold" onclick="loadNearbyChurches()" style="width:100%;margin-top:6px">Try Again</button>`;
-      return;
+    // Use saved coordinates if we have them — never re-prompt the user
+    let lat = parseFloat(localStorage.getItem('churchLat'));
+    let lon = parseFloat(localStorage.getItem('churchLon'));
+
+    if (!lat || !lon) {
+      // First time: ask for location once, then save it permanently
+      content.innerHTML = '<p style="font-size:13px;color:var(--ink-soft);padding:6px 0">Getting your location…</p>';
+      try {
+        const pos = await new Promise((res, rej) =>
+          navigator.geolocation.getCurrentPosition(res, rej, { timeout: 10000 })
+        );
+        lat = pos.coords.latitude;
+        lon = pos.coords.longitude;
+        localStorage.setItem('churchLat', lat);
+        localStorage.setItem('churchLon', lon);
+      } catch (err) {
+        const msg = err.code === 1
+          ? 'Location access denied — enable it in browser settings.'
+          : 'Could not get location. Try again.';
+        content.innerHTML = `<p style="font-size:13px;color:var(--ink-soft);padding:6px 0">${msg}</p>
+          <button class="btn btn-gold" onclick="loadNearbyChurches()" style="width:100%;margin-top:6px">Try Again</button>`;
+        return;
+      }
     }
 
     content.innerHTML = '<p style="font-size:13px;color:var(--ink-soft);padding:6px 0">Finding nearby churches…</p>';
@@ -2132,10 +2667,7 @@
       const perm = await Notification.requestPermission();
       if (perm !== 'granted') return;
     }
-    const now    = new Date();
-    const easter = getEaster(now.getFullYear());
-    const feast  = getTodaysFeast(now);
-    const litDay = getLiturgicalDayDesc(now, easter);
+    const { feast, litDay } = await fetchLiturgicalData();
     const title  = feast.title ? `✦ ${feast.title}` : '✦ Daily Faith';
     const body   = `${litDay} — tap to open your daily readings.`;
     try {
@@ -2148,6 +2680,88 @@
       });
     } catch (err) {
       console.error('Test notification failed:', err);
+    }
+  }
+
+  // ---- Notification Center ----
+  async function openNotificationCenter() {
+    const feastEl    = document.getElementById('feast-name');
+    const feastTitEl = document.getElementById('feast-title');
+    const verseEl    = document.getElementById('verse-text');
+    const verseCiteEl= document.getElementById('verse-cite');
+
+    const feastName  = feastEl     ? feastEl.textContent.trim()     : '—';
+    const feastTitle = feastTitEl  ? feastTitEl.textContent.trim()  : '';
+    const verseText  = verseEl     ? verseEl.textContent.trim()     : '';
+    const verseCite  = verseCiteEl ? verseCiteEl.textContent.trim() : '';
+    const reflection = localStorage.getItem('reflectionText') || '';
+
+    const now    = new Date();
+    const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const dateStr = `${DAYS[now.getDay()]}, ${MONTHS[now.getMonth()]} ${now.getDate()}`;
+
+    const isEnabled = localStorage.getItem('pushEnabled') === 'true';
+
+    const html = `
+      <div style="padding-bottom:4px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;color:var(--gold);text-transform:uppercase;margin-bottom:18px">${dateStr}</div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--parchment);border-radius:14px;margin-bottom:20px;gap:16px">
+          <div>
+            <div style="font-size:14.5px;font-weight:600;color:var(--ink)">Daily Reminders</div>
+            <div style="font-size:12px;color:var(--ink-soft);margin-top:2px" id="nc-notif-label">${isEnabled ? 'Notifications are on' : 'Tap to enable'}</div>
+          </div>
+          <label class="toggle" aria-label="Toggle notifications">
+            <input type="checkbox" id="nc-notif-toggle" ${isEnabled ? 'checked' : ''} onchange="handleNCNotifToggle(this)" />
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
+        </div>
+
+        <div style="margin-bottom:18px">
+          <div class="card-label">Saint of the Day</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--ink);line-height:1.2;margin-bottom:3px">${feastName}</div>
+          ${feastTitle ? `<div style="font-size:12px;color:var(--ink-soft)">${feastTitle}</div>` : ''}
+        </div>
+
+        ${verseText ? `
+        <div style="background:var(--parchment);border:1px solid var(--gold-soft);border-radius:14px;padding:16px;margin-bottom:18px">
+          <div class="card-label" style="margin-bottom:8px">Verse of the Day</div>
+          <p style="font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;line-height:1.5;color:var(--ink);margin:0 0 8px">${verseText}</p>
+          <div style="font-size:12px;color:var(--ink-soft);text-align:right">${verseCite}</div>
+        </div>` : ''}
+
+        ${reflection ? `
+        <div style="margin-bottom:20px">
+          <div class="card-label">Today's Reflection</div>
+          <p style="font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;line-height:1.65;color:var(--ink-soft);margin:0">${reflection}</p>
+        </div>` : ''}
+
+        <button class="btn btn-outline" id="nc-test-btn" onclick="sendTestNotification()"
+          style="width:100%;font-size:13.5px;${isEnabled ? '' : 'display:none'}">
+          Send Test Notification
+        </button>
+      </div>
+    `;
+
+    openCModal("Today's Briefing", html, false);
+  }
+
+  async function handleNCNotifToggle(cb) {
+    const label   = document.getElementById('nc-notif-label');
+    const testBtn = document.getElementById('nc-test-btn');
+    if (cb.checked) {
+      if (label) label.textContent = 'Enabling…';
+      await enablePush();
+      const ok = localStorage.getItem('pushEnabled') === 'true';
+      cb.checked = ok;
+      if (label)   label.textContent = ok ? 'Notifications are on' : 'Permission denied — check settings';
+      if (testBtn) testBtn.style.display = ok ? '' : 'none';
+    } else {
+      await disablePush();
+      if (label)   label.textContent = 'Tap to enable';
+      if (testBtn) testBtn.style.display = 'none';
     }
   }
 
