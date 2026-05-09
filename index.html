@@ -2311,7 +2311,9 @@
 
     async function getVerseText(ref) {
       try {
-        const r = await fetch(`https://bible-api.com/${encodeURIComponent(ref)}?translation=web`);
+        // bible-api.com can't handle "Ps 57:8-9, 10 and 12" — simplify to first range
+        const simplified = ref.replace(/,.*$/, '').replace(/\s+and\s+\S+/g, '').trim();
+        const r = await fetch(`https://bible-api.com/${encodeURIComponent(simplified)}?translation=web`);
         if (!r.ok) return '';
         const d = await r.json();
         return (d.text || '').trim();
