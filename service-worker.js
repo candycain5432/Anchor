@@ -1,8 +1,7 @@
-const CACHE_NAME = 'daily-faith-v6';
+const CACHE_NAME = 'daily-faith-v7';
 
+// index.html is intentionally excluded — navigation is always network-first
 const STATIC_ASSETS = [
-  './',
-  './index.html',
   './manifest.json',
   './offline.html',
   './icons/icon-192.svg',
@@ -23,6 +22,11 @@ self.addEventListener('activate', event => {
     )
   );
   self.clients.claim();
+});
+
+// Allow the app to trigger an immediate SW swap without waiting for tab close
+self.addEventListener('message', event => {
+  if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
 // ---- Push Notifications ----
@@ -54,7 +58,7 @@ self.addEventListener('notificationclick', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // API: network-first, graceful offline message on failure
+  // External APIs: network-only with graceful offline fallback
   if (url.hostname === 'project-veritas-backend.onrender.com') {
     event.respondWith(
       fetch(event.request).catch(() =>
@@ -67,7 +71,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Google Fonts: cache-first
+  // Google Fonts: cache-first (rarely changes, safe to cache long-term)
   if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
     event.respondWith(
       caches.match(event.request).then(cached => {
@@ -84,7 +88,24 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Everything else: cache-first, network fallback, offline page for navigation
+  // Navigation (index.html): network-first so updates are seen immediately
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).then(response => {
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+        }
+        return response;
+      }).catch(() =>
+        caches.match(event.request)
+          .then(cached => cached || caches.match('./offline.html'))
+      )
+    );
+    return;
+  }
+
+  // Everything else (icons, manifest, etc.): cache-first, network fallback
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
@@ -94,11 +115,7 @@ self.addEventListener('fetch', event => {
           caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
         }
         return response;
-      }).catch(() => {
-        if (event.request.mode === 'navigate') {
-          return caches.match('./offline.html');
-        }
-      });
+      }).catch(() => {});
     })
   );
 });
