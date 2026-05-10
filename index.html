@@ -20,19 +20,74 @@
 <style>
   :root {
     --navy:        #1a2547;
-    --navy-deep:   #141c38;
+    --navy-deep:   #111b3a;
     --gold:        #c9a449;
-    --gold-light:  #e0c076;
-    --gold-soft:   #efe3c4;
-    --parchment:   #f5f2ec;
+    --gold-light:  #ddb95e;
+    --gold-soft:   #f0e4c4;
+    --parchment:   #f6f3ed;
     --card:        #ffffff;
-    --ink:         #2b2a26;
+    --ink:         #252320;
     --ink-soft:    #6b6a63;
-    --ink-mute:    #a7a59c;
-    --line:        #e8e4d9;
-    --shadow-sm:   0 1px 2px rgba(26,37,71,0.06);
-    --shadow-md:   0 4px 14px rgba(26,37,71,0.08);
+    --ink-mute:    #a9a79f;
+    --line:        #ebe7dc;
+    --shadow-sm:   0 2px 6px rgba(26,37,71,0.07);
+    --shadow-md:   0 6px 20px rgba(26,37,71,0.10);
+    --shadow-lg:   0 16px 40px rgba(26,37,71,0.14);
+    --radius:      20px;
     --nav-height:  90px;
+  }
+
+  /* ---------- Liturgical Season Theming ---------- */
+  [data-season="ADVENT"] {
+    --season-a: #2a1f45;
+    --season-b: #1a1030;
+    --season-accent: #9b7ec7;
+  }
+  [data-season="LENT"] {
+    --season-a: #2d1426;
+    --season-b: #1e0c1a;
+    --season-accent: #a85088;
+  }
+  [data-season="EASTER"] {
+    --season-a: #1a2f20;
+    --season-b: #0f1e14;
+    --season-accent: #5aab72;
+  }
+
+  [data-season="ADVENT"] .header,
+  [data-season="LENT"] .header,
+  [data-season="EASTER"] .header {
+    background: linear-gradient(165deg, var(--season-a) 0%, var(--season-b) 100%);
+  }
+  [data-season="ADVENT"] .nav-center-btn,
+  [data-season="LENT"] .nav-center-btn {
+    background: linear-gradient(145deg, #b89be0 0%, var(--season-accent) 50%, #7a5cad 100%);
+    box-shadow: 0 8px 28px rgba(123,92,173,0.45), 0 2px 8px rgba(26,37,71,0.2), inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  [data-season="ADVENT"] .btn-gold,
+  [data-season="LENT"] .btn-gold {
+    background: linear-gradient(135deg, #b89be0 0%, var(--season-accent) 100%);
+    box-shadow: 0 3px 10px rgba(123,94,167,0.38);
+  }
+  [data-season="ADVENT"] .card-label::before,
+  [data-season="LENT"] .card-label::before { color: var(--season-accent); }
+  [data-season="ADVENT"] .card-label,
+  [data-season="LENT"] .card-label { color: var(--season-accent); }
+  [data-season="ADVENT"] .nav-item.active::after,
+  [data-season="LENT"] .nav-item.active::after { background: var(--season-accent); }
+  [data-season="ADVENT"] .verse-card { border-color: rgba(155,126,199,0.42); }
+  [data-season="LENT"] .verse-card { border-color: rgba(168,80,136,0.42); }
+
+  .season-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 12px; border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.11);
+    color: rgba(255,255,255,0.84);
+    margin-top: 8px; width: fit-content;
+    position: relative; z-index: 1;
   }
 
   /* ---------- Dark mode ---------- */
@@ -51,11 +106,15 @@
   [data-theme="dark"] .app { background: var(--parchment); }
   [data-theme="dark"] .verse-card,
   [data-theme="dark"] .answer-card,
-  [data-theme="dark"] .reflect-card,
   [data-theme="dark"] .readings-card {
     background: var(--card);
     border-color: var(--line);
   }
+  [data-theme="dark"] .reflect-card {
+    background: var(--card);
+    border-left-color: var(--gold);
+  }
+  [data-theme="dark"] .verse-card::before { color: rgba(201,164,73,0.07); }
   [data-theme="dark"] .nav-bg path { fill: #1a2547; }
   [data-theme="dark"] #ai-input-bar { background: var(--parchment); }
   [data-theme="dark"] .nav-item.active { color: #ffffff; }
@@ -120,21 +179,33 @@
   }
 
   .header {
-    background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
+    background: linear-gradient(165deg, #1e2c56 0%, var(--navy-deep) 100%);
     color: #fff;
-    padding: calc(env(safe-area-inset-top, 0px) + 20px) 24px 36px;
-    border-radius: 0 0 28px 28px;
+    padding: calc(env(safe-area-inset-top, 0px) + 22px) 24px 40px;
+    border-radius: 0 0 32px 32px;
     position: relative;
     overflow: hidden;
     flex-shrink: 0;
+    box-shadow: 0 8px 32px rgba(17,27,58,0.28);
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    border: 52px solid rgba(201,164,73,0.07);
+    pointer-events: none;
   }
   .header::after {
     content: '';
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(circle at 85% 15%, rgba(201,164,73,0.10) 0%, transparent 50%),
-      radial-gradient(circle at 10% 90%, rgba(201,164,73,0.05) 0%, transparent 40%);
+      radial-gradient(circle at 88% 18%, rgba(201,164,73,0.13) 0%, transparent 45%),
+      radial-gradient(circle at 8% 85%, rgba(201,164,73,0.06) 0%, transparent 38%);
     pointer-events: none;
   }
 
@@ -142,73 +213,73 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
     position: relative;
     z-index: 1;
   }
   .date-tag {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    color: var(--gold-light);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: rgba(224,192,118,0.85);
     text-transform: uppercase;
   }
   .bell {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background: var(--gold);
+    background: rgba(201,164,73,0.18);
+    border: 1px solid rgba(201,164,73,0.35);
     display: grid;
     place-items: center;
-    border: none;
-    color: var(--navy);
     cursor: pointer;
-    transition: transform .2s ease;
-    box-shadow: 0 4px 10px rgba(201,164,73,0.3);
+    transition: background .2s ease, transform .2s ease;
+    color: var(--gold-light);
   }
-  .bell:active { transform: scale(0.92); }
+  .bell:active { transform: scale(0.92); background: rgba(201,164,73,0.28); }
   .bell svg { width: 18px; height: 18px; }
 
   .greeting {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 34px;
+    font-size: 40px;
     font-weight: 500;
-    line-height: 1.05;
-    letter-spacing: -0.01em;
-    margin: 0 0 6px;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
     position: relative;
     z-index: 1;
   }
   .subgreet {
-    font-size: 14px;
-    color: rgba(255,255,255,0.65);
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.55);
     margin: 0;
     position: relative;
     z-index: 1;
     font-weight: 400;
+    letter-spacing: 0.01em;
   }
 
-  .header-chat { text-align: center; padding-bottom: 28px; position: relative; }
+  .header-chat { text-align: center; padding-bottom: 32px; position: relative; }
   .header-chat .eyebrow {
     font-size: 10px;
     letter-spacing: 0.28em;
-    color: var(--gold-light);
+    color: rgba(224,192,118,0.75);
     text-transform: uppercase;
-    font-weight: 600;
-    margin-bottom: 8px;
+    font-weight: 700;
+    margin-bottom: 10px;
   }
   .header-chat .title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 30px;
+    font-size: 36px;
     font-weight: 500;
-    margin: 0 0 4px;
-    letter-spacing: -0.01em;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
   }
   .header-chat .sub {
     font-style: italic;
     font-family: 'Cormorant Garamond', serif;
     font-size: 15px;
-    color: rgba(255,255,255,0.6);
+    color: rgba(255,255,255,0.52);
   }
 
   .scroll {
@@ -223,22 +294,40 @@
 
   .card {
     background: var(--card);
-    border-radius: 16px;
-    padding: 18px;
+    border-radius: var(--radius);
+    padding: 20px;
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--line);
     margin-bottom: 14px;
   }
   .verse-card {
-    background: linear-gradient(135deg, #fff 0%, #fdfaf1 100%);
-    border: 1px solid var(--gold-soft);
+    background: linear-gradient(150deg, #ffffff 0%, #fffcf3 100%);
+    border: 1px solid rgba(201,164,73,0.42);
+    padding: 24px 22px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .verse-card::before {
+    content: '\201C';
+    position: absolute;
+    top: -4px;
+    left: 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 130px;
+    line-height: 1;
+    color: rgba(201,164,73,0.10);
+    pointer-events: none;
+    user-select: none;
   }
   .reflect-card {
-    background: linear-gradient(135deg, #f7f4f0 0%, #fdfaf1 100%);
-    border: 1px solid var(--gold-soft);
+    background: linear-gradient(150deg, #fdfaf4 0%, #fff9ee 100%);
+    border: none;
+    border-left: 3.5px solid var(--gold);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding-left: 22px;
   }
   .reflect-text {
-    font-size: 20px;
+    font-size: 19.5px;
     line-height: 1.65;
     color: var(--ink);
     font-style: italic;
@@ -255,29 +344,33 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
   }
-  .card-label::before { content: '✦'; font-size: 11px; color: var(--gold); }
+  .card-label::before { content: '✦'; font-size: 10px; color: var(--gold); }
   .verse-text {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 19px;
+    font-size: 21px;
     font-style: italic;
-    line-height: 1.45;
+    line-height: 1.5;
     color: var(--ink);
-    margin: 4px 0 12px;
+    margin: 6px 0 14px;
     font-weight: 500;
+    position: relative;
+    z-index: 1;
   }
   .verse-cite {
     font-size: 12px;
     color: var(--ink-soft);
     text-align: right;
-    font-weight: 500;
-    letter-spacing: 0.04em;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    position: relative;
+    z-index: 1;
   }
 
   .readings-card {
     background: linear-gradient(135deg, #fff 0%, #f9f7f3 100%);
-    border: 1px solid var(--gold-soft);
+    border: 1px solid rgba(201,164,73,0.42);
     padding: 18px 18px 4px;
   }
   .reading-item { border-bottom: 1px solid var(--line); }
@@ -312,81 +405,96 @@
   }
   .reading-item.open .reading-body { display: block; }
 
-  .feast-card { display: flex; padding: 0; overflow: hidden; min-height: 108px; }
+  .feast-card { display: flex; padding: 0; overflow: hidden; min-height: 112px; border-radius: var(--radius); }
   .feast-art {
-    width: 108px;
+    width: 100px;
     flex-shrink: 0;
-    background: repeating-linear-gradient(45deg, var(--gold-soft) 0px, var(--gold-soft) 8px, #f5e9c8 8px, #f5e9c8 16px);
+    background: linear-gradient(160deg, #1e2d5a 0%, var(--navy-deep) 100%);
     position: relative;
     display: grid;
     place-items: center;
   }
-  .feast-art::after {
+  .feast-art::before {
     content: '';
     position: absolute;
-    width: 44px;
-    height: 44px;
-    border: 2px solid rgba(201,164,73,0.4);
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, transparent 70%);
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(201,164,73,0.22) 0%, transparent 65%);
+    pointer-events: none;
   }
-  .feast-body { padding: 16px 18px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .feast-art::after {
+    content: '✝';
+    font-size: 42px;
+    color: var(--gold);
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 0 28px rgba(201,164,73,0.55);
+    line-height: 1;
+  }
+  .feast-body { padding: 18px 20px; flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 3px; }
   .feast-label {
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.22em;
     color: var(--gold);
     text-transform: uppercase;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
   }
   .feast-name {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
+    font-size: 23px;
     font-weight: 600;
     color: var(--ink);
-    margin: 0 0 2px;
+    margin: 0;
+    line-height: 1.15;
   }
-  .feast-title { font-size: 12.5px; color: var(--ink-soft); }
+  .feast-title { font-size: 12px; color: var(--ink-soft); margin: 0; }
 
   .actions-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
   .action-card {
     background: var(--card);
-    border-radius: 16px;
-    padding: 14px;
+    border-radius: var(--radius);
+    padding: 18px 16px 16px;
     border: 1px solid var(--line);
     box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 110px;
+    min-height: 148px;
+  }
+  .action-icon {
+    width: 46px; height: 46px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--gold-soft) 0%, #fdefc8 100%);
+    display: grid;
+    place-items: center;
+    font-size: 22px;
+    margin-bottom: 10px;
+    flex-shrink: 0;
   }
   .action-head {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.18em;
-    color: var(--gold);
+    letter-spacing: 0.14em;
+    color: var(--ink);
     text-transform: uppercase;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+    margin-bottom: 2px;
   }
-  .action-title { font-size: 14px; font-weight: 600; color: var(--ink); margin: 0 0 2px; line-height: 1.2; }
-  .action-meta { font-size: 11.5px; color: var(--ink-soft); }
+  .action-title { font-size: 13px; font-weight: 500; color: var(--ink-soft); margin: 0 0 2px; line-height: 1.3; }
+  .action-meta { font-size: 11px; color: var(--ink-mute); }
   .btn {
     margin-top: 10px;
-    padding: 9px 16px;
+    padding: 10px 16px;
     border-radius: 999px;
     font-size: 12.5px;
     font-weight: 600;
     border: none;
     cursor: pointer;
     font-family: inherit;
-    transition: transform .15s ease;
+    transition: transform .15s ease, box-shadow .15s ease;
   }
   .btn:active { transform: scale(0.96); }
-  .btn-gold { background: var(--gold); color: #fff; box-shadow: 0 2px 6px rgba(201,164,73,0.3); }
-  .btn-outline { background: transparent; color: var(--navy); border: 1.5px solid var(--navy); }
+  .btn-gold { background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%); color: #fff; box-shadow: 0 3px 10px rgba(201,164,73,0.35); }
+  .btn-outline { background: transparent; color: var(--navy); border: 1.5px solid rgba(26,37,71,0.3); }
 
   .mass-card { padding: 16px 18px; }
   .mass-head {
@@ -423,16 +531,16 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-around;
-    padding: 12px 12px 6px;
+    padding: 10px 8px calc(env(safe-area-inset-bottom, 6px) + 4px);
     background: transparent;
     z-index: 20;
   }
   .nav-bg {
     position: absolute;
-    left: 0; right: 0; bottom: 0; top: -40px;
+    left: 0; right: 0; bottom: 0; top: -48px;
     width: 100%;
     pointer-events: none;
-    filter: drop-shadow(0 -4px 16px rgba(26,37,71,0.08));
+    filter: drop-shadow(0 -2px 20px rgba(26,37,71,0.10));
   }
   .nav-bg svg { width: 100%; height: 100%; display: block; overflow: visible; }
   .nav-item {
@@ -442,20 +550,30 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    padding: 6px 8px;
+    gap: 3px;
+    padding: 6px 10px 4px;
     font-family: inherit;
     color: var(--ink-mute);
     transition: color .2s ease;
     flex: 1;
-    max-width: 70px;
+    max-width: 72px;
     position: relative;
     z-index: 2;
   }
-  .nav-item svg { width: 22px; height: 22px; }
-  .nav-item .label { font-size: 10.5px; font-weight: 500; letter-spacing: 0.02em; }
+  .nav-item svg { width: 22px; height: 22px; transition: transform .2s ease; }
+  .nav-item .label { font-size: 10px; font-weight: 600; letter-spacing: 0.03em; }
   .nav-item.active { color: var(--navy); }
-  .nav-item.active svg { stroke: var(--navy); }
+  .nav-item.active svg { stroke: var(--navy); transform: translateY(-1px); }
+  .nav-item.active .label { color: var(--navy); }
+  .nav-item.active::after {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    margin: 1px auto 0;
+  }
 
   .nav-center {
     position: relative;
@@ -463,35 +581,35 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    margin: 0 6px;
+    gap: 3px;
+    margin: 0 4px;
     z-index: 2;
     cursor: pointer;
   }
   .nav-center-btn {
-    width: 62px;
-    height: 62px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 60%, #b38d38 100%);
+    background: linear-gradient(145deg, #ddb95e 0%, var(--gold) 50%, #b38b30 100%);
     border: none;
-    box-shadow: 0 10px 24px rgba(201,164,73,0.4), 0 4px 10px rgba(26,37,71,0.18), inset 0 1px 0 rgba(255,255,255,0.5);
+    box-shadow: 0 8px 28px rgba(201,164,73,0.45), 0 2px 8px rgba(26,37,71,0.2), inset 0 1px 0 rgba(255,255,255,0.45);
     display: grid;
     place-items: center;
     cursor: pointer;
-    transform: translateY(-16px);
+    transform: translateY(-18px);
     transition: transform .2s ease, box-shadow .2s ease;
   }
-  .nav-center-btn:active { transform: translateY(-14px) scale(0.94); }
-  .nav-center-btn svg { width: 24px; height: 24px; color: #fff; }
+  .nav-center-btn:active { transform: translateY(-15px) scale(0.93); }
+  .nav-center-btn svg { width: 26px; height: 26px; color: #fff; }
   .nav-center .label {
-    font-size: 10.5px;
-    font-weight: 600;
-    color: var(--navy);
-    margin-top: -4px;
-    letter-spacing: 0.02em;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-top: -12px;
+    letter-spacing: 0.03em;
   }
   .nav-center.active .nav-center-btn {
-    box-shadow: 0 12px 30px rgba(201,164,73,0.55), 0 2px 6px rgba(26,37,71,0.2), inset 0 1px 0 rgba(255,255,255,0.55);
+    box-shadow: 0 12px 36px rgba(201,164,73,0.60), 0 2px 8px rgba(26,37,71,0.2), inset 0 1px 0 rgba(255,255,255,0.5);
   }
 
   /* ---------- AI Chat ---------- */
@@ -748,8 +866,8 @@
   .pray-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 16px;
+    border-radius: var(--radius);
+    padding: 18px 16px 16px;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -760,79 +878,100 @@
   }
   .pray-card:active { transform: scale(0.97); box-shadow: none; }
   .pray-card-icon {
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    background: var(--gold-soft);
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--gold-soft) 0%, #fdefc8 100%);
     display: grid;
     place-items: center;
-    font-size: 18px;
+    font-size: 22px;
     flex-shrink: 0;
   }
-  .pray-card-title { font-size: 13.5px; font-weight: 600; color: var(--ink); line-height: 1.25; margin: 0; }
-  .pray-card-meta { font-size: 11px; color: var(--ink-mute); }
+  .pray-card-title { font-size: 13.5px; font-weight: 700; color: var(--ink); line-height: 1.25; margin: 0; }
+  .pray-card-meta { font-size: 11px; color: var(--ink-mute); font-weight: 500; }
   .pray-card.featured {
     grid-column: span 2;
     flex-direction: row;
     align-items: center;
-    gap: 14px;
-    background: linear-gradient(135deg, #fff 0%, #fdfaf1 100%);
-    border-color: var(--gold-soft);
+    gap: 16px;
+    min-height: 100px;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+    border-color: transparent;
+    box-shadow: var(--shadow-md);
   }
+  .pray-card.featured .pray-card-title { color: #fff; font-size: 16px; }
+  .pray-card.featured .pray-card-meta { color: rgba(255,255,255,0.55); }
   [data-theme="dark"] .pray-card.featured { background: var(--card); }
   .pray-card.featured .pray-card-icon {
-    width: 52px; height: 52px; font-size: 24px;
+    width: 58px; height: 58px; font-size: 28px;
+    background: rgba(201,164,73,0.2);
+    border-radius: 16px;
+    flex-shrink: 0;
   }
 
   /* ---------- Saints Screen ---------- */
   .saint-today-card {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
-    border-radius: 20px;
-    padding: 22px;
+    background: linear-gradient(150deg, #1e2d5a 0%, var(--navy-deep) 100%);
+    border-radius: var(--radius);
+    padding: 24px 22px 22px;
     margin-bottom: 14px;
     color: #fff;
     position: relative;
     overflow: hidden;
+    box-shadow: var(--shadow-lg);
   }
   .saint-today-card::before {
     content: '';
     position: absolute;
+    top: -50px; right: -50px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    border: 40px solid rgba(201,164,73,0.08);
+    pointer-events: none;
+  }
+  .saint-today-card::after {
+    content: '';
+    position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 85% 20%, rgba(201,164,73,0.15) 0%, transparent 50%);
+    background: radial-gradient(circle at 80% 30%, rgba(201,164,73,0.14) 0%, transparent 50%);
     pointer-events: none;
   }
   .saint-today-label {
-    font-size: 10px; font-weight: 700; letter-spacing: 0.22em;
-    color: var(--gold-light); text-transform: uppercase; margin-bottom: 10px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.24em;
+    color: rgba(224,192,118,0.80); text-transform: uppercase; margin-bottom: 12px;
+    position: relative; z-index: 1;
   }
   .saint-today-name {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 28px; font-weight: 600; line-height: 1.1; margin: 0 0 4px;
+    font-size: 32px; font-weight: 600; line-height: 1.05; margin: 0 0 5px;
+    position: relative; z-index: 1;
   }
-  .saint-today-title { font-size: 13px; color: rgba(255,255,255,0.65); margin: 0 0 14px; }
+  .saint-today-title { font-size: 13px; color: rgba(255,255,255,0.6); margin: 0 0 18px; position: relative; z-index: 1; }
   .saint-bio-card {
     background: var(--card);
-    border-radius: 16px; padding: 18px;
+    border-radius: var(--radius); padding: 20px;
     border: 1px solid var(--line);
     box-shadow: var(--shadow-sm); margin-bottom: 14px;
   }
-  .saint-bio-text { font-size: 13.5px; color: var(--ink-soft); line-height: 1.65; margin: 0; }
+  .saint-bio-text { font-size: 14px; color: var(--ink-soft); line-height: 1.70; margin: 0; }
   .saints-list-label {
     font-size: 10.5px; font-weight: 700; letter-spacing: 0.2em;
     text-transform: uppercase; color: var(--gold);
     padding: 0 4px; margin: 4px 0 10px;
   }
   .saint-row {
-    background: var(--card); border-radius: 12px;
+    background: var(--card); border-radius: 16px;
     padding: 14px 16px; margin-bottom: 8px;
     border: 1px solid var(--line);
-    display: flex; align-items: center; gap: 12px;
-    cursor: pointer; transition: transform .15s ease;
+    display: flex; align-items: center; gap: 14px;
+    cursor: pointer; transition: transform .15s ease, box-shadow .15s ease;
+    box-shadow: var(--shadow-sm);
   }
-  .saint-row:active { transform: scale(0.98); }
+  .saint-row:active { transform: scale(0.98); box-shadow: none; }
   .saint-row-icon {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: var(--gold-soft); display: grid; place-items: center;
-    font-size: 16px; flex-shrink: 0;
+    width: 42px; height: 42px; border-radius: 13px;
+    background: linear-gradient(135deg, var(--gold-soft) 0%, #fdefc8 100%);
+    display: grid; place-items: center;
+    font-size: 18px; flex-shrink: 0;
   }
   .saint-row-name { font-size: 14px; font-weight: 600; color: var(--ink); margin: 0 0 2px; }
   .saint-row-dates { font-size: 11.5px; color: var(--ink-mute); }
@@ -847,49 +986,45 @@
   .cmodal.open { pointer-events: all; opacity: 1; }
   .cmodal-overlay {
     position: absolute; inset: 0;
-    background: rgba(13,22,40,0.6);
-    backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+    background: rgba(10,18,35,0.65);
+    backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
   }
   .cmodal-sheet {
     position: relative; width: 100%; max-width: 480px;
     margin: 0 auto; background: var(--card);
-    border-radius: 24px 24px 0 0;
+    border-radius: 28px 28px 0 0;
     max-height: 88vh; max-height: 88dvh;
     display: flex; flex-direction: column;
-    transform: translateY(40px); transition: transform .3s ease;
+    transform: translateY(40px); transition: transform .32s cubic-bezier(.32,1,.56,1);
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   .cmodal.open .cmodal-sheet { transform: translateY(0); }
   .cmodal-handle {
-    width: 40px; height: 4px; border-radius: 999px;
-    background: var(--line); margin: 12px auto 0; flex-shrink: 0;
+    width: 36px; height: 4px; border-radius: 999px;
+    background: var(--line); margin: 14px auto 0; flex-shrink: 0;
     cursor: grab; touch-action: none;
   }
   .cmodal-handle:active { cursor: grabbing; }
-  /* Fullscreen — applied to the container so the sheet can stretch to fill it */
-  .cmodal.fullscreen-mode {
-    align-items: stretch;
-  }
-  .cmodal.fullscreen-mode .cmodal-sheet {
-    max-height: 100%;
-    height: 100%;
-    border-radius: 0;
-  }
+  .cmodal.fullscreen-mode { align-items: stretch; }
+  .cmodal.fullscreen-mode .cmodal-sheet { max-height: 100%; height: 100%; border-radius: 0; }
   .cmodal-header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 16px 24px 14px; flex-shrink: 0; border-bottom: 1px solid var(--line);
   }
   .cmodal-title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 22px; font-weight: 600; color: var(--ink);
+    font-size: 24px; font-weight: 600; color: var(--ink);
   }
   .cmodal-close {
-    background: none; border: none; font-size: 18px;
-    color: var(--ink-mute); cursor: pointer;
-    padding: 4px 8px; border-radius: 8px; font-family: inherit;
-    line-height: 1; transition: color .15s ease;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--line); border: none;
+    font-size: 14px; color: var(--ink-soft);
+    cursor: pointer; display: grid; place-items: center;
+    font-family: inherit; line-height: 1;
+    transition: background .15s ease, color .15s ease;
   }
-  .cmodal-close:hover { color: var(--ink); }
+  .cmodal-close:hover { background: var(--gold-soft); color: var(--ink); }
   .cmodal-body {
     flex: 1; overflow-y: auto; padding: 20px 24px 24px;
     scrollbar-width: none; -webkit-overflow-scrolling: touch;
@@ -952,7 +1087,183 @@
   .fade-in > *:nth-child(2) { animation-delay: .12s; }
   .fade-in > *:nth-child(3) { animation-delay: .19s; }
   .fade-in > *:nth-child(4) { animation-delay: .26s; }
+  .fade-in > *:nth-child(5) { animation-delay: .33s; }
+  .fade-in > *:nth-child(6) { animation-delay: .40s; }
+  .fade-in > *:nth-child(7) { animation-delay: .47s; }
+  .fade-in > *:nth-child(8) { animation-delay: .54s; }
   @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+
+  /* Header decorative cross watermark */
+  .header-cross {
+    position: absolute;
+    bottom: -22px;
+    right: 16px;
+    font-size: 138px;
+    line-height: 1;
+    color: rgba(201,164,73,0.068);
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+  }
+
+  /* Daily streak badge */
+  .streak-badge {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: rgba(224,192,118,0.92);
+    padding: 4px 11px;
+    background: rgba(201,164,73,0.16);
+    border-radius: 999px;
+    border: 1px solid rgba(201,164,73,0.30);
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+    transition: opacity .3s ease;
+  }
+  .streak-badge:empty { display: none; }
+
+  /* Settings row icon tiles */
+  .settings-row-icon {
+    width: 38px; height: 38px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--gold-soft) 0%, #fdefc8 100%);
+    display: grid; place-items: center;
+    font-size: 19px; flex-shrink: 0;
+  }
+  [data-theme="dark"] .settings-row-icon { background: rgba(201,164,73,0.18); }
+
+  /* Prayer modal */
+  .prayer-content { text-align: center; padding: 0 2px; }
+  .prayer-ornament {
+    color: var(--gold);
+    font-size: 14px;
+    letter-spacing: 0.38em;
+    margin: 6px 0;
+  }
+  .prayer-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--gold-soft) 50%, transparent 100%);
+    margin: 14px 0 22px;
+  }
+  .prayer-stanza {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19.5px;
+    line-height: 1.85;
+    color: var(--ink);
+    margin: 0 0 22px;
+    text-align: center;
+  }
+  .prayer-stanza:last-of-type { margin-bottom: 8px; }
+
+  /* Featured Rosary pray card decoration */
+  .pray-card.featured { position: relative; overflow: hidden; }
+  .pray-card.featured::after {
+    content: '✝';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 96px;
+    line-height: 1;
+    color: rgba(201,164,73,0.09);
+    pointer-events: none;
+  }
+  .pray-card.featured .pray-card-icon,
+  .pray-card.featured > div { position: relative; z-index: 1; }
+
+  /* Daily Habit Tracker */
+  .action-icon { position: relative; }
+  .habit-check {
+    position: absolute;
+    top: -4px; right: -4px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #4caf6e;
+    border: 2px solid var(--card);
+    display: grid; place-items: center;
+    font-size: 9px; color: #fff; font-weight: 700;
+    opacity: 0;
+    transform: scale(0.4);
+    transition: opacity .25s ease, transform .3s cubic-bezier(.34,1.56,.64,1);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .habit-check.done { opacity: 1; transform: scale(1); }
+  .readings-done-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10px; font-weight: 700; color: #4caf6e;
+    margin-left: 6px; letter-spacing: 0.03em;
+    opacity: 0; transition: opacity .25s ease;
+  }
+  .readings-done-badge.done { opacity: 1; }
+
+  /* Examination of Conscience */
+  .examen-intro {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px; font-style: italic; line-height: 1.7;
+    color: var(--ink-soft); text-align: center;
+    padding: 6px 4px 20px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 6px;
+  }
+  .examen-count-bar {
+    position: sticky; top: -20px;
+    background: var(--card); z-index: 2;
+    padding: 10px 24px 12px; margin: 0 -24px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .examen-count-text { font-size: 11.5px; font-weight: 700; color: var(--gold); letter-spacing: 0.08em; }
+  .examen-progress-track {
+    height: 3px; background: var(--line); border-radius: 999px;
+    margin-top: 6px; overflow: hidden;
+  }
+  .examen-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-light), var(--gold));
+    border-radius: 999px; transition: width .3s ease; width: 0%;
+  }
+  .examen-category { margin-bottom: 18px; }
+  .examen-category-title {
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.18em;
+    color: var(--navy); text-transform: uppercase;
+    padding: 0 0 8px; border-bottom: 1px solid var(--line);
+    margin-bottom: 8px;
+  }
+  [data-theme="dark"] .examen-category-title { color: var(--gold-light); }
+  .examen-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 12px; border-radius: 12px;
+    cursor: pointer; user-select: none; -webkit-user-select: none;
+    transition: background .15s ease; margin-bottom: 2px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .examen-item:active { background: var(--gold-soft); }
+  .examen-item.considered {
+    background: linear-gradient(135deg, rgba(201,164,73,0.08) 0%, rgba(201,164,73,0.14) 100%);
+  }
+  .examen-check {
+    width: 22px; height: 22px; flex-shrink: 0;
+    border-radius: 50%; border: 2px solid var(--line);
+    display: grid; place-items: center;
+    font-size: 11px; font-weight: 700; color: transparent;
+    transition: border-color .2s, background .2s, color .2s;
+    margin-top: 1px;
+  }
+  .examen-item.considered .examen-check {
+    border-color: var(--gold); background: var(--gold); color: #fff;
+  }
+  .examen-text { font-size: 13.5px; color: var(--ink); line-height: 1.5; }
+  .examen-item.considered .examen-text { color: var(--ink-soft); }
+
+  /* Saint bio modal header ornament */
+  .bio-ornament {
+    text-align: center;
+    color: var(--gold);
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
 </style>
 </head>
 <body>
@@ -961,8 +1272,10 @@
   <!-- HOME -->
   <section class="screen active" data-screen="home">
     <header class="header">
+      <span class="header-cross" aria-hidden="true">✝</span>
       <div class="header-top">
         <span class="date-tag" id="home-date">Tuesday · Apr 21</span>
+        <div class="streak-badge" id="streak-badge"></div>
         <button class="bell" aria-label="Notifications">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
@@ -972,6 +1285,7 @@
       </div>
       <h1 class="greeting" id="home-greeting">Good morning</h1>
       <p class="subgreet" id="home-subgreet">Day 12 of Eastertide · St. Anselm</p>
+      <div class="season-badge" id="season-badge" style="display:none"></div>
     </header>
 
     <div class="scroll fade-in">
@@ -996,7 +1310,7 @@
       </div>
 
       <div class="card readings-card">
-        <div class="card-label">Mass Readings</div>
+        <div class="card-label">Mass Readings<span class="readings-done-badge" id="habit-readings">✓ Done</span></div>
         <div id="readings-list">
           <div style="font-size:13px;color:var(--ink-mute);padding:6px 0 14px">Loading today's readings…</div>
         </div>
@@ -1004,14 +1318,18 @@
 
       <div class="actions-row">
         <div class="action-card">
-          <div><div class="action-head">🙏 Morning Prayer</div></div>
+          <div>
+            <div class="action-icon">🙏<div class="habit-check" id="habit-morning">✓</div></div>
+            <div class="action-head">Morning Prayer</div>
+          </div>
           <button class="btn btn-gold" onclick="openPrayer('Morning Offering')">Begin</button>
         </div>
         <div class="action-card">
           <div>
-            <div class="action-head">📿 Rosary</div>
+            <div class="action-icon">📿<div class="habit-check" id="habit-rosary">✓</div></div>
+            <div class="action-head">Rosary</div>
             <div class="action-title" id="rosary-mystery-title">Joyful Mysteries</div>
-            <div class="action-meta">20 min</div>
+            <div class="action-meta">~20 min</div>
           </div>
           <button class="btn btn-outline" onclick="openRosary()">Start</button>
         </div>
@@ -1029,6 +1347,7 @@
   <!-- AI CHAT -->
   <section class="screen" data-screen="ai">
     <header class="header header-chat">
+      <span class="header-cross" aria-hidden="true">✝</span>
       <div class="eyebrow">Catholic AI</div>
       <h1 class="title">Ask Daily Faith</h1>
       <div class="sub">Grounded in Church teaching</div>
@@ -1062,6 +1381,7 @@
   <!-- PRAY -->
   <section class="screen" data-screen="pray">
     <header class="header">
+      <span class="header-cross" aria-hidden="true">✝</span>
       <div class="header-top">
         <span class="date-tag">Prayers</span>
         <button class="bell" aria-label="Notifications">
@@ -1074,7 +1394,7 @@
       <h1 class="greeting">Prayer</h1>
       <p class="subgreet">Tradition, meditation, and daily devotion</p>
     </header>
-    <div class="pray-grid">
+    <div class="pray-grid fade-in">
       <div class="pray-card featured" onclick="openRosary()">
         <div class="pray-card-icon">📿</div>
         <div>
@@ -1122,12 +1442,35 @@
         <div class="pray-card-title">Glory Be</div>
         <div class="pray-card-meta">Doxology</div>
       </div>
+      <div class="pray-card" onclick="openPrayer('Divine Mercy Chaplet')">
+        <div class="pray-card-icon">🌊</div>
+        <div class="pray-card-title">Divine Mercy Chaplet</div>
+        <div class="pray-card-meta">For God's mercy</div>
+      </div>
+      <div class="pray-card" onclick="openPrayer('Memorare')">
+        <div class="pray-card-icon">🌹</div>
+        <div class="pray-card-title">Memorare</div>
+        <div class="pray-card-meta">Marian intercession</div>
+      </div>
+      <div class="pray-card" onclick="openPrayer('Prayer to St. Michael')">
+        <div class="pray-card-icon">⚔️</div>
+        <div class="pray-card-title">Prayer to St. Michael</div>
+        <div class="pray-card-meta">Defense against evil</div>
+      </div>
+      <div class="pray-card featured" onclick="openExamen()">
+        <div class="pray-card-icon">📋</div>
+        <div>
+          <div class="pray-card-title">Examination of Conscience</div>
+          <div class="pray-card-meta">Confession preparation · ~5 min</div>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- SAINTS -->
   <section class="screen" data-screen="saints">
     <header class="header">
+      <span class="header-cross" aria-hidden="true">✝</span>
       <div class="header-top">
         <span class="date-tag">Saints</span>
         <button class="bell" aria-label="Notifications">
@@ -1140,7 +1483,7 @@
       <h1 class="greeting">Communion of Saints</h1>
       <p class="subgreet">Lives that point us to Christ</p>
     </header>
-    <div class="scroll">
+    <div class="scroll fade-in">
       <div class="saint-today-card">
         <div class="saint-today-label">Saint of the Day</div>
         <h2 class="saint-today-name skel" id="saint-today-name">Loading…</h2>
@@ -1193,6 +1536,7 @@
   <!-- MORE -->
   <section class="screen" data-screen="more">
     <header class="header">
+      <span class="header-cross" aria-hidden="true">✝</span>
       <div class="header-top">
         <span class="date-tag">More</span>
         <button class="bell" aria-label="Notifications">
@@ -1205,7 +1549,7 @@
       <h1 class="greeting">Settings & more</h1>
       <p class="subgreet">Customize your daily walk</p>
     </header>
-    <div class="scroll">
+    <div class="scroll fade-in">
 
       <div class="settings-section">
         <div class="settings-group-label">Appearance</div>
@@ -1651,19 +1995,167 @@
     'Glory Be': `Glory Be to the Father, and to the Son, and to the Holy Spirit.\n\nAs it was in the beginning, is now, and ever shall be, world without end.\n\nAmen.`,
     'Act of Contrition': `O my God, I am heartily sorry for having offended Thee,\nand I detest all my sins because of Thy just punishments,\nbut most of all because they offend Thee, my God,\nWho art all good and deserving of all my love.\n\nI firmly resolve, with the help of Thy grace,\nto sin no more and to avoid the near occasions of sin.\n\nAmen.`,
     'Apostles Creed': `I believe in God, the Father Almighty, Creator of Heaven and earth;\nand in Jesus Christ, His only Son, Our Lord,\nWho was conceived by the Holy Spirit,\nborn of the Virgin Mary,\nsuffered under Pontius Pilate,\nwas crucified, died, and was buried.\n\nHe descended into Hell;\nthe third day He rose again from the dead;\nHe ascended into Heaven,\nand sitteth at the right hand of God, the Father Almighty;\nfrom thence He shall come to judge the living and the dead.\n\nI believe in the Holy Spirit, the holy Catholic Church,\nthe communion of Saints, the forgiveness of sins,\nthe resurrection of the body,\nand life everlasting.\n\nAmen.`,
-    'Angelus': `V. The Angel of the Lord declared unto Mary.\nR. And she conceived of the Holy Spirit.\n\nHail Mary, full of grace, the Lord is with thee;\nblessed art thou among women, and blessed is the fruit of thy womb, Jesus.\nHoly Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen.\n\nV. Behold the handmaid of the Lord.\nR. Be it done unto me according to Thy Word.\n\nHail Mary…\n\nV. And the Word was made Flesh.\nR. And dwelt among us.\n\nHail Mary…\n\nV. Pray for us, O Holy Mother of God.\nR. That we may be made worthy of the promises of Christ.\n\nLet us pray:\nPour forth, we beseech Thee, O Lord, Thy grace into our hearts; that we, to whom the Incarnation of Christ, Thy Son, was made known by the message of an angel, may by His Passion and Cross be brought to the glory of His Resurrection, through the same Christ Our Lord.\n\nAmen.`
+    'Angelus': `V. The Angel of the Lord declared unto Mary.\nR. And she conceived of the Holy Spirit.\n\nHail Mary, full of grace, the Lord is with thee;\nblessed art thou among women, and blessed is the fruit of thy womb, Jesus.\nHoly Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen.\n\nV. Behold the handmaid of the Lord.\nR. Be it done unto me according to Thy Word.\n\nHail Mary…\n\nV. And the Word was made Flesh.\nR. And dwelt among us.\n\nHail Mary…\n\nV. Pray for us, O Holy Mother of God.\nR. That we may be made worthy of the promises of Christ.\n\nLet us pray:\nPour forth, we beseech Thee, O Lord, Thy grace into our hearts; that we, to whom the Incarnation of Christ, Thy Son, was made known by the message of an angel, may by His Passion and Cross be brought to the glory of His Resurrection, through the same Christ Our Lord.\n\nAmen.`,
+
+    'Divine Mercy Chaplet': `Begin with the Apostles' Creed, one Our Father, one Hail Mary, and the Act of Contrition.\n\nOn each Our Father bead, pray:\n"Eternal Father, I offer You the Body and Blood, Soul and Divinity of Your dearly beloved Son, Our Lord Jesus Christ, in atonement for our sins and those of the whole world."\n\nOn each Hail Mary bead (10 times per decade), pray:\n"For the sake of His sorrowful Passion, have mercy on us and on the whole world."\n\nRepeat for five decades. After each decade pray once:\n"Holy God, Holy Mighty One, Holy Immortal One, have mercy on us and on the whole world."\n\nClose by praying three times:\n"Holy God, Holy Mighty One, Holy Immortal One, have mercy on us and on the whole world."\n\nFinal prayer:\nEternal God, in whom mercy is endless and the treasury of compassion inexhaustible, look kindly upon us and increase Your mercy in us, that in difficult moments we might not despair nor become despondent, but with great confidence submit ourselves to Your holy will, which is Love and Mercy itself.\n\nAmen.`,
+
+    'Memorare': `Remember, O most gracious Virgin Mary,\nthat never was it known that anyone who fled to thy protection,\nimplored thy help, or sought thy intercession\nwas left unaided.\n\nInspired with this confidence,\nI fly to thee, O Virgin of virgins, my Mother;\nto thee do I come, before thee I stand,\nsinful and sorrowful.\n\nO Mother of the Word Incarnate,\ndespise not my petitions,\nbut in thy mercy hear and answer me.\n\nAmen.`,
+
+    'Prayer to St. Michael': `Saint Michael the Archangel,\ndefend us in battle.\nBe our protection against the wickedness\nand snares of the devil.\n\nMay God rebuke him, we humbly pray;\nand do thou, O Prince of the Heavenly Host,\nby the power of God,\ncast into hell Satan and all the evil spirits\nwho prowl about the world\nseeking the ruin of souls.\n\nAmen.`
   };
 
   function openPrayer(name) {
+    if (name === 'Morning Offering') markHabit('morningPrayer');
     const text = PRAYERS[name];
     if (!text) return;
     const displayName = name === 'Apostles Creed' ? "Apostles' Creed" : name;
+
+    const stanzas = text.split('\n\n').map(stanza => {
+      const escaped = stanza.trim()
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br>');
+      return `<p class="prayer-stanza">${escaped}</p>`;
+    }).join('');
+
     openCModal(displayName,
-      `<p style="white-space:pre-wrap;font-family:'Cormorant Garamond',serif;font-size:18px;line-height:1.75;color:var(--ink)">${text}</p>`,
+      `<div class="prayer-content">
+        <div class="prayer-ornament">✦&ensp;✦&ensp;✦</div>
+        <div class="prayer-divider"></div>
+        ${stanzas}
+        <div class="prayer-divider"></div>
+        <div class="prayer-ornament">✦</div>
+      </div>`,
       false);
   }
 
   function openApostlesCreed() { openPrayer('Apostles Creed'); }
+
+  // ---- Examination of Conscience ----
+  const EXAMEN_CATEGORIES = [
+    {
+      title: '1st Commandment — Love of God',
+      items: [
+        'Have I neglected daily prayer or rushed through it without attention?',
+        'Have I placed anything above God — possessions, status, or comfort?',
+        'Have I doubted or despaired of God\'s mercy?',
+        'Have I skipped Mass on a Sunday or Holy Day of Obligation without serious reason?',
+        'Have I received the Eucharist unworthily or without preparation?',
+      ]
+    },
+    {
+      title: '2nd Commandment — Holy Name',
+      items: [
+        'Have I used the name of God, Jesus, or Mary carelessly or in anger?',
+        'Have I made rash oaths or broken solemn promises?',
+      ]
+    },
+    {
+      title: '3rd Commandment — The Lord\'s Day',
+      items: [
+        'Have I failed to observe Sunday as a day of rest and worship?',
+        'Have I caused others to work unnecessarily on Sunday?',
+      ]
+    },
+    {
+      title: '4th Commandment — Parents & Authority',
+      items: [
+        'Have I been disrespectful or disobedient to my parents or lawful superiors?',
+        'Have I neglected my duties to my spouse, children, or dependents?',
+      ]
+    },
+    {
+      title: '5th Commandment — Life',
+      items: [
+        'Have I harmed another person physically or emotionally?',
+        'Have I harbored hatred, anger, or desires for revenge?',
+        'Have I been reckless with my own health — substance abuse or self-harm?',
+        'Have I given scandal or led others into sin?',
+      ]
+    },
+    {
+      title: '6th & 9th Commandments — Chastity',
+      items: [
+        'Have I been impure in thought, word, or deed?',
+        'Have I sought out impure content?',
+        'Have I been immodest in speech or dress?',
+        'Have I been faithful in mind and heart to my spouse?',
+      ]
+    },
+    {
+      title: '7th & 10th Commandments — Justice & Envy',
+      items: [
+        'Have I stolen, cheated, or failed to repay debts?',
+        'Have I envied what belongs to others?',
+        'Have I been fair in my business and work dealings?',
+        'Have I been generous to the poor and those in need?',
+      ]
+    },
+    {
+      title: '8th Commandment — Truth',
+      items: [
+        'Have I lied, deceived, or damaged another\'s reputation?',
+        'Have I gossiped or spread rumors about others?',
+        'Have I been silent when truth required me to speak?',
+      ]
+    },
+    {
+      title: 'General Examination',
+      items: [
+        'Have I been proud, vain, or unwilling to accept correction?',
+        'Have I been slothful in my spiritual or daily duties?',
+        'Have I been grateful to God for His gifts and blessings?',
+        'Is there any serious sin I have been avoiding confessing?',
+      ]
+    },
+  ];
+
+  let _examenState = {};
+
+  function toggleExamenItem(catIdx, itemIdx) {
+    const key = catIdx + '-' + itemIdx;
+    _examenState[key] = !_examenState[key];
+    const el = document.getElementById('ex-' + key);
+    if (el) el.classList.toggle('considered', _examenState[key]);
+    const total = EXAMEN_CATEGORIES.reduce((s, c) => s + c.items.length, 0);
+    const done  = Object.values(_examenState).filter(Boolean).length;
+    const pct   = Math.round((done / total) * 100);
+    const fill = document.getElementById('examen-prog-fill');
+    const text = document.getElementById('examen-prog-text');
+    if (fill) fill.style.width = pct + '%';
+    if (text) text.textContent = done + ' of ' + total + ' reflected upon';
+  }
+
+  function openExamen() {
+    _examenState = {};
+    const total = EXAMEN_CATEGORIES.reduce((s, c) => s + c.items.length, 0);
+
+    const cats = EXAMEN_CATEGORIES.map((cat, ci) =>
+      '<div class="examen-category">' +
+      '<div class="examen-category-title">' + cat.title + '</div>' +
+      cat.items.map((item, ii) =>
+        '<div class="examen-item" id="ex-' + ci + '-' + ii + '" onclick="toggleExamenItem(' + ci + ',' + ii + ')">' +
+        '<div class="examen-check">✓</div>' +
+        '<div class="examen-text">' + item + '</div>' +
+        '</div>'
+      ).join('') +
+      '</div>'
+    ).join('');
+
+    const bodyHTML =
+      '<div class="examen-intro">Ask the Holy Spirit to enlighten your conscience.<br>Read each question slowly. Tap it when you have reflected.</div>' +
+      '<div class="examen-count-bar">' +
+        '<div class="examen-count-text" id="examen-prog-text">0 of ' + total + ' reflected upon</div>' +
+        '<div class="examen-progress-track"><div class="examen-progress-fill" id="examen-prog-fill"></div></div>' +
+      '</div>' +
+      cats +
+      '<div style="text-align:center;padding:18px 0 8px;font-family:\'Cormorant Garamond\',serif;font-size:16px;font-style:italic;color:var(--ink-soft)">When ready, go to Confession and receive God\'s mercy.</div>';
+
+    document.getElementById('cmodal-title').textContent = 'Examination of Conscience';
+    document.getElementById('cmodal-body').innerHTML = bodyHTML;
+    document.getElementById('rosary-nav').style.display = 'none';
+    document.getElementById('rosary-progress').style.display = 'none';
+    document.getElementById('cmodal').classList.add('open', 'fullscreen-mode');
+  }
 
   // ---- Rosary ----
   const ROSARY_MYSTERIES = {
@@ -1705,10 +2197,37 @@
     return 'Luminous';
   }
 
+  // ---- Liturgical Season Theming ----
+  const SEASON_MAP = {
+    ADVENT:        { label: 'Advent',       emoji: '🕯️' },
+    CHRISTMAS:     { label: 'Christmas',    emoji: '⭐' },
+    LENT:          { label: 'Lent',         emoji: '✝' },
+    EASTER:        { label: 'Easter',       emoji: '🌅' },
+    ORDINARY_TIME: { label: 'Ordinary Time',emoji: '✦' },
+  };
+
+  function applySeasonTheme(seasonKey) {
+    const s = SEASON_MAP[seasonKey];
+    document.documentElement.dataset.season = seasonKey || 'ORDINARY_TIME';
+    const badge = document.getElementById('season-badge');
+    if (badge) {
+      if (s && seasonKey !== 'ORDINARY_TIME') {
+        badge.textContent = s.emoji + ' ' + s.label;
+        badge.style.display = '';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+    const themeColors = { ADVENT: '#2a1f45', LENT: '#2d1426', EASTER: '#1a2f20' };
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = themeColors[seasonKey] || '#1a2547';
+  }
+
   // ---- Interactive Rosary ----
   let iRosaryStates = new Array(61).fill(false);
 
   function openRosary() {
+    markHabit('rosary');
     iRosaryStates = new Array(61).fill(false);
     openCModal('The Holy Rosary', irBuildHTML(), false);
     document.getElementById('cmodal').classList.add('fullscreen-mode');
@@ -2290,6 +2809,7 @@
     const data = await r.json();
     const result = _mapApiLiturgicalData(data);
     localStorage.setItem(cacheKey, JSON.stringify(result));
+    localStorage.setItem('lastSeasonKey', result.feast.season || 'ORDINARY_TIME');
     return result;
   }
 
@@ -2339,7 +2859,10 @@
   }
 
   function toggleReading(i) {
-    document.getElementById('ri-' + i)?.classList.toggle('open');
+    const item = document.getElementById('ri-' + i);
+    if (!item) return;
+    item.classList.toggle('open');
+    if (item.classList.contains('open')) markHabit('readings');
   }
 
   function loadReadingsCard() {
@@ -2377,6 +2900,26 @@
     return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
   }
 
+  function getStreak() {
+    const today = new Date().toDateString();
+    const lastOpen = localStorage.getItem('lastOpenDate');
+    let streak = parseInt(localStorage.getItem('streakCount') || '1', 10);
+    if (!lastOpen || lastOpen !== today) {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      if (lastOpen === yesterday.toDateString()) {
+        streak = Math.min(streak + 1, 9999);
+      } else if (!lastOpen) {
+        streak = 1;
+      } else {
+        streak = 1;
+      }
+      localStorage.setItem('lastOpenDate', today);
+      localStorage.setItem('streakCount', String(streak));
+    }
+    return streak;
+  }
+
   async function loadDailyReflection() {
     const el = document.getElementById('reflect-text');
     if (!el) return;
@@ -2397,12 +2940,48 @@
     }
   }
 
+  // ---- Daily Habit Tracker ----
+  function _habitKey() {
+    const d = new Date();
+    return 'habitTracker_' + d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
+  }
+
+  function getHabits() {
+    try {
+      const raw = localStorage.getItem(_habitKey());
+      return raw ? JSON.parse(raw) : { morningPrayer: false, rosary: false, readings: false };
+    } catch { return { morningPrayer: false, rosary: false, readings: false }; }
+  }
+
+  function markHabit(habit) {
+    const habits = getHabits();
+    habits[habit] = true;
+    try { localStorage.setItem(_habitKey(), JSON.stringify(habits)); } catch {}
+    renderHabitUI();
+  }
+
+  function renderHabitUI() {
+    const habits = getHabits();
+    const mEl = document.getElementById('habit-morning');
+    if (mEl) mEl.classList.toggle('done', !!habits.morningPrayer);
+    const rEl = document.getElementById('habit-rosary');
+    if (rEl) rEl.classList.toggle('done', !!habits.rosary);
+    const rdEl = document.getElementById('habit-readings');
+    if (rdEl) rdEl.classList.toggle('done', !!habits.readings);
+  }
+
   async function loadHomeData() {
     const now = new Date();
     const hd = document.getElementById('home-date');
     const hg = document.getElementById('home-greeting');
     if (hd) hd.textContent = formatHomeDate(now);
     if (hg) hg.textContent = getGreetingWord();
+
+    const streak = getStreak();
+    const streakBadge = document.getElementById('streak-badge');
+    if (streakBadge) streakBadge.textContent = streak > 1 ? `🔥 ${streak} days` : '';
 
     const mystTitle = document.getElementById('rosary-mystery-title');
     const mystMeta  = document.getElementById('pray-mystery-meta');
@@ -2428,6 +3007,7 @@
 
     // Feast day + liturgical day description (from API, falls back offline)
     const { feast, litDay } = await fetchLiturgicalData();
+    applySeasonTheme(feast.season);
     const fName  = document.getElementById('feast-name');
     const fTitle = document.getElementById('feast-title');
     const hSub   = document.getElementById('home-subgreet');
@@ -2446,6 +3026,9 @@
     const saintChip = document.getElementById('chip-saint');
     const chipName = (feast.title && feast.rank) ? feast.title : getSaintFallback().name;
     if (saintChip) saintChip.textContent = `✦ ${chipName}`;
+
+    // Restore habit tracker state from localStorage
+    renderHabitUI();
   }
 
   // ---- Saints Screen ----
@@ -2520,14 +3103,18 @@
 
   function openSaintWiki() {
     if (!currentSaint.name) return;
+    const bio = (currentSaint.bio || 'Biography not loaded yet.')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     openCModal(currentSaint.name,
-      `<p style="font-size:14px;line-height:1.7;color:var(--ink-soft);white-space:pre-wrap">${currentSaint.bio || 'Biography not loaded yet.'}</p>`,
+      `<div class="bio-ornament">✦</div>
+       <p style="font-size:14.5px;line-height:1.78;color:var(--ink)">${bio}</p>`,
       false);
   }
 
   function openSaintDetail(name, bio) {
     openCModal(name,
-      `<p style="font-size:14px;line-height:1.7;color:var(--ink-soft)">${bio}</p>`,
+      `<div class="bio-ornament">✦</div>
+       <p style="font-size:14.5px;line-height:1.78;color:var(--ink)">${bio}</p>`,
       false);
   }
 
@@ -2639,6 +3226,12 @@
   })();
 
   // ---- Init ----
+  // Apply last-known season instantly — before API responds — to avoid header color flicker
+  (function () {
+    const s = localStorage.getItem('lastSeasonKey');
+    if (s) applySeasonTheme(s);
+  })();
+
   loadHomeData();
 
   // ---- Push Notifications ----
