@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daily-faith-v12';
+const CACHE_NAME = 'daily-faith-v13';
 
 // index.html is intentionally excluded — navigation is always network-first
 const STATIC_ASSETS = [
@@ -15,8 +15,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS))
   );
-  // Do NOT call skipWaiting() here — the client shows an update toast
-  // and only skips waiting when the user taps it (via the message handler below).
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {
