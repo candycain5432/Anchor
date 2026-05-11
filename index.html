@@ -1014,9 +1014,14 @@
   }
   .cmodal.open .cmodal-sheet { transform: translateY(0); }
   .cmodal-handle {
+    position: relative;
     width: 36px; height: 4px; border-radius: 999px;
     background: var(--line); margin: 14px auto 0; flex-shrink: 0;
     cursor: grab; touch-action: none;
+  }
+  .cmodal-handle::before {
+    content: ''; position: absolute;
+    top: -20px; left: -40px; right: -40px; bottom: -24px;
   }
   .cmodal-handle:active { cursor: grabbing; }
   .cmodal.fullscreen-mode { align-items: stretch; }
@@ -1647,7 +1652,7 @@
           <div class="settings-row">
             <div>
               <div class="settings-row-title">Daily Faith</div>
-              <div class="settings-row-sub">Made by William Cain · v1.1</div>
+              <div class="settings-row-sub">Made by William Cain · v1.2</div>
             </div>
           </div>
           <div class="settings-row">
