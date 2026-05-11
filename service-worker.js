@@ -1,9 +1,12 @@
-const CACHE_NAME = 'daily-faith-v10';
+const CACHE_NAME = 'daily-faith-v11';
 
 // index.html is intentionally excluded — navigation is always network-first
 const STATIC_ASSETS = [
   './manifest.json',
   './offline.html',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/apple-touch-icon.png',
   './icons/icon-192.svg',
   './icons/icon-512.svg'
 ];
