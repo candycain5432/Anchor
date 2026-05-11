@@ -1019,7 +1019,7 @@
   }
   .cmodal-handle:active { cursor: grabbing; }
   .cmodal.fullscreen-mode { align-items: stretch; }
-  .cmodal.fullscreen-mode .cmodal-sheet { max-height: 100%; height: 100%; border-radius: 0; }
+  .cmodal.fullscreen-mode .cmodal-sheet { max-height: 100%; height: 100%; border-radius: 0; padding-top: env(safe-area-inset-top, 0px); }
   .cmodal-header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 16px 24px 14px; flex-shrink: 0; border-bottom: 1px solid var(--line);
