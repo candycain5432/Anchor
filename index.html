@@ -194,7 +194,7 @@
   .header {
     background: linear-gradient(165deg, #1e2c56 0%, var(--navy-deep) 100%);
     color: #fff;
-    padding: calc(env(safe-area-inset-top, 0px) + 22px) 24px 40px;
+    padding: calc(env(safe-area-inset-top, 0px) + 8px) 24px 40px;
     border-radius: 0 0 32px 32px;
     position: relative;
     overflow: hidden;
@@ -1006,7 +1006,7 @@
     position: relative; width: 100%; max-width: 480px;
     margin: 0 auto; background: var(--card);
     border-radius: 28px 28px 0 0;
-    max-height: 88vh; max-height: 88dvh;
+    max-height: 88vh; max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 12px);
     display: flex; flex-direction: column;
     transform: translateY(40px); transition: transform .32s cubic-bezier(.32,1,.56,1);
     padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -1646,7 +1646,7 @@
           <div class="settings-row">
             <div>
               <div class="settings-row-title">Daily Faith</div>
-              <div class="settings-row-sub">Made by William Cain · v1.0</div>
+              <div class="settings-row-sub">Made by William Cain · v1.1</div>
             </div>
           </div>
           <div class="settings-row">
