@@ -422,7 +422,7 @@
     pointer-events: none;
   }
   .feast-art::after {
-    content: '✝';
+    content: '\271D\FE0E';
     font-size: 42px;
     color: var(--gold);
     position: relative;
@@ -1096,7 +1096,7 @@
   /* Header decorative cross watermark */
   .header-cross {
     position: absolute;
-    bottom: -22px;
+    bottom: 20px;
     right: 16px;
     font-size: 138px;
     line-height: 1;
@@ -1158,7 +1158,7 @@
   /* Featured Rosary pray card decoration */
   .pray-card.featured { position: relative; overflow: hidden; }
   .pray-card.featured::after {
-    content: '✝';
+    content: '\271D\FE0E';
     position: absolute;
     right: -10px;
     top: 50%;
@@ -1265,9 +1265,43 @@
     padding-bottom: 14px;
     border-bottom: 1px solid var(--line);
   }
+
+  /* SW update toast */
+  .sw-update-bar {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1a2547;
+    color: #fff;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 11px 20px;
+    border-radius: 999px;
+    border: 1px solid rgba(201,164,73,0.5);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.32);
+    cursor: pointer;
+    z-index: 9999;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .sw-update-bar.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+  }
+  [data-theme="dark"] .sw-update-bar {
+    background: #0f1420;
+    border-color: rgba(201,164,73,0.4);
+  }
 </style>
 </head>
 <body>
+<div class="sw-update-bar" id="sw-update-bar" role="button" tabindex="0" aria-label="Update available">
+  ✦ Update available — tap to refresh
+</div>
 <div class="app">
 
   <!-- HOME -->
@@ -3435,14 +3469,42 @@
 
   // ---- Service Worker (only on http/https, not file://) ----
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    // Reload the page when a new SW takes control
+    let swRefreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!swRefreshing) { swRefreshing = true; location.reload(); }
+    });
+
+    const swUpdateBar = document.getElementById('sw-update-bar');
+    function showUpdateBar(reg) {
+      if (!swUpdateBar) return;
+      swUpdateBar.classList.add('visible');
+      swUpdateBar.onclick = () => {
+        if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+      };
+    }
+
     window.addEventListener('load', async () => {
+      let reg;
       try {
-        await navigator.serviceWorker.register('./service-worker.js');
+        reg = await navigator.serviceWorker.register('./service-worker.js');
         console.log('[Lumen] SW registered');
       } catch (err) {
         console.warn('[Lumen] SW failed:', err);
         return;
       }
+
+      // If a new worker is already waiting (e.g. page was open during install)
+      if (reg.waiting && navigator.serviceWorker.controller) showUpdateBar(reg);
+
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            showUpdateBar(reg);
+          }
+        });
+      });
       // Sync push subscription state on every load.
       // Render free tier wipes subscriptions.json on restart, so re-POST to stay registered.
       // If browser has no subscription at all, reset the toggle so the user knows to re-enable.
