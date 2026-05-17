@@ -3062,7 +3062,7 @@
       return;
     }
     try {
-      const r = await fetch('https://project-veritas-backend.onrender.com/daily-reflection');
+      const r = await fetch(`https://project-veritas-backend.onrender.com/daily-reflection?date=${encodeURIComponent(today)}`);
       if (!r.ok) throw new Error();
       const { reflection } = await r.json();
       el.textContent = reflection;
