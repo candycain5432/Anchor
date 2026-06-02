@@ -3053,6 +3053,33 @@
     return streak;
   }
 
+  async function loadVerseOfDay() {
+    const vText = document.getElementById('verse-text');
+    const vCite = document.getElementById('verse-cite');
+    if (!vText || !vCite) return;
+    const today = new Date().toDateString();
+    if (localStorage.getItem('verseDate') === today) {
+      vText.textContent = localStorage.getItem('verseText') || vText.textContent;
+      vCite.textContent = localStorage.getItem('verseCite') || vCite.textContent;
+      return;
+    }
+    try {
+      const r = await fetch('https://labs.bible.org/api/?passage=votd&type=json');
+      if (!r.ok) throw new Error();
+      const verses = await r.json();
+      const text = verses.map(v => v.text).join(' ');
+      const first = verses[0], last = verses[verses.length - 1];
+      const ref = first.verse !== last.verse
+        ? `${first.bookname} ${first.chapter}:${first.verse}–${last.verse}`
+        : `${first.bookname} ${first.chapter}:${first.verse}`;
+      vText.textContent = text;
+      vCite.textContent = '— ' + ref;
+      localStorage.setItem('verseDate', today);
+      localStorage.setItem('verseText', text);
+      localStorage.setItem('verseCite', '— ' + ref);
+    } catch {}
+  }
+
   async function loadDailyReflection() {
     const el = document.getElementById('reflect-text');
     if (!el) return;
@@ -3128,15 +3155,8 @@
     // Mass readings (cached per day)
     loadReadingsCard();
 
-    // Verse of the day
-    try {
-      const vr = await fetch('https://beta.ourmanna.com/api/v1/get/?format=json');
-      const vd = await vr.json();
-      const vText = document.getElementById('verse-text');
-      const vCite = document.getElementById('verse-cite');
-      if (vText && vd.verse?.details?.text)      vText.textContent = vd.verse.details.text;
-      if (vCite && vd.verse?.details?.reference) vCite.textContent = '— ' + vd.verse.details.reference;
-    } catch {}
+    // Verse of the day (cached per day)
+    loadVerseOfDay();
 
     // Feast day + liturgical day description (from API, falls back offline)
     const { feast, litDay } = await fetchLiturgicalData();
