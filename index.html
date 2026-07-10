@@ -546,7 +546,7 @@
     align-items: flex-end;
     justify-content: space-around;
     padding: 10px 8px calc(env(safe-area-inset-bottom, 6px) + 4px);
-    background: transparent;
+    background: var(--card);
     z-index: 20;
   }
   .nav-bg {
@@ -2345,7 +2345,7 @@
     const badge = document.getElementById('season-badge');
     if (badge) {
       if (s && seasonKey !== 'ORDINARY_TIME') {
-        badge.textContent = s.emoji + ' ' + s.label;
+        badge.textContent = s.emoji + ' ' + s.label;
         badge.style.display = '';
       } else {
         badge.style.display = 'none';
