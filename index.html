@@ -116,6 +116,7 @@
     --shadow-sm:  0 1px 3px rgba(0,0,0,0.5);
     --shadow-md:  0 4px 14px rgba(0,0,0,0.6);
   }
+  [data-theme="dark"] html { background: var(--card); }
   [data-theme="dark"] body { background: var(--parchment); }
   [data-theme="dark"] .app { background: var(--parchment); }
   [data-theme="dark"] .verse-card,
@@ -139,6 +140,7 @@
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; }
+  html { background: var(--card); }
   body {
     font-family: 'DM Sans', -apple-system, sans-serif;
     background: var(--parchment);
@@ -555,6 +557,19 @@
     width: 100%;
     pointer-events: none;
     filter: drop-shadow(0 -2px 20px rgba(26,37,71,0.10));
+  }
+
+  /* Fills the iOS home-indicator safe-area strip below the nav so the
+     page background never shows through as a mismatched band. */
+  .safe-area-fill {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(env(safe-area-inset-bottom, 0px) + 2px);
+    background: var(--card);
+    z-index: 19;
+    pointer-events: none;
   }
   .nav-bg svg { width: 100%; height: 100%; display: block; overflow: visible; }
   .nav-item {
@@ -1652,7 +1667,7 @@
           <div class="settings-row">
             <div>
               <div class="settings-row-title">Daily Faith</div>
-              <div class="settings-row-sub">Made by William Cain · v1.3</div>
+              <div class="settings-row-sub">Made by William Cain · v1.2</div>
             </div>
           </div>
           <div class="settings-row">
@@ -1740,6 +1755,9 @@
       <span class="label">More</span>
     </button>
   </nav>
+
+  <!-- Fills the iOS home-indicator safe-area strip so no background band shows -->
+  <div class="safe-area-fill" aria-hidden="true"></div>
 </div>
 
 <script>
