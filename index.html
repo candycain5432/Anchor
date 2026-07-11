@@ -145,7 +145,8 @@
     /* iOS PWA fix: flow the document into the bottom safe area so no bare
        background band shows below the home indicator. Top inset is handled
        by the header itself, so it's left out here to avoid a double gap. */
-    min-height: calc(100% + env(safe-area-inset-bottom));
+    min-height: 100%;
+    min-height: calc(100dvh + env(safe-area-inset-bottom));
     padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     background: var(--card);
     background-attachment: fixed;
@@ -559,6 +560,17 @@
     padding: 10px 8px calc(env(safe-area-inset-bottom, 6px) + 4px);
     background: var(--card);
     z-index: 20;
+  }
+  /* Extends the nav's background down through the home-indicator inset,
+     covering any residual gap below bottom:0 on iOS PWAs. */
+  .nav::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: env(safe-area-inset-bottom, 0px);
+    background: var(--card);
   }
   .nav-bg {
     position: absolute;
@@ -1663,7 +1675,7 @@
           <div class="settings-row">
             <div>
               <div class="settings-row-title">Daily Faith</div>
-              <div class="settings-row-sub">Made by William Cain · v4.7</div>
+              <div class="settings-row-sub">Made by William Cain · v1.2</div>
             </div>
           </div>
           <div class="settings-row">
