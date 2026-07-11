@@ -1350,9 +1350,6 @@
 </style>
 </head>
 <body>
-<div class="sw-update-bar" id="sw-update-bar" role="button" tabindex="0" aria-label="Update available">
-  ✦ Update available — tap to refresh
-</div>
 <div class="app">
 
   <!-- HOME -->
@@ -1684,7 +1681,7 @@
           <div class="settings-row">
             <div>
               <div class="settings-row-title">Daily Faith</div>
-              <div class="settings-row-sub">Made by William Cain · v5.5</div>
+              <div class="settings-row-sub">Made by William Cain · v5.7</div>
             </div>
           </div>
           <div class="settings-row">
@@ -3625,13 +3622,9 @@
       if (!swRefreshing) { swRefreshing = true; location.reload(); }
     });
 
-    const swUpdateBar = document.getElementById('sw-update-bar');
-    function showUpdateBar(reg) {
-      if (!swUpdateBar) return;
-      swUpdateBar.classList.add('visible');
-      swUpdateBar.onclick = () => {
-        if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
-      };
+    // Silently activate any new/waiting worker — no prompt, just update.
+    function activateUpdate(reg) {
+      if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
     }
 
     window.addEventListener('load', async () => {
@@ -3644,16 +3637,24 @@
         return;
       }
 
-      // If a new worker is already waiting (e.g. page was open during install)
-      if (reg.waiting && navigator.serviceWorker.controller) showUpdateBar(reg);
+      // A worker was already waiting when the page loaded — activate it now
+      if (reg.waiting && navigator.serviceWorker.controller) activateUpdate(reg);
 
+      // A new worker is installing — activate it the moment it's ready
       reg.addEventListener('updatefound', () => {
         const newWorker = reg.installing;
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            showUpdateBar(reg);
+            activateUpdate(reg);
           }
         });
+      });
+
+      // Proactively check for a new version on every load
+      reg.update().catch(() => {});
+      // ...and whenever the app is refocused (e.g. reopened from the home screen)
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') reg.update().catch(() => {});
       });
       // Sync push subscription state on every load.
       // Render free tier wipes subscriptions.json on restart, so re-POST to stay registered.
@@ -3678,6 +3679,77 @@
         } catch (err) {
           console.warn('[Lumen] Auto-resubscribe failed:', err);
         }
+      }
+    });
+  }
+
+  // ---- Manual update / cache control ----
+  // Callable from the app OR straight from the browser console (DevTools),
+  // e.g.  DailyFaith.forceUpdate()   or   DailyFaith.clearCaches()
+  window.DailyFaith = window.DailyFaith || {};
+
+  // List what's currently cached — quick way to see the active version
+  window.DailyFaith.listCaches = async function () {
+    if (!('caches' in window)) { console.warn('[Lumen] Cache API unavailable'); return []; }
+    const keys = await caches.keys();
+    console.log('[Lumen] Caches present:', keys);
+    return keys;
+  };
+
+  // Ask the browser to re-check service-worker.js for a new version right now
+  window.DailyFaith.checkForUpdate = async function () {
+    if (!('serviceWorker' in navigator)) { console.warn('[Lumen] SW unsupported'); return; }
+    const reg = await navigator.serviceWorker.getRegistration();
+    if (!reg) { console.warn('[Lumen] No SW registered'); return; }
+    await reg.update();
+    console.log('[Lumen] Update check complete. waiting:', !!reg.waiting, 'installing:', !!reg.installing);
+    return reg;
+  };
+
+  // Delete every cache, then hard-reload — the "nuke it" button
+  window.DailyFaith.clearCaches = async function () {
+    try {
+      // Ask the active SW to clear (covers caches it owns)
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage('CLEAR_CACHES');
+      }
+      // Also clear directly from the page as a belt-and-suspenders fallback
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+        console.log('[Lumen] Cleared caches:', keys);
+      }
+    } catch (err) {
+      console.warn('[Lumen] clearCaches error:', err);
+    }
+    location.reload();
+  };
+
+  // Full reset: unregister the SW, wipe caches, reload from scratch
+  window.DailyFaith.forceUpdate = async function () {
+    try {
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+        console.log('[Lumen] Caches wiped:', keys);
+      }
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
+        console.log('[Lumen] Unregistered', regs.length, 'worker(s)');
+      }
+    } catch (err) {
+      console.warn('[Lumen] forceUpdate error:', err);
+    }
+    location.reload();
+  };
+
+  // When the SW confirms it cleared its caches, reload to pick up fresh assets
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', event => {
+      if (event.data === 'CACHES_CLEARED') {
+        console.log('[Lumen] SW reported caches cleared — reloading');
+        location.reload();
       }
     });
   }
