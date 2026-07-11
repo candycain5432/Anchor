@@ -4,26 +4,26 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#1a2547" />
-<title>Daily Faith</title>
+<title>Anchor</title>
 <meta name="description" content="Your daily Catholic companion — faith, prayer, saints, and AI-powered guidance." />
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Daily Faith" />
+<meta name="apple-mobile-web-app-title" content="Anchor" />
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
 <link rel="icon" href="icons/icon-192.png" type="image/png" />
 
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Daily Faith" />
+<meta property="og:title" content="Anchor" />
 <meta property="og:description" content="Your daily Catholic companion — faith, prayer, saints, and AI-powered guidance." />
 <meta property="og:image" content="icons/icon-512.png" />
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="Daily Faith" />
+<meta name="twitter:title" content="Anchor" />
 <meta name="twitter:description" content="Your daily Catholic companion — faith, prayer, saints, and AI-powered guidance." />
 <meta name="twitter:image" content="icons/icon-512.png" />
 
@@ -1432,7 +1432,7 @@
     <header class="header header-chat">
       <span class="header-cross" aria-hidden="true">✝&#xFE0E;</span>
       <div class="eyebrow">Catholic AI</div>
-      <h1 class="title">Ask Daily Faith</h1>
+      <h1 class="title">Ask Anchor</h1>
       <div class="sub">Grounded in Church teaching</div>
     </header>
 
@@ -1680,8 +1680,8 @@
         <div class="settings-card">
           <div class="settings-row">
             <div>
-              <div class="settings-row-title">Daily Faith</div>
-              <div class="settings-row-sub">Made by William Cain · v7.1</div>
+              <div class="settings-row-title">Anchor</div>
+              <div class="settings-row-sub">Made by William Cain · v7.4</div>
             </div>
           </div>
           <div class="settings-row">
@@ -1827,7 +1827,7 @@
   function appendBotCard() {
     const card = document.createElement('div');
     card.className = 'answer-card';
-    card.innerHTML = '<div class="answer-label">Ask Daily Faith</div><p class="answer-text"></p>';
+    card.innerHTML = '<div class="answer-label">Ask Anchor</div><p class="answer-text"></p>';
     chatMessages.appendChild(card);
     scrollToBottom();
     return card.querySelector('.answer-text');
@@ -1837,7 +1837,7 @@
     const card = document.createElement('div');
     card.className = 'answer-card';
     card.id = 'typing-indicator';
-    card.innerHTML = '<div class="answer-label">Ask Daily Faith</div><div class="typing-dots"><span></span><span></span><span></span></div>';
+    card.innerHTML = '<div class="answer-label">Ask Anchor</div><div class="typing-dots"><span></span><span></span><span></span></div>';
     chatMessages.appendChild(card);
     scrollToBottom();
   }
@@ -2239,7 +2239,7 @@
 
         <p style="margin-bottom:18px;color:var(--ink-mute);font-size:11.5px;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;">Last updated: May 2026</p>
 
-        <p style="${p}">Daily Faith is a free Catholic companion app built and maintained by William Cain. Your trust matters. This policy explains plainly what data the app touches, why, and what we do — and don't do — with it.</p>
+        <p style="${p}">Anchor is a free Catholic companion app built and maintained by William Cain. Your trust matters. This policy explains plainly what data the app touches, why, and what we do — and don't do — with it.</p>
 
         <h3 style="${h3}">The short version</h3>
         <p style="${p}">We do not create accounts, track you, run ads, or sell data. Almost everything the app knows about you lives only on your own device. The only time any data leaves your phone is when you use AI chat or enable push notifications — and even then, nothing is tied to your identity.</p>
@@ -2264,7 +2264,7 @@
         <p style="${p}">If you choose to enable daily notifications, your browser generates a push subscription token — a technical identifier that allows our server to send you a notification. This token is stored on our server only for the purpose of delivering your daily notification. It is not linked to your name, email, location, or any other personal detail. If you disable notifications, the token is deleted from our server.</p>
 
         <h3 style="${h3}">Third-party services</h3>
-        <p style="margin-bottom:6px;">Daily Faith uses a small number of external services to function:</p>
+        <p style="margin-bottom:6px;">Anchor uses a small number of external services to function:</p>
         <ul style="${ul}">
           <li><strong>Google Fonts</strong> — loads the Cormorant Garamond and DM Sans typefaces. Google may log the font request as a standard web request.</li>
           <li><strong>Catholic Liturgical API</strong> — fetches today's feast day, Mass readings, and liturgical season from a public Catholic calendar API. No personal data is sent in these requests.</li>
@@ -2273,7 +2273,7 @@
         <p style="${p}">No advertising networks, analytics platforms, crash reporters, or tracking SDKs of any kind are included in this app.</p>
 
         <h3 style="${h3}">Children's privacy</h3>
-        <p style="${p}">Daily Faith does not knowingly collect any information from children under 13. The app contains no features that require personal data from any user of any age.</p>
+        <p style="${p}">Anchor does not knowingly collect any information from children under 13. The app contains no features that require personal data from any user of any age.</p>
 
         <h3 style="${h3}">Changes to this policy</h3>
         <p style="${p}">If this policy changes materially, the "Last updated" date at the top will be revised. Continued use of the app after a policy update constitutes acceptance of the revised terms. We will always keep this policy accessible from the Settings screen.</p>
@@ -3445,7 +3445,7 @@
       if (perm !== 'granted') return;
     }
     const { feast, litDay } = await fetchLiturgicalData();
-    const title  = feast.title ? `✦ ${feast.title}` : '✦ Daily Faith';
+    const title  = feast.title ? `✦ ${feast.title}` : '✦ Anchor';
     const body   = `${litDay} — tap to open your daily readings.`;
     try {
       const reg = await navigator.serviceWorker.ready;
