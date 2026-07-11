@@ -1,6 +1,6 @@
 {
-  "name": "Daily Faith",
-  "short_name": "Daily Faith",
+  "name": "Anchor",
+  "short_name": "Anchor",
   "description": "Your daily Catholic companion — faith, prayer, saints, and AI-powered guidance.",
   "start_url": "./",
   "scope": "./",
