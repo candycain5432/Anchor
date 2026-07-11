@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daily-faith-v14';
+const CACHE_NAME = 'daily-faith-v5.6';
 
 // index.html is intentionally excluded — navigation is always network-first
 const STATIC_ASSETS = [
