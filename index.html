@@ -1681,7 +1681,7 @@
           <div class="settings-row">
             <div>
               <div class="settings-row-title">Daily Faith</div>
-              <div class="settings-row-sub">Made by William Cain · v5.9</div>
+              <div class="settings-row-sub">Made by William Cain · v6.5</div>
             </div>
           </div>
           <div class="settings-row">
@@ -3627,6 +3627,16 @@
       if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
     }
 
+    // Throttle update checks so we don't spam reg.update() (browsers rate-limit
+    // it, which can cause updates to silently stop being picked up).
+    let lastUpdateCheck = 0;
+    function maybeCheckForUpdate(reg) {
+      const now = Date.now();
+      if (now - lastUpdateCheck < 5 * 60 * 1000) return; // at most once / 5 min
+      lastUpdateCheck = now;
+      reg.update().catch(() => {});
+    }
+
     window.addEventListener('load', async () => {
       let reg;
       try {
@@ -3637,24 +3647,24 @@
         return;
       }
 
-      // A worker was already waiting when the page loaded — activate it now
-      if (reg.waiting && navigator.serviceWorker.controller) activateUpdate(reg);
+      // A worker is already waiting — activate it now (don't require a
+      // controller; an early install can leave one waiting and orphaned).
+      if (reg.waiting) activateUpdate(reg);
 
       // A new worker is installing — activate it the moment it's ready
       reg.addEventListener('updatefound', () => {
         const newWorker = reg.installing;
+        if (!newWorker) return;
         newWorker.addEventListener('statechange', () => {
-          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            activateUpdate(reg);
-          }
+          if (newWorker.state === 'installed') activateUpdate(reg);
         });
       });
 
-      // Proactively check for a new version on every load
+      // Check once now (throttled), and again on refocus (also throttled)
+      lastUpdateCheck = Date.now();
       reg.update().catch(() => {});
-      // ...and whenever the app is refocused (e.g. reopened from the home screen)
       document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') reg.update().catch(() => {});
+        if (document.visibilityState === 'visible') maybeCheckForUpdate(reg);
       });
       // Sync push subscription state on every load.
       // Render free tier wipes subscriptions.json on restart, so re-POST to stay registered.
