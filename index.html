@@ -139,8 +139,16 @@
   [data-theme="dark"] .btn-outline { color: #fff; border-color: rgba(255,255,255,0.55); }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; padding: 0; }
-  html { background: var(--card); }
+  html, body { margin: 0; }
+  body { padding: 0; }
+  html {
+    /* Documented iOS PWA fix: flow the document into the safe areas so no
+       bare background band shows at the bottom below the home indicator. */
+    min-height: calc(100% + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    background: var(--card);
+    background-attachment: fixed;
+  }
   body {
     font-family: 'DM Sans', -apple-system, sans-serif;
     background: var(--parchment);
@@ -557,19 +565,6 @@
     width: 100%;
     pointer-events: none;
     filter: drop-shadow(0 -2px 20px rgba(26,37,71,0.10));
-  }
-
-  /* Fills the iOS home-indicator safe-area strip below the nav so the
-     page background never shows through as a mismatched band. */
-  .safe-area-fill {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: calc(env(safe-area-inset-bottom, 0px) + 2px);
-    background: var(--card);
-    z-index: 19;
-    pointer-events: none;
   }
   .nav-bg svg { width: 100%; height: 100%; display: block; overflow: visible; }
   .nav-item {
@@ -1667,7 +1662,7 @@
           <div class="settings-row">
             <div>
               <div class="settings-row-title">Daily Faith</div>
-              <div class="settings-row-sub">Made by William Cain · v1.2</div>
+              <div class="settings-row-sub">Made by William Cain · v4.6</div>
             </div>
           </div>
           <div class="settings-row">
@@ -1755,9 +1750,6 @@
       <span class="label">More</span>
     </button>
   </nav>
-
-  <!-- Fills the iOS home-indicator safe-area strip so no background band shows -->
-  <div class="safe-area-fill" aria-hidden="true"></div>
 </div>
 
 <script>
