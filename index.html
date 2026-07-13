@@ -2993,9 +2993,14 @@
 
     async function getVerseText(ref) {
       try {
-        // bible-api.com can't handle "Ps 57:8-9, 10 and 12" — simplify to first range
-        const simplified = ref.replace(/,.*$/, '').replace(/\s+and\s+\S+/g, '').trim();
-        const r = await fetch(`https://bible-api.com/${encodeURIComponent(simplified)}?translation=web`);
+        // Catholic psalm citations look like "Psalm 90:3-4, 5-6, 12-13, 14 and 17".
+        // bible-api.com accepts comma-separated ranges but not the word "and",
+        // so convert "14 and 17" -> "14,17" and keep every range.
+        const simplified = ref
+          .replace(/\s+and\s+/gi, ',')
+          .replace(/\s+/g, ' ')
+          .trim();
+        const r = await fetch(`https://bible-api.com/${encodeURIComponent(simplified)}?translation=dra`);
         if (!r.ok) return '';
         const d = await r.json();
         return (d.text || '').trim();
