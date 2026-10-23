@@ -3,7 +3,7 @@ import * as api from '../api.js';
 import { PRAYERS } from '../data/prayers.js';
 import { openSheet, closeSheet, esc, prayerHTML } from '../ui.js';
 import { icon } from '../icons.js';
-import { complete, bumpCount } from '../practices.js';
+import { complete, bumpCount, checkMilestones } from '../practices.js';
 import { countdown, bell } from './timer.js';
 
 const FALLBACK_QUESTIONS = [
@@ -100,6 +100,7 @@ export async function openLectio() {
     }
     bumpCount('lectio');
     complete('lectio', { quiet: true });
+    checkMilestones();
     const carry = prompts?.word || word;
     body.innerHTML = `<div style="text-align:center;padding:40px 10px">
       <div style="font-size:3rem">🕯️</div>

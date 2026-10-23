@@ -1,7 +1,7 @@
 // Silent prayer / Holy Hour timer with a soft synthesized bell.
 import { openSheet, closeSheet, haptic, esc } from '../ui.js';
 import { icon } from '../icons.js';
-import { complete, bumpCount } from '../practices.js';
+import { complete, bumpCount, checkMilestones } from '../practices.js';
 
 let audio;
 /** A gentle church-bell tone built from decaying partials. */
@@ -145,6 +145,7 @@ export function openTimer({ minutes } = {}) {
     keepAwake(false);
     bumpCount('silenceMin', min);
     complete('silence', { quiet: true });
+    checkMilestones();
     body.innerHTML = `
       <div style="text-align:center;padding:50px 10px">
         <div style="font-size:3rem">🤍</div>

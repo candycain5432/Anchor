@@ -3,7 +3,7 @@ import { EXAMEN_CATEGORIES, DAILY_EXAMEN, CONFESSION_STEPS, PRAYERS } from '../d
 import * as store from '../store.js';
 import { openSheet, closeSheet, esc, prayerHTML, relDay, toast } from '../ui.js';
 import { icon } from '../icons.js';
-import { complete, bumpCount } from '../practices.js';
+import { complete, bumpCount, checkMilestones } from '../practices.js';
 
 export function openDailyExamen() {
   let i = 0;
@@ -39,6 +39,7 @@ export function openDailyExamen() {
       if (items.length) (await import('../screens/journal.js')).saveGratitude(items);
       bumpCount('examen');
       complete('examen');
+      checkMilestones();
       closeSheet();
     }
   };

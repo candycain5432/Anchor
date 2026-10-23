@@ -296,7 +296,8 @@ a { color: var(--gold); }
 .reading-text { font-family: var(--font-display); font-size: 1.15rem; line-height: 1.7; margin: 0 0 12px; }
 
 /* Week strip */
-.week { display: flex; gap: 10px; overflow-x: auto; margin: 0 -18px 14px; padding: 2px 18px 6px; scrollbar-width: none; scroll-snap-type: x mandatory; }
+.week { display: flex; gap: 10px; overflow-x: auto; margin: 0 -18px 14px; padding: 2px 18px 6px; scroll-padding-inline: 18px; scrollbar-width: none; scroll-snap-type: x proximity; }
+.week::after, .chips.scroll::after { content: ''; flex: 0 0 8px; }
 .week::-webkit-scrollbar { display: none; }
 .day-chip {
   flex: none; width: 132px; scroll-snap-align: start;
@@ -350,7 +351,7 @@ a { color: var(--gold); }
 
 /* Chips & segmented */
 .chips { display: flex; gap: 8px; flex-wrap: wrap; }
-.chips.scroll { flex-wrap: nowrap; overflow-x: auto; margin: 0 -18px; padding: 2px 18px 4px; scrollbar-width: none; }
+.chips.scroll { flex-wrap: nowrap; overflow-x: auto; margin: 0 -18px; padding: 2px 18px 4px; scroll-padding-inline: 18px; scrollbar-width: none; }
 .chips.scroll::-webkit-scrollbar { display: none; }
 .chip {
   flex: none; padding: 8px 14px; border-radius: 999px;

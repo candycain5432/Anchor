@@ -3,7 +3,7 @@ import * as store from '../store.js';
 import * as api from '../api.js';
 import { esc, greeting, fmtDate, track } from '../ui.js';
 import { icon } from '../icons.js';
-import { PRACTICES, rule, dayLog, streak, launch, onChange } from '../practices.js';
+import { PRACTICES, rule, dayLog, streak, launch, onChange, complete } from '../practices.js';
 import { season, rank, isFeria, litColor, isSaint, saintFallback, COLOR_NAMES, COLOR_HEX, mysterySet } from '../liturgy.js';
 
 let root, day = null, bound = false;
@@ -245,7 +245,7 @@ async function loadVerse() {
   }
 }
 
-let reflectionText = '';
+let reflectionText = '', readingsData = null;
 async function loadReflection() {
   const card = root.querySelector('[data-reflect]');
   const p = card.querySelector('.reflect-text');
@@ -265,17 +265,25 @@ async function loadReadings() {
   const card = root.querySelector('[data-readings]');
   try {
     const r = await api.readings();
+    readingsData = r;
     card.innerHTML = `
       <div class="card-label">Mass Readings<span class="spacer"></span>${dayLog().readings ? `<span class="badge done">${icon('check')} Read</span>` : ''}</div>
       ${r.sections.map(s => `
-        <button class="reading-head" data-reading="${s.id}" style="border-top:1px solid var(--line)">
-          <div><div class="t">${esc(s.label)}</div><div class="c">${esc(s.cite)}</div></div>${icon('chev', 'chev')}
-        </button>`).join('')}
+        <div class="reading" data-section="${s.id}">
+          <button class="reading-head" data-toggle-reading="${s.id}" aria-expanded="false">
+            <div><div class="t">${esc(s.label)}</div><div class="c">${esc(s.cite)}</div></div>${icon('chev', 'chev')}
+          </button>
+          <div class="reading-body">
+            <p class="reading-text">${s.text ? esc(s.text) : `<em class="muted">Couldn’t load this text — open ${esc(s.cite)} in your Bible, or try again later.</em>`}</p>
+            <div class="card-actions" style="margin-top:0">
+              <button class="btn btn-soft btn-sm" data-ask-reading="${s.id}">${icon('spark')} Ask Anchor</button>
+              ${s.id === 'gospel' ? `<button class="btn btn-soft btn-sm" data-launch="lectio">${icon('candle')} Lectio Divina</button>` : ''}
+            </div>
+          </div>
+        </div>`).join('')}
       <div class="card-actions">
-        <button class="btn btn-primary btn-sm" data-reading="first">${icon('book')} Read all</button>
-        <button class="btn btn-soft btn-sm" data-launch="lectio">${icon('candle')} Lectio Divina</button>
+        <button class="btn btn-primary btn-sm" data-reading="first">${icon('book')} Open full readings</button>
       </div>`;
-    card.querySelector('.reading-head').style.borderTop = '0';
   } catch {
     card.innerHTML = `<div class="card-label">Mass Readings</div><p class="muted small" style="margin:0">Couldn’t load today’s readings. Check your connection.</p>`;
   }
@@ -366,6 +374,23 @@ async function onClick(e) {
 
   const ln = t.closest('[data-launch]');
   if (ln) return launch(ln.dataset.launch);
+
+  const tg = t.closest('[data-toggle-reading]');
+  if (tg) {
+    const item = tg.closest('.reading');
+    const open = item.classList.toggle('open');
+    tg.setAttribute('aria-expanded', open);
+    if (open && root.querySelectorAll('[data-readings] .reading.open').length === readingsData.sections.length) complete('readings');
+    return;
+  }
+  const ar = t.closest('[data-ask-reading]');
+  if (ar) {
+    const s = readingsData.sections.find(x => x.id === ar.dataset.askReading);
+    return (await import('./ask.js')).askAbout({
+      kind: 'reading', title: `${s.label} — ${s.cite}`, text: s.text || s.cite,
+      prompt: `Help me understand today's ${s.label.toLowerCase()} (${s.cite}). What is it saying, and how can I live it today?`,
+    });
+  }
 
   const rd = t.closest('[data-reading]');
   if (rd) return launch('readings', { focus: rd.dataset.reading });

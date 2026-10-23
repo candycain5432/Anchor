@@ -59,24 +59,40 @@ async function verseText(ref) {
     // comma-separated ranges but not "and", so "14 and 17" -> "14,17".
     const simplified = ref.replace(/\s+and\s+/gi, ',').replace(/\s+/g, ' ').trim();
     const d = await getJSON(`https://bible-api.com/${encodeURIComponent(simplified)}?translation=dra`);
-    return (d.text || '').trim();
+    // d.text runs verses together ("kindled?And"), so join the verses ourselves.
+    const verses = (d.verses || []).map(v => v.text.trim()).filter(Boolean);
+    return (verses.length ? verses.join(' ') : d.text || '').replace(/\s+/g, ' ').trim();
   } catch { return ''; }
 }
 
-export function readings(iso = store.isoDate()) {
-  return daily('readings', iso, async () => {
-    const ref = await getJSON(`${CAL}/readings/${calPath(iso)}`);
-    const { firstReading, secondReading, psalm, gospel } = ref.readings || {};
-    const list = [
-      { id: 'first', label: 'First Reading', cite: firstReading },
-      { id: 'psalm', label: 'Responsorial Psalm', cite: psalm },
-      ...(secondReading ? [{ id: 'second', label: 'Second Reading', cite: secondReading }] : []),
-      { id: 'gospel', label: 'Gospel', cite: gospel },
-    ].filter(s => s.cite);
-    const texts = await Promise.all(list.map(s => verseText(s.cite)));
-    list.forEach((s, i) => { s.text = texts[i]; });
-    return { sections: list, usccb: ref.usccbLink || '' };
-  });
+export async function readings(iso = store.isoDate()) {
+  const key = `cache:readings2:${iso}`; // v2: verses joined with spaces
+  const hit = store.get(key);
+  if (hit && hit.sections.every(s => s.text)) return hit;
+  const fresh = await fetchReadings(iso);
+  // Only cache once every text has arrived, so a hiccup isn't stuck for the whole day.
+  if (fresh.sections.every(s => s.text)) store.set(key, fresh);
+  return fresh;
+}
+
+async function fetchReadings(iso) {
+  const ref = await getJSON(`${CAL}/readings/${calPath(iso)}`);
+  const { firstReading, secondReading, psalm, gospel } = ref.readings || {};
+  const list = [
+    { id: 'first', label: 'First Reading', cite: firstReading },
+    { id: 'psalm', label: 'Responsorial Psalm', cite: psalm },
+    ...(secondReading ? [{ id: 'second', label: 'Second Reading', cite: secondReading }] : []),
+    { id: 'gospel', label: 'Gospel', cite: gospel },
+  ].filter(s => s.cite);
+  const texts = await Promise.all(list.map(s => verseText(s.cite)));
+  list.forEach((s, i) => { s.text = texts[i]; });
+  // One retry for anything that failed (bible-api.com rate-limits bursts)
+  const missing = list.filter(s => !s.text);
+  if (missing.length) {
+    await new Promise(r => setTimeout(r, 1500));
+    for (const s of missing) s.text = await verseText(s.cite);
+  }
+  return { sections: list, usccb: ref.usccbLink || '' };
 }
 
 // ---- Verse of the day ----

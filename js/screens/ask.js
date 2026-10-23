@@ -77,7 +77,7 @@ function autosize() {
 function starters() {
   const today = store.isoDate();
   const lit = store.get('cache:lit:' + today);
-  const rd = store.get('cache:readings:' + today);
+  const rd = store.get('cache:readings2:' + today);
   const gospel = rd?.sections?.find(s => s.id === 'gospel');
   const saint = lit && !isFeria(lit) ? lit.name : saintFallback().name;
   const s = season(lit?.season).key;

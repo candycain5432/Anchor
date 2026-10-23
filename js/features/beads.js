@@ -4,7 +4,7 @@ import { PRAYERS, ROSARY_MYSTERIES, ROSARY_CLOSING, CHAPLET } from '../data/pray
 import * as store from '../store.js';
 import { openSheet, closeSheet, esc, haptic, toast, sealSVG } from '../ui.js';
 import { icon } from '../icons.js';
-import { complete, bumpCount } from '../practices.js';
+import { complete, bumpCount, checkMilestones } from '../practices.js';
 import { mysterySet } from '../liturgy.js';
 
 // ---------- Geometry ----------
@@ -211,9 +211,10 @@ function player(state) {
   function finish() {
     finished = true;
     store.del(`beads:${state.kind}`);
-    complete(state.kind === 'rosary' ? 'rosary' : 'chaplet', { quiet: true });
     if (state.kind === 'rosary') { bumpCount('rosaryFull'); bumpCount('set:' + state.set); }
     else bumpCount('chapletFull');
+    complete(state.kind === 'rosary' ? 'rosary' : 'chaplet', { quiet: true });
+    checkMilestones(); // complete() only checks the first time per day
     haptic([20, 60, 20, 60, 40]);
     const label = state.kind === 'rosary' ? `the ${state.set} Mysteries` : 'the Divine Mercy Chaplet';
     body.innerHTML = `

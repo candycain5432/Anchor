@@ -108,7 +108,7 @@ async function boot() {
   buildNav();
   await navigate('today');
   handleDeepLink();
-  checkMilestones({ silent: true });
+  checkMilestones({ silent: !store.get('milestones') });
 
   const { needsOnboarding, openOnboarding } = await import('./onboarding.js');
   if (needsOnboarding()) setTimeout(() => openOnboarding(), 400);
