@@ -121,7 +121,7 @@ export function confirmSheet({ title, message, confirm = 'Confirm', danger = fal
     openSheet({
       title,
       html: `<p class="muted" style="margin:0 0 6px">${esc(message)}</p>`,
-      foot: `<button class="btn btn-soft btn-block" data-act="no">Cancel</button><button class="btn ${danger ? 'btn-dark' : 'btn-primary'} btn-block" data-act="yes">${esc(confirm)}</button>`,
+      foot: `<button class="btn btn-soft btn-block" data-act="no">Cancel</button><button class="btn ${danger ? 'btn-danger' : 'btn-primary'} btn-block" data-act="yes">${esc(confirm)}</button>`,
       onMount: (_b, foot) => {
         foot.onclick = e => {
           const a = e.target.closest('[data-act]')?.dataset.act;

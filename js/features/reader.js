@@ -80,7 +80,7 @@ export async function openReadings({ focus } = {}) {
           ${s.id === 'gospel' ? `<button class="btn btn-soft btn-sm" data-lectio>${icon('candle')} Pray with Lectio</button>` : ''}
         </div>
       </section>`).join('') +
-      (r.usccb ? `<p class="small" style="text-align:center"><a href="${esc(r.usccb)}" target="_blank" rel="noopener">Read the full NABRE readings at USCCB ↗</a></p>` : '') +
+      (r.usccb ? `<p class="small" style="text-align:center"><a class="link" href="${esc(r.usccb)}" target="_blank" rel="noopener">Read the full NABRE readings at USCCB ↗</a></p>` : '') +
       `<button class="btn btn-primary btn-block btn-lg" data-done style="margin-top:8px">${icon('check')} I’ve read today’s readings</button>`;
     if (focus) body.querySelector(`#rd-${focus}`)?.scrollIntoView({ block: 'start' });
     body.onclick = async e => {

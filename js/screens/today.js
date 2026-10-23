@@ -169,8 +169,7 @@ async function loadDay() {
   root.querySelector('[data-day-name]').textContent = feria ? (day.name || season(day.season).label) : day.name;
   root.querySelector('[data-day-pills]').innerHTML = `
     <span class="pill"><span class="dot"></span>${esc(season(day.season).label)}</span>
-    ${rank(day.type) ? `<span class="pill">${esc(rank(day.type))}</span>` : ''}
-    <span class="pill" title="Liturgical color">${esc(COLOR_NAMES[color])}</span>`;
+    <span class="pill" title="Liturgical color: ${esc(COLOR_NAMES[color])}">${rank(day.type) ? `${esc(rank(day.type))} · ` : ''}${esc(COLOR_NAMES[color].split(' ')[0])}</span>`;
   renderPractice();
   renderSaint();
   loadWeek();

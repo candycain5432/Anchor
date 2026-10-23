@@ -91,7 +91,7 @@ export async function openSaint(name, { quote, description } = {}) {
     wikiText = info.extract;
     if (info.image) body.querySelector('[data-img]').innerHTML = `<img class="saint-hero-img" src="${esc(info.image)}" alt="${esc(name)}">`;
     wikiEl.innerHTML = local ? '' : `<p style="line-height:1.7;margin:0 0 8px">${esc(info.extract)}</p>`;
-    if (info.url) wikiEl.insertAdjacentHTML('beforeend', `<a class="small" href="${esc(info.url)}" target="_blank" rel="noopener">Read more on Wikipedia ↗</a>`);
+    if (info.url) wikiEl.insertAdjacentHTML('beforeend', `<a class="small link" href="${esc(info.url)}" target="_blank" rel="noopener">Read more on Wikipedia ↗</a>`);
   } else {
     wikiEl.innerHTML = local || description ? '' : `<p class="muted">No biography found.</p>`;
   }

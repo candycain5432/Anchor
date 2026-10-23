@@ -333,6 +333,7 @@ a { color: var(--gold); }
 .btn-dark { background: var(--navy); color: #fff; }
 :root[data-theme="dark"] .btn-dark { background: var(--surface-3); }
 .btn-soft { background: var(--surface-2); color: var(--ink); border: 1px solid var(--line); }
+.btn-danger { background: #b03a43; color: #fff; box-shadow: 0 6px 16px -8px rgba(176,58,67,.8); }
 .btn-ghost { background: transparent; color: var(--ink-2); }
 .btn-sm { padding: 7px 13px; font-size: .78rem; }
 .btn-block { width: 100%; }
@@ -485,6 +486,7 @@ button.row:active, .row.tap:active { background: var(--surface-2); }
 
 /* Saints */
 .saint-row-icon { font-size: 1.4rem; }
+.link { display: inline-block; padding: 10px 0; font-weight: 600; }
 .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); font-size: .7rem; color: var(--ink-2); margin: 2px 4px 0 0; }
 .saint-hero-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: var(--r-md); margin-bottom: 14px; background: var(--surface-2); }
 
@@ -576,9 +578,15 @@ button.row:active, .row.tap:active { background: var(--surface-2); }
 }
 .toast.show { translate: -50% 0; pointer-events: auto; visibility: visible; transition: translate .45s var(--spring); }
 .toast button { background: none; border: 0; color: var(--gold-2); font-weight: 800; padding: 0 0 0 6px; }
+:root[data-theme="dark"] .toast { background: #f1ece0; color: #14203f; }
+:root[data-theme="dark"] .toast button { color: #8a6825; }
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] .toast { background: #f1ece0; color: #14203f; }
+  :root[data-theme="auto"] .toast button { color: #8a6825; }
+}
 
 /* Milestone seal overlay */
-.seal-pop { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; background: rgba(8,12,26,.55); animation: fade .3s both; }
+.seal-pop { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; background: radial-gradient(circle at 50% 40%, rgba(29,44,86,.92), rgba(8,12,26,.96)); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); animation: fade .3s both; }
 .seal-pop .inner { text-align: center; color: #fff; padding: 24px; animation: rise .5s var(--spring) both; }
 .seal-pop .seal { width: 140px; height: 140px; margin: 0 auto 18px; animation: seal-in .9s var(--spring) both; }
 .seal-pop h3 { font-family: var(--font-display); font-size: 2rem; margin: 0 0 6px; font-weight: 600; }
@@ -724,8 +732,8 @@ button.row:active, .row.tap:active { background: var(--surface-2); }
 .player-top { text-align: center; padding: 0 6px 6px; }
 .player-mystery { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; line-height: 1.15; }
 .player-fruit { font-size: .76rem; color: var(--gold); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-top: 3px; }
-.beads { display: block; flex: 0 1 auto; width: 100%; max-width: 300px; min-height: 110px; max-height: 30dvh; margin: 4px auto 2px; }
-.beads .b { fill: var(--surface); stroke: var(--ink-3); stroke-width: 1.4; transition: fill .3s, stroke .3s, r .3s; }
+.beads { display: block; flex: 0 1 auto; width: 100%; max-width: 300px; min-height: 150px; max-height: 36dvh; margin: 4px auto 2px; }
+.beads .b { fill: var(--surface); stroke: color-mix(in srgb, var(--ink-3) 70%, var(--ink)); stroke-width: 1.6; transition: fill .3s, stroke .3s, r .3s; }
 .beads .b.done { fill: var(--gold); stroke: color-mix(in srgb, var(--gold) 70%, #000); }
 .beads .b.cur { fill: var(--gold-2); stroke: var(--gold); filter: url(#beadGlow); }
 .beads .chain { fill: none; stroke: var(--line-2); stroke-width: 1.2; }
@@ -744,6 +752,7 @@ button.row:active, .row.tap:active { background: var(--surface-2); }
 .player-card .k { font-size: .7rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
 .player-card .pt { font-family: var(--font-display); font-size: calc(1.14rem * var(--reader, 1)); line-height: 1.5; font-weight: 500; white-space: pre-line; }
 .player-card .hint { font-size: .72rem; color: var(--ink-3); margin-top: 14px; }
+.player-card.more { -webkit-mask-image: linear-gradient(#000 82%, transparent); mask-image: linear-gradient(#000 82%, transparent); }
 .player-card.flip { animation: flip .35s var(--ease); }
 @keyframes flip { from { opacity: .2; transform: translateX(var(--dir, 16px)); } }
 .count { display: inline-flex; gap: 4px; justify-content: center; margin-top: 12px; }

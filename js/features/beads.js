@@ -190,6 +190,8 @@ function player(state) {
     card.querySelector('.hint').textContent = `${i + 1} of ${steps.length}`;
     nextBtn.innerHTML = s.last ? `${icon('check')} Amen` : `Next ${icon('chev')}`;
     body.querySelector('[data-act="prev"]').disabled = i === 0;
+    card.scrollTop = 0;
+    fadeIfMore();
     if (dir) {
       card.style.setProperty('--dir', `${dir * 18}px`);
       card.classList.remove('flip'); void card.offsetWidth; card.classList.add('flip');
@@ -197,6 +199,12 @@ function player(state) {
   }
 
   let finished = false;
+  // Fade the bottom edge while there's more prayer text to scroll to.
+  function fadeIfMore() {
+    card.classList.toggle('more', card.scrollHeight - card.scrollTop - card.clientHeight > 8);
+  }
+  card.addEventListener('scroll', fadeIfMore, { passive: true });
+
   function go(dir) {
     if (finished) return;
     if (dir > 0 && steps[i].last) return finish();

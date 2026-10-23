@@ -82,7 +82,7 @@ function starters() {
   const saint = lit && !isFeria(lit) ? lit.name : saintFallback().name;
   const s = season(lit?.season).key;
   const list = [
-    { e: '✝️', t: `Tell me about ${saint}`, ctx: null },
+    { e: '🕊️', t: `Tell me about ${saint}`, ctx: null },
     gospel && { e: '📖', t: `Explain today’s Gospel (${gospel.cite})`, ctx: { kind: 'reading', title: `Gospel — ${gospel.cite}`, text: gospel.text || gospel.cite } },
     s === 'ADVENT' && { e: '🕯️', t: 'How can I prepare my heart for Christmas?' },
     (s === 'LENT' || s === 'HOLY_WEEK') && { e: '🌿', t: 'Give me ideas for prayer, fasting and almsgiving this Lent' },

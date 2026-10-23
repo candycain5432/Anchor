@@ -170,7 +170,7 @@ function openPrivacy() {
       <h3 ${h}>Changes</h3>
       <p>If this policy changes materially, the date above will change. The policy is always available from the Me tab.</p>
       <h3 ${h}>Contact</h3>
-      <p>Questions? Reach out to <b>William Cain</b> at <a href="mailto:williamtylercain441@gmail.com">williamtylercain441@gmail.com</a>.</p>
+      <p>Questions? Reach out to <b>William Cain</b> at <a class="link" href="mailto:williamtylercain441@gmail.com">williamtylercain441@gmail.com</a>.</p>
     </div>`,
   });
 }
