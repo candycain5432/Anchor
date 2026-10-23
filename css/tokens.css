@@ -1,0 +1,118 @@
+/* ==========================================================================
+   Anchor design tokens
+   Light / dark themes, liturgical colors, type scale.
+   ========================================================================== */
+
+:root {
+  /* Brand */
+  --navy:        #14203f;
+  --navy-2:      #1d2c56;
+  --gold:        #b8913a;
+  --gold-2:      #d9b866;
+  --gold-3:      #f3e6c3;
+
+  /* Surfaces (light) */
+  --bg:          #f4efe4;
+  --surface:     #fffdf8;
+  --surface-2:   #f3ede1;
+  --surface-3:   #ebe3d3;
+  --ink:         #1f1d1a;
+  --ink-2:       #5c574d;
+  --ink-3:       #948d80;
+  --line:        #e5ddcc;
+  --line-2:      #d8ceb9;
+  --on-accent:   #ffffff;
+
+  --shadow-1: 0 1px 2px rgba(20,32,63,.06), 0 2px 8px rgba(20,32,63,.05);
+  --shadow-2: 0 4px 14px rgba(20,32,63,.08), 0 12px 32px rgba(20,32,63,.08);
+  --shadow-3: 0 18px 50px rgba(20,32,63,.22);
+
+  /* Liturgical color (overridden by [data-lit]) */
+  --lit:       #3f7d4e;
+  --lit-soft:  rgba(63,125,78,.14);
+  --lit-name:  'Green';
+
+  /* Type */
+  --scale: 1;
+  --font-display: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+  --font-ui: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-caps: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
+
+  /* Shape & motion */
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 26px;
+  --r-xl: 34px;
+  --ease: cubic-bezier(.2,.8,.2,1);
+  --spring: cubic-bezier(.34,1.56,.64,1);
+  --dur: .32s;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --nav-h: 84px;
+
+  /* Paper grain, used on heroes and the page background */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+
+  color-scheme: light;
+}
+
+/* ---------- Dark theme ---------- */
+:root[data-theme="dark"] {
+  --bg:        #0a0f1e;
+  --surface:   #131a30;
+  --surface-2: #19223d;
+  --surface-3: #212c4c;
+  --ink:       #f1ece0;
+  --ink-2:     #b0b5c7;
+  --ink-3:     #727a96;
+  --line:      #222c4a;
+  --line-2:    #2d3960;
+  --gold:      #d4af5a;
+  --gold-2:    #e6c77d;
+  --gold-3:    rgba(212,175,90,.16);
+  --shadow-1: 0 1px 2px rgba(0,0,0,.4);
+  --shadow-2: 0 6px 22px rgba(0,0,0,.45);
+  --shadow-3: 0 18px 60px rgba(0,0,0,.6);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    --bg:        #0a0f1e;
+    --surface:   #131a30;
+    --surface-2: #19223d;
+    --surface-3: #212c4c;
+    --ink:       #f1ece0;
+    --ink-2:     #b0b5c7;
+    --ink-3:     #727a96;
+    --line:      #222c4a;
+    --line-2:    #2d3960;
+    --gold:      #d4af5a;
+    --gold-2:    #e6c77d;
+    --gold-3:    rgba(212,175,90,.16);
+    --shadow-1: 0 1px 2px rgba(0,0,0,.4);
+    --shadow-2: 0 6px 22px rgba(0,0,0,.45);
+    --shadow-3: 0 18px 60px rgba(0,0,0,.6);
+    color-scheme: dark;
+  }
+}
+
+/* ---------- Liturgical colors (vestment color of the day) ---------- */
+:root[data-lit="green"]  { --lit: #3f7d4e; --lit-soft: rgba(63,125,78,.15); }
+:root[data-lit="violet"] { --lit: #6d4f9e; --lit-soft: rgba(109,79,158,.16); }
+:root[data-lit="rose"]   { --lit: #c46b8d; --lit-soft: rgba(196,107,141,.16); }
+:root[data-lit="white"]  { --lit: #c9a449; --lit-soft: rgba(201,164,73,.18); }
+:root[data-lit="red"]    { --lit: #b03a43; --lit-soft: rgba(176,58,67,.15); }
+
+/* ---------- Text size ---------- */
+:root[data-size="s"]  { --scale: .92; }
+:root[data-size="m"]  { --scale: 1; }
+:root[data-size="l"]  { --scale: 1.1; }
+:root[data-size="xl"] { --scale: 1.22; }
+
+html { font-size: calc(16px * var(--scale)); }
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur: .01s; }
+  *, *::before, *::after { animation-duration: .01s !important; animation-iteration-count: 1 !important; transition-duration: .01s !important; }
+}

@@ -3,81 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#1a2547" />
-  <title>Offline — Daily Faith</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#14203f" />
+  <title>Offline — Anchor</title>
   <style>
-    :root {
-      --navy: #1a2547;
-      --gold: #c9a449;
-      --gold-soft: #efe3c4;
-      --parchment: #f5f2ec;
-    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      height: 100%;
-      background: var(--parchment);
-      font-family: 'DM Sans', sans-serif;
-      color: var(--navy);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
+    html, body { height: 100%; }
+    body {
+      display: grid; place-items: center; text-align: center;
       padding: 32px 24px;
-    }
-    .card {
-      max-width: 360px;
-      background: #fff;
-      border-radius: 20px;
-      padding: 48px 36px;
-      box-shadow: 0 12px 32px rgba(26,37,71,0.12);
-      border: 1px solid var(--gold-soft);
-    }
-    .icon {
-      width: 72px; height: 72px;
-      border-radius: 50%;
-      background: var(--gold-soft);
-      color: var(--gold);
-      display: grid;
-      place-items: center;
-      margin: 0 auto 24px;
-      font-size: 32px;
-    }
-    h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 30px;
-      font-weight: 500;
-      margin-bottom: 10px;
-    }
-    p {
-      font-size: 14px;
-      color: #6b6a63;
-      line-height: 1.6;
-      margin-bottom: 32px;
-    }
-    a {
-      display: inline-block;
-      background: var(--navy);
+      font-family: 'DM Sans', -apple-system, sans-serif;
       color: #fff;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 600;
-      font-size: 14px;
-      padding: 14px 32px;
-      border-radius: 999px;
-      text-decoration: none;
-      letter-spacing: 0.02em;
-      transition: background .2s ease;
+      background:
+        radial-gradient(120% 60% at 100% 0%, rgba(63,125,78,.45), transparent 60%),
+        radial-gradient(100% 60% at 0% 100%, rgba(201,164,73,.25), transparent 60%),
+        linear-gradient(170deg, #1d2c56, #0b1430);
     }
-    a:hover { background: #2a3560; }
+    .mark { font-size: 46px; color: #e6c77d; margin-bottom: 18px; }
+    h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; font-size: 40px; line-height: 1.05; margin-bottom: 12px; }
+    p { color: rgba(255,255,255,.7); line-height: 1.6; max-width: 320px; margin: 0 auto 30px; font-size: 15px; }
+    blockquote { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 19px; color: rgba(255,255,255,.85); max-width: 320px; margin: 0 auto 32px; }
+    a {
+      display: inline-block; padding: 14px 32px; border-radius: 999px;
+      background: linear-gradient(140deg, #d9b866, #b8913a); color: #fff;
+      font-weight: 700; font-size: 15px; text-decoration: none;
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="icon" style="font-variant-emoji:text;">✝&#xFE0E;</div>
-    <h1>You're Offline</h1>
-    <p>No internet connection right now. Please check your connection and try again.</p>
-    <a href="./">Try Again</a>
-  </div>
+  <main>
+    <div class="mark" aria-hidden="true">⚓&#xFE0E;</div>
+    <h1>You’re offline</h1>
+    <p>Anchor needs a connection the first time it loads. Once it has, your prayers work offline too.</p>
+    <blockquote>“Be still, and know that I am God.” — Psalm 46:10</blockquote>
+    <a href="./">Try again</a>
+  </main>
 </body>
 </html>
