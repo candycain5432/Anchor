@@ -1,4 +1,4 @@
-const CACHE_NAME = 'anchor-v9.3';
+const CACHE_NAME = 'anchor-v9.4';
 
 // App shell. index.html is network-first (below) but precached for offline use.
 const STATIC_ASSETS = [

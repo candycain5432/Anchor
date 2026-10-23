@@ -28,15 +28,6 @@
       r.dataset.size = g('size') || 'm';
       r.dataset.lit = g('lastLit') || 'green';
     } catch (e) {}
-    // Installed iPhone app: measure how far the viewport stops short of the screen bottom
-    // (see --vp-gap in css/tokens.css). Large differences are the keyboard or landscape, not the strip.
-    var fit = function () {
-      // navigator.standalone exists only on iOS; Android's system bars would otherwise count as a gap.
-      var gap = navigator.standalone === true ? screen.height - innerHeight : 0;
-      document.documentElement.style.setProperty('--vp-gap', (gap > 0 && gap < 60 ? gap : 0) + 'px');
-    };
-    fit();
-    addEventListener('resize', fit);
   })();
 </script>
 
