@@ -51,6 +51,11 @@
   /* Deliberately 0: reserving the iPhone home-indicator inset floated the tab bar
      and sheets ~34px up with dead space beneath. Content sits flush to the bottom. */
   --safe-bottom: 0px;
+  /* iOS home-screen apps can end the layout viewport above the screen's bottom edge,
+     leaving the home-indicator strip uncovered. index.html measures that shortfall into
+     --vp-gap; full-screen layers extend down by it (--below is the matching negative inset). */
+  --vp-gap: 0px;
+  --below: calc(-1 * var(--vp-gap));
   --nav-h: 84px;
 
   /* Paper grain, used on heroes and the page background */

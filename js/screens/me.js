@@ -5,7 +5,7 @@ import { icon } from '../icons.js';
 import { PRACTICES, rule, setRule, log, streak, bestStreak, totalDays, MILESTONES, unlocked, onChange } from '../practices.js';
 import * as push from '../push.js';
 
-export const VERSION = '9.2';
+export const VERSION = '9.3';
 let root, bound = false;
 
 export function mount(el) {
