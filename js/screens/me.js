@@ -5,7 +5,7 @@ import { icon } from '../icons.js';
 import { PRACTICES, rule, setRule, log, streak, bestStreak, totalDays, MILESTONES, unlocked, onChange } from '../practices.js';
 import * as push from '../push.js';
 
-export const VERSION = '9.4';
+export const VERSION = '9.5';
 let root, bound = false;
 
 export function mount(el) {
@@ -90,6 +90,7 @@ function render() {
         <button class="row" data-act="onboarding"><span class="row-icon">${icon('spark')}</span><span class="row-main"><span class="row-title">Personalize Anchor again</span></span><span class="row-end">${icon('chev')}</span></button>
         <button class="row" data-act="privacy"><span class="row-icon">${icon('lock')}</span><span class="row-main"><span class="row-title">Privacy Policy</span></span><span class="row-end">${icon('chev')}</span></button>
         <div class="row"><span class="row-icon" style="background:none;overflow:hidden"><img src="icons/icon.svg" alt="" width="40" height="40"></span><span class="row-main"><span class="row-title" style="display:block">Anchor ${VERSION}</span><span class="row-sub" style="display:block">Made with love by William Cain · AI by OpenAI</span></span></div>
+        <a class="row" href="https://williamcain.net" target="_blank" rel="noopener"><span class="row-icon">${icon('globe')}</span><span class="row-main"><span class="row-title" style="display:block">William Cain’s portfolio</span><span class="row-sub" style="display:block">williamcain.net</span></span><span class="row-end">${icon('external')}</span></a>
         <a class="row" href="https://github.com/candycain5432" target="_blank" rel="noopener"><span class="row-icon">${icon('github')}</span><span class="row-main"><span class="row-title" style="display:block">William Cain on GitHub</span><span class="row-sub" style="display:block">github.com/candycain5432</span></span><span class="row-end">${icon('external')}</span></a>
         <a class="row" href="mailto:contact@williamcain.net"><span class="row-icon">${icon('mail')}</span><span class="row-main"><span class="row-title" style="display:block">Contact</span><span class="row-sub" style="display:block">contact@williamcain.net</span></span><span class="row-end">${icon('chev')}</span></a>
       </div>
@@ -172,7 +173,7 @@ function openPrivacy() {
       <h3 ${h}>Changes</h3>
       <p>If this policy changes materially, the date above will change. The policy is always available from the Me tab.</p>
       <h3 ${h}>Contact</h3>
-      <p>Questions? Reach out to <b>William Cain</b> at <a class="link" href="mailto:contact@williamcain.net">contact@williamcain.net</a>.</p>
+      <p>Questions? Reach out to <b>William Cain</b> at <a class="link" href="mailto:contact@williamcain.net">contact@williamcain.net</a> or visit <a class="link" href="https://williamcain.net" target="_blank" rel="noopener">williamcain.net</a>.</p>
     </div>`,
   });
 }

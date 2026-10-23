@@ -144,5 +144,5 @@ Nothing changes on the backend (CORS is open to any origin).
 ---
 
 <div align="center">
-<sub>Made by <a href="https://github.com/candycain5432">William Cain</a> · <a href="mailto:contact@williamcain.net">contact@williamcain.net</a><br><i>Ad maiorem Dei gloriam</i></sub>
+<sub>Made by <a href="https://williamcain.net">William Cain</a> · <a href="https://github.com/candycain5432">GitHub</a> · <a href="mailto:contact@williamcain.net">contact@williamcain.net</a><br><i>Ad maiorem Dei gloriam</i></sub>
 </div>
