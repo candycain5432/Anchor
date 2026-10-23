@@ -31,15 +31,33 @@ const P = {
   edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/>',
   heart: '<path d="M12 20s-7-4.4-9-9.2C1.6 7.1 4 4 7.2 4c2 0 3.6 1.1 4.8 2.8C13.2 5.1 14.8 4 16.8 4 20 4 22.4 7.1 21 10.8 19 15.6 12 20 12 20z"/>',
   chat: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.8A8 8 0 1 1 21 12z"/>',
-  dove: '<path d="M3 13c3 0 5-1 7-4 1.5-2.2 3.5-4 6.5-4C19 5 21 7 21 7l-2.5 1.5c0 6-4.5 10.5-11 10.5L3 20l2-3.5c-1.2-.8-2-2-2-3.5z"/>',
+  dove: '<path d="M2.5 10 5 8.6a2.4 2.4 0 0 1 3.7 1.6l1 2.3L13.5 5c.5-1 1.9-1 2.3 0l.9 2.3L21 5.5l-2.2 6.3a7 7 0 0 1-6.3 4.7l-1.7 4-1.2-4.1A5.6 5.6 0 0 1 5.6 12z"/>',
   settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
   text: '<path d="M4 7V5h16v2M9 19h6M12 5v14"/>',
   map: '<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>',
   globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
   candle: '<path d="M9 10h6v11H9z"/><path d="M12 2c1.3 1.6 2 2.8 2 4a2 2 0 0 1-4 0c0-1.2.7-2.4 2-4z"/>',
   anchor: '<circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V21"/><path d="M8 11h8"/><path d="M4 14c0 4 3.6 7 8 7s8-3 8-7"/><path d="m2.5 15.5 1.5-1.5 1.5 1.5M18.5 15.5l1.5-1.5 1.5 1.5"/>',
+  // A loop of beads and a crucifix; few, widely spaced beads stay distinct at 20px.
+  rosary: '<circle cx="8.04" cy="11.96" r="1.45" fill="currentColor" stroke="none"/><circle cx="6.40" cy="8.00" r="1.45" fill="currentColor" stroke="none"/><circle cx="8.04" cy="4.04" r="1.45" fill="currentColor" stroke="none"/><circle cx="12.00" cy="2.40" r="1.45" fill="currentColor" stroke="none"/><circle cx="15.96" cy="4.04" r="1.45" fill="currentColor" stroke="none"/><circle cx="17.60" cy="8.00" r="1.45" fill="currentColor" stroke="none"/><circle cx="15.96" cy="11.96" r="1.45" fill="currentColor" stroke="none"/><path d="M8.9 12.9 12 15.4l3.1 -2.5M12 15.4v6.6M9.5 18.4h5"/>',
+  mercy: '<path d="M12 18c-3.6-2.2-6-4.6-6-7.4a3 3 0 0 1 6-1.4 3 3 0 0 1 6 1.4c0 2.8-2.4 5.2-6 7.4z"/><path d="M12 2.5v2.5M5.2 5.2 6.8 6.8M18.8 5.2l-1.6 1.6M2.5 11H4M20 11h1.5"/>',
+  sunrise: '<path d="M12 2.5v3M4.6 6.6l1.6 1.6M19.4 6.6l-1.6 1.6M2 16h20M6.5 16a5.5 5.5 0 0 1 11 0M6 20h12"/>',
+  stars: '<path d="M10 3.5 11.6 8 16 9.5l-4.4 1.6L10 15.5l-1.6-4.4L4 9.5 8.4 8z"/><path d="m18 14 .9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9z"/>',
+  hourglass: '<path d="M6 2.5h12M6 21.5h12"/><path d="M7.5 2.5v2.2c0 2.3 4.5 5 4.5 7.3 0-2.3 4.5-5 4.5-7.3V2.5M7.5 21.5v-2.2c0-2.3 4.5-5 4.5-7.3 0 2.3 4.5 5 4.5 7.3v2.2"/>',
+  sprout: '<path d="M12 21v-8.5"/><path d="M12 12.5C12 8 9 5 4 5c0 4.5 3 7.5 8 7.5zM12 15c0-3.8 2.8-6.5 8-6.5 0 3.8-2.8 6.5-8 6.5z"/>',
+  key: '<circle cx="7.5" cy="16" r="4.5"/><path d="M10.7 12.8 20 3.5M16.5 7l3 3M14 9.5l2 2"/>',
+  lock: '<rect x="4.5" y="10.5" width="15" height="10.5" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/>',
+  crown: '<path d="M3 8.5 7.5 12 12 5l4.5 7L21 8.5 19 19H5z"/><path d="M5 19h14"/>',
+  rose: '<path d="M12 13a4 4 0 0 0 4-4c0-2.4-1.8-4-4-5-2.2 1-4 2.6-4 5a4 4 0 0 0 4 4z"/><path d="M12 13v8.5M12 17.5c-2.2 0-4-1-5-3M12 19c2 0 3.6-.9 4.6-2.6"/>',
+  church: '<path d="M12 2v4.5M10 4h4"/><path d="M6 21v-9.5l6-5 6 5V21"/><path d="M3 21h18M10 21v-3.5a2 2 0 0 1 4 0V21"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/>',
+  external: '<path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/>',
+  github: '<path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/>',
 };
 
 export function icon(name, cls = '') {
   return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[name] || ''}</svg>`;
 }
+
+/** Raw paths, for embedding an icon inside another SVG (milestone seals). */
+export const iconPaths = name => P[name];

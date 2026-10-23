@@ -59,7 +59,7 @@ function guided() {
   const card = (id, ic, title, sub, extra = '') => `
     <button class="guide" data-launch="${id}">
       ${done[id] ? `<span class="badge done">${icon('check')}</span>` : extra}
-      <span class="gi">${ic}</span>
+      <span class="gi">${icon(ic)}</span>
       <span><span class="gt" style="display:block">${title}</span><span class="gs" style="display:block">${sub}</span></span>
     </button>`;
 
@@ -67,15 +67,15 @@ function guided() {
     <div class="guide-grid">
       <button class="guide feature" data-launch="rosary">
         <span class="badge">${done.rosary ? `${icon('check')} Prayed today` : resume ? 'Resume' : 'Today'}</span>
-        <span class="gi">📿</span>
+        <span class="gi">${icon('rosary')}</span>
         <span><span class="gt" style="display:block">The Holy Rosary</span><span class="gs" style="display:block">${set} Mysteries · guided bead by bead</span></span>
       </button>
-      ${card('chaplet', '🌊', 'Divine Mercy Chaplet', 'The Hour of Mercy · 8 min')}
-      ${card('lectio', '🕯️', 'Lectio Divina', 'Pray with today’s Gospel')}
-      ${card('examen', '🌙', 'Daily Examen', 'Five steps with St. Ignatius')}
-      ${card('silence', '🤍', 'Silent Prayer', 'Timer & bell · Holy Hour')}
-      ${card('confession', '🗝️', 'Confession', 'Examination & how-to')}
-      ${card('angelus', '🔔', 'The Angelus', 'Morning, noon & evening')}
+      ${card('chaplet', 'mercy', 'Divine Mercy Chaplet', 'The Hour of Mercy · 8 min')}
+      ${card('lectio', 'candle', 'Lectio Divina', 'Pray with today’s Gospel')}
+      ${card('examen', 'moon', 'Daily Examen', 'Five steps with St. Ignatius')}
+      ${card('silence', 'hourglass', 'Silent Prayer', 'Timer & bell · Holy Hour')}
+      ${card('confession', 'key', 'Confession', 'Examination & how-to')}
+      ${card('angelus', 'bell', 'The Angelus', 'Morning, noon & evening')}
     </div>
 
     <div class="section-head"><h2 class="section-title">Novenas</h2><span class="faint small">Nine days of prayer</span></div>
@@ -83,7 +83,7 @@ function guided() {
       ${NOVENAS.map(n => {
         const a = novenas[n.id];
         return `<button class="row" data-novena="${n.id}">
-          <span class="row-icon">${n.icon}</span>
+          <span class="row-icon">${icon(n.icon)}</span>
           <span class="row-main"><span class="row-title" style="display:block">${esc(n.name)}</span>
           <span class="row-sub" style="display:block">${a ? `Day ${Math.min(9, a.days.length + (a.days.includes(store.isoDate()) ? 0 : 1))} of 9${a.intention ? ' · ' + esc(a.intention) : ''}` : esc(n.sub)}</span>
           ${a ? `<span style="display:block;margin-top:8px"><span class="progress"><i style="width:${(a.days.length / 9) * 100}%"></i></span></span>` : ''}</span>
@@ -115,7 +115,7 @@ function renderPrayers(q) {
         <span class="row-main"><span class="row-title" style="display:block">${esc(p.title || p.name)}</span><span class="row-sub" style="display:block">${esc(p.sub)}</span></span>
         <span class="row-end">${favs.includes(p.name) ? `<span style="color:var(--gold)">${icon('star')}</span>` : ''}${icon('chev')}</span>
       </button>`).join('')}</div>`).join('')
-    : `<div class="empty"><div class="big">🔎</div><p>No prayers match “${esc(q)}”. Try asking Anchor to teach you one.</p></div>`;
+    : `<div class="empty"><div class="big">${icon('search')}</div><p>No prayers match “${esc(q)}”. Try asking Anchor to teach you one.</p></div>`;
 }
 
 // ---- Saints ----
@@ -123,9 +123,12 @@ function saintsShell() {
   return `
     <div class="search" style="margin-bottom:12px">${icon('search')}<input class="field" type="search" data-search="saints" placeholder="Search saints or a need…" aria-label="Search saints"></div>
     <div class="list-label" style="margin-top:4px">Find a patron</div>
-    <div class="chips scroll" style="margin-bottom:6px">${PATRON_TAGS.map(([t, e]) => `<button class="chip ${saintTag === t ? 'active' : ''}" data-tag="${t}">${e} ${t}</button>`).join('')}</div>
+    <div class="chips scroll" style="margin-bottom:6px">${PATRON_TAGS.map(([t]) => `<button class="chip ${saintTag === t ? 'active' : ''}" data-tag="${t}">${t}</button>`).join('')}</div>
     <div data-list></div>`;
 }
+
+// Illuminated-initial style: "St. Thérèse of Lisieux" → T, "The Blessed Virgin Mary" → M.
+const monogram = name => name.replace(/^(St\.|Saint|The Blessed Virgin|The)\s+/, '').charAt(0);
 
 function renderSaints(q) {
   const list = searchSaints(q, saintTag);
@@ -133,14 +136,14 @@ function renderSaints(q) {
   const rest = list.filter(x => !isFavSaint(x.name));
   const row = x => `
     <button class="row" data-saint="${esc(x.name)}">
-      <span class="row-icon saint-row-icon">${x.icon}</span>
+      <span class="row-icon mono" aria-hidden="true">${monogram(x.name)}</span>
       <span class="row-main"><span class="row-title" style="display:block">${esc(x.name)}</span><span class="row-sub" style="display:block">${esc(x.patron.slice(0, 3).join(' · '))}</span></span>
       <span class="row-end">${icon('chev')}</span>
     </button>`;
   root.querySelector('[data-list]').innerHTML =
     (favs.length ? `<div class="list-label">★ Your saints</div><div class="list">${favs.map(row).join('')}</div>` : '') +
     (rest.length ? `<div class="list-label">${saintTag ? `Patrons of ${esc(saintTag)}` : 'Saints'}</div><div class="list">${rest.map(row).join('')}</div>` : '') +
-    (!list.length ? `<div class="empty"><div class="big">🕊️</div><p>No saints found. Try another word — or ask Anchor “Who is the patron saint of…?”</p></div>` : '');
+    (!list.length ? `<div class="empty"><div class="big">${icon('dove')}</div><p>No saints found. Try another word — or ask Anchor “Who is the patron saint of…?”</p></div>` : '');
 }
 
 // ---- Events ----

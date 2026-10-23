@@ -227,7 +227,7 @@ function player(state) {
     const label = state.kind === 'rosary' ? `the ${state.set} Mysteries` : 'the Divine Mercy Chaplet';
     body.innerHTML = `
       <div style="text-align:center;padding:30px 10px">
-        ${sealSVG(state.kind === 'rosary' ? '📿' : '🌊', 'seal')}
+        ${sealSVG(state.kind === 'rosary' ? 'rosary' : 'mercy', 'seal')}
         <h2 class="serif" style="font-size:2.2rem;font-weight:600;margin:18px 0 6px">Deo gratias</h2>
         <p class="muted" style="margin:0 0 26px">You prayed ${esc(label)}. May Our Lady keep you close to her Son.</p>
         <div style="display:grid;gap:10px;max-width:320px;margin:0 auto">

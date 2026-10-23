@@ -41,7 +41,7 @@ export function openGratitude() {
         const items = [...body.querySelectorAll('[data-g]')].map(i => i.value.trim()).filter(Boolean);
         if (!items.length) return toast('Write at least one thing');
         saveGratitude(items);
-        toast('Gratitude saved 🙏');
+        toast('Gratitude saved');
         closeSheet();
       };
     },
@@ -94,7 +94,7 @@ function intentionsHTML() {
       <button data-filter="active" class="${filter === 'active' ? 'active' : ''}">Praying for (${all.length - answered.length})</button>
       <button data-filter="answered" class="${filter === 'answered' ? 'active' : ''}">Answered (${answered.length})</button>
     </div>
-    ${list.length ? list.map(intentionCard).join('') : `<div class="empty"><div class="big">${filter === 'active' ? '🤲' : '🕊️'}</div><p>${filter === 'active'
+    ${list.length ? list.map(intentionCard).join('') : `<div class="empty"><div class="big">${icon(filter === 'active' ? 'candle' : 'dove')}</div><p>${filter === 'active'
       ? 'Add the people and needs you’re carrying. Pray for them here each day.'
       : 'When God answers a prayer, mark it here — a record of His faithfulness.'}</p></div>`}`;
 }
@@ -106,13 +106,13 @@ function intentionCard(it) {
     <div class="card intention ${it.answered ? 'answered' : ''}" data-id="${esc(it.id)}">
       <p class="it">${esc(it.text)}</p>
       <div class="meta">Added ${esc(relDay(store.isoDate(new Date(it.created))))}${n ? ` · prayed ${n} time${n === 1 ? '' : 's'}` : ''}${it.answered ? ` · answered ${esc(relDay(it.answered.date))}` : ''}</div>
-      ${it.answered?.note ? `<div class="ans">🕊️ ${esc(it.answered.note)}</div>` : ''}
+      ${it.answered?.note ? `<div class="ans">${icon('dove')} ${esc(it.answered.note)}</div>` : ''}
       ${it.composed ? `<div class="composed">${esc(it.composed)}</div>` : ''}
       ${it.answered ? `<div class="card-actions"><button class="btn btn-ghost btn-sm" data-i="delete">${icon('trash')}</button></div>` : `
       <div class="card-actions">
-        <button class="btn ${today ? 'btn-soft' : 'btn-primary'} btn-sm" data-i="pray">${today ? `${icon('check')} Prayed today` : '🙏 Pray now'}</button>
+        <button class="btn ${today ? 'btn-soft' : 'btn-primary'} btn-sm" data-i="pray">${today ? `${icon('check')} Prayed today` : 'Pray now'}</button>
         <button class="btn btn-soft btn-sm" data-i="compose">${icon('spark')} ${it.composed ? 'New prayer' : 'Help me pray'}</button>
-        <button class="btn btn-soft btn-sm" data-i="answered">🕊️ Answered</button>
+        <button class="btn btn-soft btn-sm" data-i="answered">${icon('dove')} Answered</button>
         <button class="btn btn-ghost btn-sm" data-i="delete" aria-label="Delete">${icon('trash')}</button>
       </div>`}
     </div>`;
@@ -123,7 +123,7 @@ function gratitudeHTML() {
   const days = Object.keys(all).sort().reverse().filter(d => all[d]?.length);
   return `
     <button class="card now-card" data-act="gratitude" style="width:100%;text-align:left">
-      <div class="now-icon">🙏</div>
+      <div class="now-icon">${icon('sprout')}</div>
       <div class="now-body"><div class="now-kicker">${all[store.isoDate()]?.length ? 'Add more' : 'Today'}</div><div class="now-title">Count your blessings</div><div class="now-sub">Three gifts from today</div></div>
       <div class="now-go">${icon('plus')}</div>
     </button>
@@ -131,7 +131,7 @@ function gratitudeHTML() {
       <div class="card">
         <div class="card-label">${esc(relDay(d))}</div>
         ${all[d].map(g => `<div style="padding:3px 0" class="serif" ><span style="color:var(--gold)">✦</span> <span style="font-size:1.12rem">${esc(g)}</span></div>`).join('')}
-      </div>`).join('') : `<div class="empty"><div class="big">🌾</div><p>Gratitude opens the heart to God. Your entries will gather here.</p></div>`}`;
+      </div>`).join('') : `<div class="empty"><div class="big">${icon('sprout')}</div><p>Gratitude opens the heart to God. Your entries will gather here.</p></div>`}`;
 }
 
 function notesHTML() {
@@ -143,7 +143,7 @@ function notesHTML() {
         <div class="card-label">${esc(relDay(store.isoDate(new Date(n.created))))}</div>
         <div class="serif" style="font-size:1.25rem;font-weight:600;line-height:1.2;margin-bottom:4px">${esc(n.title || 'Note')}</div>
         <div class="muted small" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap">${esc(n.text)}</div>
-      </button>`).join('') : `<div class="empty"><div class="big">📝</div><p>Notes from Lectio Divina, saved answers from Ask Anchor, and your own reflections live here.</p></div>`}`;
+      </button>`).join('') : `<div class="empty"><div class="big">${icon('edit')}</div><p>Notes from Lectio Divina, saved answers from Ask Anchor, and your own reflections live here.</p></div>`}`;
 }
 
 // ---- Editing ----
@@ -202,7 +202,7 @@ async function compose(id, btn) {
 
 function markAnswered(id) {
   openSheet({
-    title: 'Prayer answered 🕊️',
+    title: 'Prayer answered',
     html: `<p class="muted" style="margin:0 0 12px">How did God answer? A few words now will be a gift to remember later.</p>
       <textarea class="field" data-note maxlength="300" placeholder="He answered by…"></textarea>`,
     foot: `<button class="btn btn-primary btn-block btn-lg" data-act="save">Thanks be to God</button>`,

@@ -100,7 +100,7 @@ export async function openReadings({ focus } = {}) {
       }
     };
   } catch {
-    body.innerHTML = `<div class="empty"><div class="big">📖</div><p>Couldn’t load today’s readings. Check your connection and try again.</p></div>`;
+    body.innerHTML = `<div class="empty"><div class="big">${icon('book')}</div><p>Couldn’t load today’s readings. Check your connection and try again.</p></div>`;
   }
 }
 

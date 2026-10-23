@@ -1,5 +1,5 @@
 // Shared UI: escaping, the bottom sheet, toasts, haptics, sharing, analytics.
-import { icon } from './icons.js';
+import { icon, iconPaths } from './icons.js';
 
 export const $ = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -177,7 +177,7 @@ export function relDay(iso) {
 }
 
 /** Ornamental seal SVG used for milestones and the onboarding mark. */
-export function sealSVG(glyph = '✦', cls = 'seal') {
+export function sealSVG(glyph = 'spark', cls = 'seal') {
   const teeth = Array.from({ length: 24 }, (_, i) => {
     const a = (i / 24) * Math.PI * 2;
     return `${50 + Math.cos(a) * 47},${50 + Math.sin(a) * 47} ${50 + Math.cos(a + Math.PI / 24) * 42},${50 + Math.sin(a + Math.PI / 24) * 42}`;
@@ -186,6 +186,8 @@ export function sealSVG(glyph = '✦', cls = 'seal') {
     <polygon class="rim" points="${teeth}"/>
     <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.2"/>
     <circle cx="50" cy="50" r="31" fill="rgba(0,0,0,.08)"/>
-    <text x="50" y="52" text-anchor="middle" dominant-baseline="central" font-size="28">${glyph}</text>
+    ${iconPaths(glyph)
+      ? `<g transform="translate(34 34) scale(1.333)" fill="none" stroke="#fff" color="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${iconPaths(glyph)}</g>`
+      : `<text x="50" y="51" text-anchor="middle" dominant-baseline="central" font-family="Cormorant Garamond, Georgia, serif" font-weight="700" font-size="26" fill="#fff">${glyph}</text>`}
   </svg>`;
 }

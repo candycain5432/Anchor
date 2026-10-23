@@ -48,7 +48,9 @@
   --dur: .32s;
 
   --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  /* Deliberately 0: reserving the iPhone home-indicator inset floated the tab bar
+     and sheets ~34px up with dead space beneath. Content sits flush to the bottom. */
+  --safe-bottom: 0px;
   --nav-h: 84px;
 
   /* Paper grain, used on heroes and the page background */

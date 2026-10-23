@@ -113,13 +113,13 @@ function renderPractice() {
     const sub = sug.id === 'rosary' ? `${mysterySet(new Date(), day?.season)} Mysteries · ~${p.min} min` : `${p.sub} · ~${p.min} min`;
     now.dataset.now = sug.id;
     now.innerHTML = `
-      <div class="now-icon" aria-hidden="true">${p.icon}</div>
+      <div class="now-icon" aria-hidden="true">${icon(p.icon)}</div>
       <div class="now-body"><div class="now-kicker">${sug.kicker}</div><div class="now-title">${esc(p.name)}</div><div class="now-sub">${esc(sub)}</div></div>
       <div class="now-go" aria-hidden="true">${icon('play')}</div>`;
   } else {
     now.dataset.now = 'gratitude';
     now.innerHTML = `
-      <div class="now-icon" aria-hidden="true">🕊️</div>
+      <div class="now-icon" aria-hidden="true">${icon('dove')}</div>
       <div class="now-body"><div class="now-kicker">All done for today</div><div class="now-title">Rest in His peace</div><div class="now-sub">Add a note of gratitude before bed</div></div>
       <div class="now-go" aria-hidden="true">${icon('plus')}</div>`;
   }

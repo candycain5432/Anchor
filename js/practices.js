@@ -3,16 +3,16 @@ import * as store from './store.js';
 import { toast, track, haptic, sealSVG, esc } from './ui.js';
 
 export const PRACTICES = {
-  morning:   { name: 'Morning Offering',      icon: '🌅', min: 2,  sub: 'Offer the day to God' },
-  readings:  { name: 'Daily Mass Readings',   icon: '📖', min: 8,  sub: 'The Word for today' },
-  angelus:   { name: 'The Angelus',           icon: '🔔', min: 3,  sub: 'At noon, honor the Incarnation' },
-  rosary:    { name: 'Holy Rosary',           icon: '📿', min: 20, sub: 'Guided, bead by bead' },
-  chaplet:   { name: 'Divine Mercy Chaplet',  icon: '🌊', min: 8,  sub: 'The Hour of Mercy' },
-  lectio:    { name: 'Lectio Divina',         icon: '🕯️', min: 15, sub: 'Pray with today’s Gospel' },
-  silence:   { name: 'Silent Prayer',         icon: '🤍', min: 10, sub: 'Rest in His presence' },
-  examen:    { name: 'Daily Examen',          icon: '🌙', min: 5,  sub: 'Review the day with God' },
-  night:     { name: 'Evening Prayer',        icon: '✨', min: 2,  sub: 'Entrust the night to Him' },
-  gratitude: { name: 'Gratitude',             icon: '🙏', min: 2,  sub: 'Three gifts from today' },
+  morning:   { name: 'Morning Offering',      icon: 'sunrise', min: 2,  sub: 'Offer the day to God' },
+  readings:  { name: 'Daily Mass Readings',   icon: 'book', min: 8,  sub: 'The Word for today' },
+  angelus:   { name: 'The Angelus',           icon: 'bell', min: 3,  sub: 'At noon, honor the Incarnation' },
+  rosary:    { name: 'Holy Rosary',           icon: 'rosary', min: 20, sub: 'Guided, bead by bead' },
+  chaplet:   { name: 'Divine Mercy Chaplet',  icon: 'mercy', min: 8,  sub: 'The Hour of Mercy' },
+  lectio:    { name: 'Lectio Divina',         icon: 'candle', min: 15, sub: 'Pray with today’s Gospel' },
+  silence:   { name: 'Silent Prayer',         icon: 'hourglass', min: 10, sub: 'Rest in His presence' },
+  examen:    { name: 'Daily Examen',          icon: 'moon', min: 5,  sub: 'Review the day with God' },
+  night:     { name: 'Evening Prayer',        icon: 'stars', min: 2,  sub: 'Entrust the night to Him' },
+  gratitude: { name: 'Gratitude',             icon: 'sprout', min: 2,  sub: 'Three gifts from today' },
 };
 
 export const DEFAULT_RULE = ['morning', 'readings', 'rosary', 'examen'];
@@ -95,22 +95,22 @@ export function totalDays() {
 
 // ---- Milestones ----
 export const MILESTONES = [
-  { id: 'first',      glyph: '✦',  name: 'First Light',        desc: 'Completed your first prayer in Anchor',  test: s => s.days >= 1 },
-  { id: 'streak3',    glyph: '🔥', name: 'Kindled',            desc: 'Prayed 3 days in a row',                 test: s => s.best >= 3 },
-  { id: 'streak7',    glyph: '🕯️', name: 'A Faithful Week',    desc: 'Prayed 7 days in a row',                 test: s => s.best >= 7 },
-  { id: 'streak30',   glyph: '⛪', name: 'Rule of Life',       desc: 'Prayed 30 days in a row',                test: s => s.best >= 30 },
-  { id: 'streak100',  glyph: '👑', name: 'Persevering',        desc: 'Prayed 100 days in a row',               test: s => s.best >= 100 },
-  { id: 'rosary1',    glyph: '📿', name: 'Ave Maria',          desc: 'Prayed your first full Rosary',          test: s => s.c.rosaryFull >= 1 },
-  { id: 'rosary10',   glyph: '🌹', name: 'Crown of Roses',     desc: 'Prayed 10 full Rosaries',                test: s => s.c.rosaryFull >= 10 },
-  { id: 'rosary4',    glyph: '🌟', name: 'All the Mysteries',  desc: 'Prayed all four sets of mysteries',       test: s => ['Joyful', 'Sorrowful', 'Glorious', 'Luminous'].every(m => s.c['set:' + m]) },
-  { id: 'chaplet',    glyph: '🌊', name: 'Jesus, I Trust',     desc: 'Prayed the Divine Mercy Chaplet',        test: s => s.c.chapletFull >= 1 },
-  { id: 'lectio',     glyph: '📖', name: 'Living Word',        desc: 'Prayed Lectio Divina',                   test: s => s.c.lectio >= 1 },
-  { id: 'holyhour',   glyph: '⏳', name: 'Could You Not Watch', desc: '60 minutes of silent prayer in total',   test: s => s.c.silenceMin >= 60 },
-  { id: 'examen7',    glyph: '🌙', name: 'Examined Life',      desc: 'Prayed the Daily Examen 7 times',        test: s => s.c.examen >= 7 },
-  { id: 'novena',     glyph: '9️⃣', name: 'Nine Days',          desc: 'Completed a novena',                     test: s => s.c.novenaDone >= 1 },
-  { id: 'intercessor', glyph: '🤲', name: 'Intercessor',       desc: 'Prayed for intentions 10 times',          test: s => s.c.intentionPrayed >= 10 },
-  { id: 'answered',   glyph: '🕊️', name: 'Answered',           desc: 'Marked a prayer as answered',            test: s => s.c.answered >= 1 },
-  { id: 'grateful',   glyph: '🙏', name: 'Grateful Heart',     desc: 'Wrote gratitude on 7 days',              test: s => s.c.gratitude >= 7 },
+  { id: 'first',      glyph: 'spark', name: 'First Light',        desc: 'Completed your first prayer in Anchor',  test: s => s.days >= 1 },
+  { id: 'streak3',    glyph: 'flame', name: 'Kindled',            desc: 'Prayed 3 days in a row',                 test: s => s.best >= 3 },
+  { id: 'streak7',    glyph: 'candle', name: 'A Faithful Week',    desc: 'Prayed 7 days in a row',                 test: s => s.best >= 7 },
+  { id: 'streak30',   glyph: 'church', name: 'Rule of Life',       desc: 'Prayed 30 days in a row',                test: s => s.best >= 30 },
+  { id: 'streak100',  glyph: 'crown', name: 'Persevering',        desc: 'Prayed 100 days in a row',               test: s => s.best >= 100 },
+  { id: 'rosary1',    glyph: 'rosary', name: 'Ave Maria',          desc: 'Prayed your first full Rosary',          test: s => s.c.rosaryFull >= 1 },
+  { id: 'rosary10',   glyph: 'rose', name: 'Crown of Roses',     desc: 'Prayed 10 full Rosaries',                test: s => s.c.rosaryFull >= 10 },
+  { id: 'rosary4',    glyph: 'star', name: 'All the Mysteries',  desc: 'Prayed all four sets of mysteries',       test: s => ['Joyful', 'Sorrowful', 'Glorious', 'Luminous'].every(m => s.c['set:' + m]) },
+  { id: 'chaplet',    glyph: 'mercy', name: 'Jesus, I Trust',     desc: 'Prayed the Divine Mercy Chaplet',        test: s => s.c.chapletFull >= 1 },
+  { id: 'lectio',     glyph: 'book', name: 'Living Word',        desc: 'Prayed Lectio Divina',                   test: s => s.c.lectio >= 1 },
+  { id: 'holyhour',   glyph: 'hourglass', name: 'Could You Not Watch', desc: '60 minutes of silent prayer in total',   test: s => s.c.silenceMin >= 60 },
+  { id: 'examen7',    glyph: 'moon', name: 'Examined Life',      desc: 'Prayed the Daily Examen 7 times',        test: s => s.c.examen >= 7 },
+  { id: 'novena',     glyph: 'IX', name: 'Nine Days',          desc: 'Completed a novena',                     test: s => s.c.novenaDone >= 1 },
+  { id: 'intercessor', glyph: 'heart', name: 'Intercessor',       desc: 'Prayed for intentions 10 times',          test: s => s.c.intentionPrayed >= 10 },
+  { id: 'answered',   glyph: 'dove', name: 'Answered',           desc: 'Marked a prayer as answered',            test: s => s.c.answered >= 1 },
+  { id: 'grateful',   glyph: 'sprout', name: 'Grateful Heart',     desc: 'Wrote gratitude on 7 days',              test: s => s.c.gratitude >= 7 },
 ];
 
 export function unlocked() { return store.get('milestones', {}); }

@@ -19,7 +19,7 @@ export const NOVENAS = [
     id: 'jude',
     name: 'Novena to St. Jude',
     sub: 'Patron of difficult and desperate cases',
-    icon: '🔥',
+    icon: 'flame',
     daily: () => ({
       prayer: `Most holy Apostle, St. Jude,\nfaithful servant and friend of Jesus,\nthe Church honors and invokes you universally\nas the patron of difficult cases,\nof things almost despaired of.\n\nPray for me, I am so helpless and alone.\nIntercede with God for me\nthat He bring visible and speedy help\nwhere help is almost despaired of.\n\nCome to my assistance in this great need,\nthat I may receive the consolation and help of heaven\nin all my necessities, tribulations, and sufferings,\nparticularly… (make your request)\nand that I may praise God with you and all the saints forever.\n\nI promise, O blessed St. Jude,\nto be ever mindful of this great favor granted me by God,\nto always honor you as my special and powerful patron,\nand to gratefully encourage devotion to you.\n\nAmen.`,
       then: 'Our Father… Hail Mary… Glory Be…',
@@ -29,7 +29,7 @@ export const NOVENAS = [
     id: 'sacred-heart',
     name: 'Efficacious Novena to the Sacred Heart',
     sub: 'Prayed daily by St. Padre Pio',
-    icon: '❤️',
+    icon: 'heart',
     daily: () => ({
       prayer: [
         SACRED_HEART_ASK('I', 'Truly I say to you, ask and it will be given you; seek and you will find; knock and it will be opened to you.', 'Behold, I knock, I seek, and I ask for'),
@@ -44,7 +44,7 @@ export const NOVENAS = [
     id: 'divine-mercy',
     name: 'Divine Mercy Novena',
     sub: 'Good Friday to Divine Mercy Sunday — or any time',
-    icon: '🌊',
+    icon: 'mercy',
     daily: day => {
       const [who, words] = MERCY_DAYS[day - 1];
       return {

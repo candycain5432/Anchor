@@ -28,7 +28,7 @@ export async function openLectio() {
     gospel = r.sections.find(s => s.id === 'gospel');
   } catch {}
   if (!gospel) {
-    body.innerHTML = `<div class="empty"><div class="big">📖</div><p>Couldn’t load today’s Gospel. Check your connection and try again.</p></div>`;
+    body.innerHTML = `<div class="empty"><div class="big">${icon('book')}</div><p>Couldn’t load today’s Gospel. Check your connection and try again.</p></div>`;
     return;
   }
   api.lectio().then(p => { prompts = p; if (step === 2) render(); }).catch(() => {});
@@ -103,7 +103,7 @@ export async function openLectio() {
     checkMilestones();
     const carry = prompts?.word || word;
     body.innerHTML = `<div style="text-align:center;padding:40px 10px">
-      <div style="font-size:3rem">🕯️</div>
+      <div class="done-mark">${icon('candle')}</div>
       <div class="eyebrow" style="color:var(--gold);margin-top:16px">A word to carry today</div>
       <h2 class="serif" style="font-size:2rem;font-weight:600;font-style:italic;margin:8px 0 6px">${esc(carry ? `“${carry}”` : 'Thy word is a lamp to my feet')}</h2>
       <p class="muted small" style="margin:0 0 28px">${word || prayer ? 'Your reflection was saved to your Journal.' : esc(gospel.cite)}</p>

@@ -42,7 +42,7 @@ export function openNovena(id, onChange) {
       ${d.intro ? `<h3 class="serif" style="text-align:center;font-size:1.4rem;margin:0 0 12px">${esc(d.intro)}</h3>` : ''}
       <div class="card prayer">${prayerHTML(d.prayer)}</div>
       ${d.then ? `<p class="serif muted" style="text-align:center;font-size:1.1rem;font-style:italic">${esc(d.then)}</p>` : ''}
-      ${d.chaplet ? `<button class="btn btn-soft btn-block" data-act="chaplet" style="margin-bottom:10px">🌊 Pray the Chaplet now</button>` : ''}
+      ${d.chaplet ? `<button class="btn btn-soft btn-block" data-act="chaplet" style="margin-bottom:10px">${icon('mercy')} Pray the Chaplet now</button>` : ''}
       ${/Hail, Holy Queen/.test(d.then || '') ? `<details class="card"><summary class="small" style="cursor:pointer;font-weight:700">Hail, Holy Queen</summary><div class="prayer" style="padding-top:12px">${prayerHTML(PRAYERS['Hail Holy Queen'])}</div></details>` : ''}
       <button class="btn btn-ghost btn-block small" data-act="end">End this novena</button>`,
     foot: p.prayedToday

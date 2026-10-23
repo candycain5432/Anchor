@@ -52,3 +52,22 @@ localStorage['anchor:apiBase'] = '"http://localhost:3000"'
 Console helpers: `Anchor.forceUpdate()`, `Anchor.clearCaches()`, `Anchor.listCaches()`.
 
 Deep links (used by notifications and home-screen shortcuts): `./?open=rosary|chaplet|readings|examen|lectio|confession|ask|journal|me`.
+
+## Moving to a custom domain
+
+Every path in the app is relative, so it works the same at `example.com/` as at `candycain5432.github.io/Anchor/`. To switch:
+
+1. **DNS** at your registrar:
+   - Subdomain (e.g. `anchor.example.com`): one `CNAME` record → `candycain5432.github.io`
+   - Apex (e.g. `example.com`): `A` records → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
+     (and optionally `AAAA` → `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153`), plus a `CNAME` for `www` → `candycain5432.github.io`
+2. **GitHub** → repo Settings → Pages → *Custom domain*: enter it and save (this commits a `CNAME` file — pull it). Once the certificate is issued, tick **Enforce HTTPS**.
+3. **Link previews**: replace the old URL in the three `og:`/`twitter:` tags in `index.html`:
+   ```sh
+   sed -i 's#https://candycain5432.github.io/Anchor/#https://YOUR-DOMAIN/#g' index.html
+   ```
+4. **Analytics**: update the stream URL in Google Analytics (Admin → Data streams). Optional — data keeps flowing either way.
+
+Nothing changes on the backend (CORS is open to any origin).
+
+**Heads-up for existing users:** a new domain is a new origin, so the browser treats it as a different site. GitHub redirects the old address automatically, but localStorage (streaks, journal, chats) and push subscriptions stay with the old origin. Before switching, ask people to use **Me → Back up**, then **Restore a backup** on the new domain, and to re-enable reminders and re-add the app to their home screen.

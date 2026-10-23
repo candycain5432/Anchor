@@ -82,14 +82,14 @@ function starters() {
   const saint = lit && !isFeria(lit) ? lit.name : saintFallback().name;
   const s = season(lit?.season).key;
   const list = [
-    { e: '🕊️', t: `Tell me about ${saint}`, ctx: null },
-    gospel && { e: '📖', t: `Explain today’s Gospel (${gospel.cite})`, ctx: { kind: 'reading', title: `Gospel — ${gospel.cite}`, text: gospel.text || gospel.cite } },
-    s === 'ADVENT' && { e: '🕯️', t: 'How can I prepare my heart for Christmas?' },
-    (s === 'LENT' || s === 'HOLY_WEEK') && { e: '🌿', t: 'Give me ideas for prayer, fasting and almsgiving this Lent' },
-    s === 'EASTER' && { e: '🌅', t: 'How do I live the joy of Easter in daily life?' },
-    { e: '🗝️', t: 'Help me prepare for Confession' },
-    { e: '🤍', t: 'How do I pray when God feels distant?' },
-    { e: '📿', t: 'Teach me how to pray the Rosary' },
+    { e: 'dove', t: `Tell me about ${saint}`, ctx: null },
+    gospel && { e: 'book', t: `Explain today’s Gospel (${gospel.cite})`, ctx: { kind: 'reading', title: `Gospel — ${gospel.cite}`, text: gospel.text || gospel.cite } },
+    s === 'ADVENT' && { e: 'candle', t: 'How can I prepare my heart for Christmas?' },
+    (s === 'LENT' || s === 'HOLY_WEEK') && { e: 'sprout', t: 'Give me ideas for prayer, fasting and almsgiving this Lent' },
+    s === 'EASTER' && { e: 'sunrise', t: 'How do I live the joy of Easter in daily life?' },
+    { e: 'key', t: 'Help me prepare for Confession' },
+    { e: 'heart', t: 'How do I pray when God feels distant?' },
+    { e: 'rosary', t: 'Teach me how to pray the Rosary' },
   ].filter(Boolean);
   return list.slice(0, 5);
 }
@@ -104,7 +104,7 @@ function render() {
         <div class="mark">${icon('spark')}</div>
         <h2>${name ? `How can I help, ${esc(name)}?` : 'How can I help?'}</h2>
         <p>Ask anything about the Catholic faith — Scripture, prayer, the saints, the sacraments, or what’s on your heart.</p>
-        <div class="starters">${st.map((x, i) => `<button class="starter" data-starter="${i}"><span class="e">${x.e}</span>${esc(x.t)}</button>`).join('')}</div>
+        <div class="starters">${st.map((x, i) => `<button class="starter" data-starter="${i}"><span class="e">${icon(x.e)}</span>${esc(x.t)}</button>`).join('')}</div>
       </div>`;
     chatEl._starters = st;
     return;
@@ -244,7 +244,7 @@ function openHistory() {
         <button class="icon-btn" data-del="${esc(c.id)}" aria-label="Delete conversation" style="width:34px;height:34px">${icon('trash')}</button>
       </div>`).join('')}</div>
       <p class="faint small" style="text-align:center">Conversations are stored only on this device.</p>`
-      : `<div class="empty"><div class="big">💬</div><p>No conversations yet.</p></div>`,
+      : `<div class="empty"><div class="big">${icon('chat')}</div><p>No conversations yet.</p></div>`,
     onMount(body) {
       body.onclick = e => {
         const del = e.target.closest('[data-del]');

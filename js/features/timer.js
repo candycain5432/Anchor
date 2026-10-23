@@ -148,7 +148,7 @@ export function openTimer({ minutes } = {}) {
     checkMilestones();
     body.innerHTML = `
       <div style="text-align:center;padding:50px 10px">
-        <div style="font-size:3rem">🤍</div>
+        <div class="done-mark">${icon('hourglass')}</div>
         <h2 class="serif" style="font-size:2.1rem;font-weight:600;margin:12px 0 6px">${min} minute${min === 1 ? '' : 's'} with the Lord</h2>
         <p class="muted" style="margin:0 auto 28px;max-width:320px">“Remain in me, as I remain in you.” — John 15:4</p>
         <button class="btn btn-primary btn-lg" data-act="close" style="min-width:200px">Amen</button>

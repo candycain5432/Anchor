@@ -7,23 +7,23 @@ import { icon } from '../icons.js';
 import { isSaint } from '../liturgy.js';
 
 export const PATRON_TAGS = [
-  ['students', '🎓', /student|school|universit|teacher/],
-  ['work', '💼', /worker|work|carpenter|lawyer|engineer|philanthrop/],
-  ['the sick', '🩺', /sick|cancer|healing|hospital|disease|leprosy|headache|physician|nurse|surgeon/],
-  ['anxiety', '🌿', /anxiety|mental|stress|nervous/],
-  ['family', '🏡', /famil|mother|father|marriage|wives|widow|children|pregnan|childbirth|unborn|adopted|parents/],
-  ['travel', '🧭', /travel|driver|journey|immigrant|sailor|exile/],
-  ['lost things', '🔎', /lost things/],
-  ['hard cases', '🔥', /hopeless|desperate|impossible/],
-  ['youth', '🎒', /youth|young|adolescent|World Youth/],
-  ['internet', '💻', /internet|programmer|television|journalist|writer|editor/],
-  ['protection', '🛡️', /protection|police|soldier|evil|civil defense/],
-  ['creation', '🕊️', /animal|ecology|gardener|florist/],
+  ['students', /student|school|universit|teacher/],
+  ['work', /worker|work|carpenter|lawyer|engineer|philanthrop/],
+  ['the sick', /sick|cancer|healing|hospital|disease|leprosy|headache|physician|nurse|surgeon/],
+  ['anxiety', /anxiety|mental|stress|nervous/],
+  ['family', /famil|mother|father|marriage|wives|widow|children|pregnan|childbirth|unborn|adopted|parents/],
+  ['travel', /travel|driver|journey|immigrant|sailor|exile/],
+  ['lost things', /lost things/],
+  ['hard cases', /hopeless|desperate|impossible/],
+  ['youth', /youth|young|adolescent|World Youth/],
+  ['internet', /internet|programmer|television|journalist|writer|editor/],
+  ['protection', /protection|police|soldier|evil|civil defense/],
+  ['creation', /animal|ecology|gardener|florist/],
 ];
 
 export function searchSaints(q = '', tag = null) {
   const s = q.trim().toLowerCase();
-  const re = tag ? PATRON_TAGS.find(t => t[0] === tag)?.[2] : null;
+  const re = tag ? PATRON_TAGS.find(t => t[0] === tag)?.[1] : null;
   return SAINTS.filter(x =>
     (!s || x.name.toLowerCase().includes(s) || x.patron.some(p => p.includes(s)) || x.bio.toLowerCase().includes(s)) &&
     (!re || x.patron.some(p => re.test(p))));

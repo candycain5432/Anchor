@@ -5,7 +5,7 @@ import { icon } from '../icons.js';
 import { PRACTICES, rule, setRule, log, streak, bestStreak, totalDays, MILESTONES, unlocked, onChange } from '../practices.js';
 import * as push from '../push.js';
 
-export const VERSION = '9.1';
+export const VERSION = '9.2';
 let root, bound = false;
 
 export function mount(el) {
@@ -50,7 +50,7 @@ function render() {
       <div class="list">
         ${Object.entries(PRACTICES).map(([id, p]) => `
           <label class="row">
-            <span class="row-icon">${p.icon}</span>
+            <span class="row-icon">${icon(p.icon)}</span>
             <span class="row-main"><span class="row-title" style="display:block">${esc(p.name)}</span><span class="row-sub" style="display:block">${esc(p.sub)} · ~${p.min} min</span></span>
             <span class="switch"><input type="checkbox" data-rule="${id}" ${rule().includes(id) ? 'checked' : ''} aria-label="${esc(p.name)}"><span></span></span>
           </label>`).join('')}
@@ -62,7 +62,7 @@ function render() {
       <div class="list-label">Confession</div>
       <div class="list">
         <div class="row">
-          <span class="row-icon">🗝️</span>
+          <span class="row-icon">${icon('key')}</span>
           <span class="row-main"><span class="row-title" style="display:block">Gentle reminder</span><span class="row-sub" style="display:block">Last confession: ${store.get('lastConfession') ? esc(relDay(store.get('lastConfession'))) : 'not recorded'}</span></span>
           <select class="field" data-confession style="width:auto;padding:8px 10px;font-size:.85rem">
             ${[[0, 'Off'], [2, 'Every 2 wks'], [4, 'Monthly'], [8, 'Every 2 mo']].map(([v, l]) => `<option value="${v}" ${store.get('confessionWeeks', 0) === v ? 'selected' : ''}>${l}</option>`).join('')}
@@ -87,9 +87,11 @@ function render() {
 
       <div class="list-label">About</div>
       <div class="list">
-        <button class="row" data-act="onboarding"><span class="row-icon">✦</span><span class="row-main"><span class="row-title">Personalize Anchor again</span></span><span class="row-end">${icon('chev')}</span></button>
-        <button class="row" data-act="privacy"><span class="row-icon">🔒</span><span class="row-main"><span class="row-title">Privacy Policy</span></span><span class="row-end">${icon('chev')}</span></button>
+        <button class="row" data-act="onboarding"><span class="row-icon">${icon('spark')}</span><span class="row-main"><span class="row-title">Personalize Anchor again</span></span><span class="row-end">${icon('chev')}</span></button>
+        <button class="row" data-act="privacy"><span class="row-icon">${icon('lock')}</span><span class="row-main"><span class="row-title">Privacy Policy</span></span><span class="row-end">${icon('chev')}</span></button>
         <div class="row"><span class="row-icon" style="background:none;overflow:hidden"><img src="icons/icon.svg" alt="" width="40" height="40"></span><span class="row-main"><span class="row-title" style="display:block">Anchor ${VERSION}</span><span class="row-sub" style="display:block">Made with love by William Cain · AI by OpenAI</span></span></div>
+        <a class="row" href="https://github.com/candycain5432" target="_blank" rel="noopener"><span class="row-icon">${icon('github')}</span><span class="row-main"><span class="row-title" style="display:block">William Cain on GitHub</span><span class="row-sub" style="display:block">github.com/candycain5432</span></span><span class="row-end">${icon('external')}</span></a>
+        <a class="row" href="mailto:contact@williamcain.net"><span class="row-icon">${icon('mail')}</span><span class="row-main"><span class="row-title" style="display:block">Contact</span><span class="row-sub" style="display:block">contact@williamcain.net</span></span><span class="row-end">${icon('chev')}</span></a>
       </div>
       <p class="faint small serif" style="text-align:center;font-style:italic;font-size:1rem;margin-top:20px">Ad maiorem Dei gloriam</p>
     </div>`;
@@ -170,7 +172,7 @@ function openPrivacy() {
       <h3 ${h}>Changes</h3>
       <p>If this policy changes materially, the date above will change. The policy is always available from the Me tab.</p>
       <h3 ${h}>Contact</h3>
-      <p>Questions? Reach out to <b>William Cain</b> at <a class="link" href="mailto:williamtylercain441@gmail.com">williamtylercain441@gmail.com</a>.</p>
+      <p>Questions? Reach out to <b>William Cain</b> at <a class="link" href="mailto:contact@williamcain.net">contact@williamcain.net</a>.</p>
     </div>`,
   });
 }

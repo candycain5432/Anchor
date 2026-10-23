@@ -35,7 +35,7 @@ export function openOnboarding(again = false) {
         <h1>Your <em>Daily Rule</em></h1>
         <p class="lead">Choose a few practices to make your own. Anchor will help you keep them — and celebrate when you do. You can change this anytime.</p>
         <div class="pick">${Object.entries(PRACTICES).map(([id, p]) => `
-          <button class="${data.rule.includes(id) ? 'on' : ''}" data-pick="${id}" aria-pressed="${data.rule.includes(id)}"><span class="e">${p.icon}</span><b>${esc(p.name)}</b><span>~${p.min} min</span></button>`).join('')}</div>
+          <button class="${data.rule.includes(id) ? 'on' : ''}" data-pick="${id}" aria-pressed="${data.rule.includes(id)}"><span class="e">${icon(p.icon)}</span><b>${esc(p.name)}</b><span>~${p.min} min</span></button>`).join('')}</div>
       </div>`;
     } else {
       html += `<div class="onb-step">
@@ -75,7 +75,7 @@ export function openOnboarding(again = false) {
     store.set('reminders', data.reminders);
     store.set('onboarded', store.isoDate());
     if (enablePush) {
-      try { await push.enable(); toast('Reminders are on 🔔'); }
+      try { await push.enable(); toast('Reminders are on'); }
       catch (err) { toast(err.message, { ms: 5000 }); }
     }
     el.style.transition = 'opacity .35s';
