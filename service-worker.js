@@ -1,4 +1,4 @@
-const CACHE_NAME = 'anchor-v9.0';
+const CACHE_NAME = 'anchor-v9.1';
 
 // App shell. index.html is network-first (below) but precached for offline use.
 const STATIC_ASSETS = [
@@ -34,11 +34,15 @@ const STATIC_ASSETS = [
   './js/screens/pray.js',
   './js/screens/saints.js',
   './js/screens/today.js',
+  './icons/icon.svg',
   './icons/icon-192.png',
   './icons/icon-512.png',
+  './icons/icon-maskable-192.png',
+  './icons/icon-maskable-512.png',
   './icons/apple-touch-icon.png',
-  './icons/icon-192.svg',
-  './icons/icon-512.svg'
+  './icons/favicon.svg',
+  './icons/favicon-32.png',
+  './icons/badge-96.png'
 ];
 
 self.addEventListener('install', event => {
@@ -76,7 +80,7 @@ self.addEventListener('push', event => {
     self.registration.showNotification(data.title || '✦ Anchor', {
       body: data.body || 'A moment to pray.',
       icon: './icons/icon-192.png',
-      badge: './icons/icon-192.png',
+      badge: './icons/badge-96.png', // Android draws badges as a white silhouette
       vibrate: [200, 100, 200],
       tag: data.url || 'anchor',
       data: { url: data.url || './' }

@@ -86,7 +86,7 @@ export async function test() {
   await reg.showNotification('✦ Anchor', {
     body: 'This is how your daily reminders will look. Peace be with you!',
     icon: './icons/icon-192.png',
-    badge: './icons/icon-192.png',
+    badge: './icons/badge-96.png',
     data: { url: './?open=today' },
   });
 }

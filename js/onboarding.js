@@ -1,6 +1,6 @@
 // First-run welcome: name → Daily Rule → reminders.
 import * as store from './store.js';
-import { esc, sealSVG, toast } from './ui.js';
+import { esc, toast } from './ui.js';
 import { icon } from './icons.js';
 import { PRACTICES, rule, setRule } from './practices.js';
 import * as push from './push.js';
@@ -24,7 +24,7 @@ export function openOnboarding(again = false) {
     let html = `<button class="onb-skip" data-act="skip">${again ? 'Close' : 'Skip'}</button>`;
     if (step === 0) {
       html += `<div class="onb-step">
-        ${sealSVG('⚓', 'onb-mark seal')}
+        <img class="onb-mark" src="icons/icon.svg" alt="" width="84" height="84">
         <h1>Welcome to <em>Anchor</em></h1>
         <p class="lead">A daily companion for prayer — the Rosary bead by bead, today’s readings, the saints, and a place to bring your intentions to God.</p>
         <label class="eyebrow" for="onb-name" style="display:block;margin-bottom:8px">What should we call you?</label>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+  <linearGradient id="bg" x1="0" y1="0" x2=".35" y2="1">
+    <stop offset="0" stop-color="#22336a"/><stop offset=".55" stop-color="#14203f"/><stop offset="1" stop-color="#0a1128"/>
+  </linearGradient>
+  <radialGradient id="glow" cx="50%" cy="40%" r="50%">
+    <stop offset="0" stop-color="#e6c77d" stop-opacity=".34"/><stop offset=".6" stop-color="#c9a449" stop-opacity=".06"/><stop offset="1" stop-color="#c9a449" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2=".3" y2="1">
+    <stop offset="0" stop-color="#fbe9b7"/><stop offset=".45" stop-color="#e2bf6a"/><stop offset="1" stop-color="#a87f2e"/>
+  </linearGradient>
+  <filter id="lift" x="-20%" y="-20%" width="140%" height="140%">
+    <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity=".42"/>
+  </filter><clipPath id="tile"><rect width="512" height="512" rx="114"/></clipPath></defs>
+  <g clip-path="url(#tile)">
+    <rect width="512" height="512" fill="url(#bg)"/>
+    <rect width="512" height="512" fill="url(#glow)"/>
+    
+    <g transform="translate(0 0) scale(1)" filter="url(#lift)">
+    <circle cx="256" cy="122" r="38" fill="none" stroke="url(#gold)" stroke-width="26.04"/>
+    <rect x="235" y="158" width="42" height="252" rx="21" fill="url(#gold)"/>
+    <path d="M158 184.1 Q208.4 203 256 203 Q303.6 203 354 184.1 V263.9 Q303.6 245 256 245 Q208.4 245 158 263.9 Z" fill="url(#gold)" stroke="url(#gold)" stroke-width="7.56" stroke-linejoin="round"/>
+    <path d="M150.3 342.7 A114 114 0 0 0 361.7 342.7" fill="none" stroke="url(#gold)" stroke-width="42" stroke-linecap="round"/>
+    <path d="M114.1 253.1 L103.3 388.9 L179.2 358.2 Z" fill="url(#gold)" stroke="url(#gold)" stroke-width="10.5" stroke-linejoin="round"/><path d="M397.9 253.1 L408.7 388.9 L332.8 358.2 Z" fill="url(#gold)" stroke="url(#gold)" stroke-width="10.5" stroke-linejoin="round"/></g>
+  </g>
+</svg>

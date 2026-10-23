@@ -809,7 +809,7 @@ ol.steps-list li { margin: 0 0 10px; line-height: 1.5; font-size: .92rem; }
 .onb > * { position: relative; }
 .onb-skip { align-self: flex-end; background: none; border: 0; color: rgba(255,255,255,.6); font-weight: 700; font-size: .85rem; padding: 6px; }
 .onb-step { flex: 1 0 auto; display: flex; flex-direction: column; justify-content: center; max-width: 440px; width: 100%; margin: 0 auto; animation: rise .5s var(--ease) both; opacity: 0; transform: translateY(10px); }
-.onb-mark { width: 84px; height: 84px; margin-bottom: 26px; }
+.onb-mark { width: 84px; height: 84px; margin-bottom: 26px; border-radius: 20px; box-shadow: 0 14px 34px rgba(0,0,0,.45); }
 .onb h1 { font-family: var(--font-display); font-weight: 500; font-size: 2.9rem; line-height: 1.02; margin: 0 0 12px; letter-spacing: -.02em; }
 .onb h1 em { color: var(--gold-2); }
 .onb p.lead { color: rgba(255,255,255,.7); font-size: 1rem; margin: 0 0 26px; }

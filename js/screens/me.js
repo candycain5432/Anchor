@@ -5,7 +5,7 @@ import { icon } from '../icons.js';
 import { PRACTICES, rule, setRule, log, streak, bestStreak, totalDays, MILESTONES, unlocked, onChange } from '../practices.js';
 import * as push from '../push.js';
 
-export const VERSION = '9.0';
+export const VERSION = '9.1';
 let root, bound = false;
 
 export function mount(el) {
@@ -89,7 +89,7 @@ function render() {
       <div class="list">
         <button class="row" data-act="onboarding"><span class="row-icon">✦</span><span class="row-main"><span class="row-title">Personalize Anchor again</span></span><span class="row-end">${icon('chev')}</span></button>
         <button class="row" data-act="privacy"><span class="row-icon">🔒</span><span class="row-main"><span class="row-title">Privacy Policy</span></span><span class="row-end">${icon('chev')}</span></button>
-        <div class="row"><span class="row-icon">⚓</span><span class="row-main"><span class="row-title" style="display:block">Anchor ${VERSION}</span><span class="row-sub" style="display:block">Made with love by William Cain · AI by OpenAI</span></span></div>
+        <div class="row"><span class="row-icon" style="background:none;overflow:hidden"><img src="icons/icon.svg" alt="" width="40" height="40"></span><span class="row-main"><span class="row-title" style="display:block">Anchor ${VERSION}</span><span class="row-sub" style="display:block">Made with love by William Cain · AI by OpenAI</span></span></div>
       </div>
       <p class="faint small serif" style="text-align:center;font-style:italic;font-size:1rem;margin-top:20px">Ad maiorem Dei gloriam</p>
     </div>`;
