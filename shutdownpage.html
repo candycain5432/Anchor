@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto" data-size="m" data-lit="green">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#14203f" />
+<title>Anchor — Catholic Prayer Companion</title>
+<meta name="description" content="Your daily Catholic prayer companion — the guided Rosary, today’s Mass readings, saints, Lectio Divina, a prayer journal, and Ask Anchor." />
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GZC18324HL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-GZC18324HL');
+</script>
+
+<!-- Apply saved theme before first paint (no flash) -->
+<script>
+  (function () {
+    try {
+      var g = function (k) { var v = localStorage.getItem('anchor:' + k); return v ? JSON.parse(v) : null; };
+      var r = document.documentElement;
+      var legacyDark = localStorage.getItem('darkMode');
+      r.dataset.theme = g('theme') || (legacyDark === 'true' ? 'dark' : 'auto');
+      r.dataset.size = g('size') || 'm';
+      r.dataset.lit = g('lastLit') || 'green';
+    } catch (e) {}
+  })();
+</script>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Anchor" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="icon" href="icons/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Anchor — Catholic Prayer Companion" />
+<meta property="og:description" content="Pray the Rosary bead by bead, read today’s Mass readings, meet the saints, and keep a prayer journal." />
+<meta property="og:url" content="https://candycain5432.github.io/Anchor/" />
+<meta property="og:image" content="https://candycain5432.github.io/Anchor/icons/og-image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Anchor — a gold anchor-cross on navy, with the words Catholic Prayer Companion" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Anchor — Catholic Prayer Companion" />
+<meta name="twitter:description" content="Pray the Rosary bead by bead, read today’s Mass readings, meet the saints, and keep a prayer journal." />
+<meta name="twitter:image" content="https://candycain5432.github.io/Anchor/icons/og-image.jpg" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css" />
+<link rel="stylesheet" href="css/app.css" />
+<link rel="modulepreload" href="js/app.js" />
+<link rel="modulepreload" href="js/screens/today.js" />
+</head>
+<body>
+  <!-- Shared SVG paint servers -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#e6c77d"/><stop offset="100%" stop-color="#b8913a"/>
+      </linearGradient>
+      <radialGradient id="sealGold" cx="35%" cy="30%" r="80%">
+        <stop offset="0%" stop-color="#f6e0a3"/><stop offset="55%" stop-color="#c9a449"/><stop offset="100%" stop-color="#8a6825"/>
+      </radialGradient>
+    </defs>
+  </svg>
+
+  <div class="app">
+    <main>
+      <section class="screen" data-screen="today" aria-label="Today"></section>
+      <section class="screen" data-screen="pray" aria-label="Pray"></section>
+      <section class="screen" data-screen="ask" aria-label="Ask Anchor"></section>
+      <section class="screen" data-screen="journal" aria-label="Journal"></section>
+      <section class="screen" data-screen="me" aria-label="Me"></section>
+    </main>
+    <nav class="tabbar" aria-label="Main"></nav>
+  </div>
+
+  <div class="sheet-wrap" id="sheet" aria-hidden="true">
+    <div class="sheet-scrim"></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <div class="sheet-grab" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <button class="icon-btn sheet-back" aria-label="Back" hidden></button>
+        <h2 class="sheet-title" id="sheet-title"></h2>
+        <button class="icon-btn sheet-close" aria-label="Close"></button>
+      </div>
+      <div class="sheet-body"></div>
+      <div class="sheet-foot" hidden></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <noscript><p style="padding:24px;text-align:center;font-family:sans-serif">Anchor needs JavaScript to run.</p></noscript>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
