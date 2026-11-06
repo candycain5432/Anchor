@@ -3,6 +3,7 @@ import * as store from '../store.js';
 import * as api from '../api.js';
 import { esc, greeting, fmtDate, track } from '../ui.js';
 import { icon } from '../icons.js';
+import { donateBanner } from '../donate.js';
 import { PRACTICES, rule, dayLog, streak, launch, onChange, complete } from '../practices.js';
 import { season, rank, isFeria, litColor, isSaint, saintFallback, COLOR_NAMES, COLOR_HEX, mysterySet } from '../liturgy.js';
 
@@ -58,6 +59,8 @@ export function mount(el) {
       </div>
 
       <div class="card" data-install hidden></div>
+
+      ${donateBanner()}
 
       <p class="faint small serif" style="text-align:center;font-style:italic;font-size:1rem;margin:22px 0 0">“We have this as a sure and steadfast anchor of the soul.” — Hebrews 6:19</p>
     </div>`;

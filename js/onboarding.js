@@ -1,13 +1,14 @@
-// First-run welcome: name → appearance → Daily Rule → about the maker → reminders.
+// First-run welcome: name → appearance → Daily Rule → about the maker → support → reminders.
 import * as store from './store.js';
 import { esc, toast } from './ui.js';
 import { icon } from './icons.js';
 import { PRACTICES, rule, setRule } from './practices.js';
 import * as push from './push.js';
+import { DONATE_URL } from './donate.js';
 
 export function needsOnboarding() { return !store.get('onboarded'); }
 
-const STEPS = ['welcome', 'theme', 'rule', 'about', 'remind'];
+const STEPS = ['welcome', 'theme', 'rule', 'about', 'donate', 'remind'];
 const THEMES = [['auto', 'Automatic', 'Matches your device'], ['light', 'Light', 'Parchment & gold'], ['dark', 'Dark', 'Easy on the eyes at night']];
 const LINKS = [
   ['globe', 'Portfolio', 'williamcain.net', 'https://williamcain.net'],
@@ -68,6 +69,17 @@ export function openOnboarding(again = false) {
             <span class="i">${icon(ic)}</span><span class="t"><b>${label}</b><span>${sub}</span></span>${icon(href.startsWith('http') ? 'external' : 'chev')}
           </a>`).join('')}
         <p class="serif" style="color:rgba(255,255,255,.6);font-style:italic;font-size:1.1rem;margin:14px 0 0">If Anchor helps you pray, say one for me too.</p>
+      </div>`;
+    } else if (id === 'donate') {
+      html += `<div class="onb-step">
+        <div class="onb-heart" aria-hidden="true">${icon('heart')}</div>
+        <div class="eyebrow" style="color:var(--gold-2);margin-bottom:8px">Completely optional</div>
+        <h1>Help keep Anchor <em>free</em></h1>
+        <p class="lead" style="margin-bottom:14px">Anchor is free and ad-free, and I want it to stay that way for everyone. No subscriptions, no paywalls, no ads.</p>
+        <p class="lead">Running Anchor still costs money every month. I pay for the server that sends your reminders, the AI behind Ask Anchor and the daily reflections, and the hosting that keeps it online. Your donations go straight to those costs, and they’re what keep Anchor free and ad-free.</p>
+        <a class="btn btn-primary btn-lg btn-block" href="${DONATE_URL}" target="_blank" rel="noopener">${icon('heart')} Support Anchor</a>
+        <p class="serif" style="color:rgba(255,255,255,.75);font-style:italic;font-size:1.1rem;margin:16px 0 0;text-align:center">Every gift, big or small, is very appreciated. Thank you.</p>
+        <p class="small" style="color:rgba(255,255,255,.5);margin:8px 0 0;text-align:center">You can always find this later in Me → About.</p>
       </div>`;
     } else {
       html += `<div class="onb-step">
