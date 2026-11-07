@@ -6,7 +6,7 @@ import { PRACTICES, rule, setRule, log, streak, bestStreak, totalDays, MILESTONE
 import * as push from '../push.js';
 import { donateBanner } from '../donate.js';
 
-export const VERSION = '9.7';
+export const VERSION = '9.8';
 let root, bound = false;
 
 export function mount(el) {

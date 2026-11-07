@@ -4,6 +4,13 @@
 
 # Anchor
 
+<a href="https://candycain5432.github.io/Anchor/"><img alt="version 9.8" src="https://img.shields.io/badge/version-9.8-2f6fb3"></a>
+<img alt="PWA: installable" src="https://img.shields.io/badge/PWA-installable-5a3fc0">
+<img alt="works offline" src="https://img.shields.io/badge/works-offline-b8913a">
+<img alt="JavaScript: vanilla ES modules" src="https://img.shields.io/badge/javascript-vanilla_ES_modules-f7df1e">
+<img alt="build: none" src="https://img.shields.io/badge/build-none-4c9a2a">
+<a href="https://ko-fi.com/williamcain"><img alt="Support on Ko-fi" src="https://img.shields.io/badge/Ko--fi-support-ff5e5b?logo=kofi&logoColor=white"></a>
+
 **A daily Catholic prayer companion**
 
 Pray the Rosary bead by bead, read today's Mass readings, meet the saints,<br>and keep a journal of everything you're bringing to God.
