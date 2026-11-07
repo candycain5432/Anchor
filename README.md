@@ -8,7 +8,7 @@
 
 Pray the Rosary bead by bead, read today's Mass readings, meet the saints,<br>and keep a journal of everything you're bringing to God.
 
-**[Open Anchor →](https://candycain5432.github.io/Anchor/)**
+**[Open Anchor →](https://candycain5432.github.io/Anchor/)** · **[☕ Support on Ko-fi](https://ko-fi.com/williamcain)**
 
 <sub>Free · No account · Works offline · Your data stays on your device</sub>
 
@@ -74,6 +74,14 @@ Your journal, intentions, chats, streaks and settings live **only on your device
 
 The full policy is in the app under **Me → Privacy Policy**.
 
+## Support Anchor
+
+Anchor is free and ad-free, and it's going to stay that way. It still costs money every month: the server that sends reminders, the AI behind Ask Anchor and the daily reflections, and the hosting. Donations go straight to those costs.
+
+**[☕ Buy me a coffee on Ko-fi](https://ko-fi.com/williamcain)**: a one-off coffee or a monthly gift, by card or PayPal, no account needed. Every gift, big or small, is very appreciated.
+
+In the app, the same link is on the Today screen, in **Me → About**, and in the welcome steps.
+
 ---
 
 ## How it's built
@@ -87,6 +95,7 @@ css/app.css         components
 js/app.js           boot, router, theme, service worker
 js/store.js         localStorage wrapper + migration from pre-9.0 keys
 js/api.js           every network call (calendar, readings, verse, backend, Wikipedia, Overpass)
+js/donate.js        Ko-fi link + support banner (onboarding, Today, Me → About)
 js/icons.js         line icon set (used everywhere instead of emoji)
 js/practices.js     Daily Rule, log, streaks, milestones, launching practices
 js/screens/         today, pray, ask, journal, me, saints
@@ -144,5 +153,5 @@ Nothing changes on the backend (CORS is open to any origin).
 ---
 
 <div align="center">
-<sub>Made by <a href="https://williamcain.net">William Cain</a> · <a href="https://github.com/candycain5432">GitHub</a> · <a href="mailto:contact@williamcain.net">contact@williamcain.net</a><br><i>Ad maiorem Dei gloriam</i></sub>
+<sub>Made by <a href="https://williamcain.net">William Cain</a> · <a href="https://github.com/candycain5432">GitHub</a> · <a href="mailto:contact@williamcain.net">contact@williamcain.net</a> · <a href="https://ko-fi.com/williamcain">Ko-fi</a><br><i>Ad maiorem Dei gloriam</i></sub>
 </div>
