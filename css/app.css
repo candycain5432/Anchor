@@ -957,5 +957,9 @@ ol.steps-list li { margin: 0 0 10px; line-height: 1.5; font-size: .92rem; }
 .donate-body { flex: 1; min-width: 0; }
 .donate-body b { display: block; font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; line-height: 1.15; }
 .donate-body span { display: block; margin-top: 2px; font-size: .8rem; line-height: 1.4; color: rgba(255,255,255,.7); }
+.donate-body em.donate-kofi { display: block; margin-top: 6px; font-style: normal; font-size: .72rem; font-weight: 600; letter-spacing: .04em; color: var(--gold-2); }
 .donate-go { flex: none; color: var(--gold-2); }
+.onb-kofi { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 8px; }
+.onb-kofi li { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,.82); font-size: .92rem; }
+.onb-kofi svg { flex: none; width: 16px; height: 16px; color: var(--gold-2); }
 .donate-go svg { width: 18px; height: 18px; }

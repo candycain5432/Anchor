@@ -87,7 +87,7 @@ function render() {
       </div>
 
       <div class="list-label">About</div>
-      ${donateBanner({ title: 'Support the creator', sub: 'Anchor is free and ad-free, but the server and AI behind it cost money every month. Donations keep it running, and every one is very appreciated.' })}
+      ${donateBanner({ title: 'Support the creator on Ko-fi', sub: 'Anchor is free and ad-free, but the server and AI behind it cost money every month. A one-off coffee or a monthly gift on Ko-fi keeps it running. No account needed.' })}
       <div class="list">
         <button class="row" data-act="onboarding"><span class="row-icon">${icon('spark')}</span><span class="row-main"><span class="row-title">Personalize Anchor again</span></span><span class="row-end">${icon('chev')}</span></button>
         <button class="row" data-act="privacy"><span class="row-icon">${icon('lock')}</span><span class="row-main"><span class="row-title">Privacy Policy</span></span><span class="row-end">${icon('chev')}</span></button>

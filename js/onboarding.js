@@ -77,9 +77,15 @@ export function openOnboarding(again = false) {
         <h1>Help keep Anchor <em>free</em></h1>
         <p class="lead" style="margin-bottom:14px">Anchor is free and ad-free, and I want it to stay that way for everyone. No subscriptions, no paywalls, no ads.</p>
         <p class="lead">Running Anchor still costs money every month. I pay for the server that sends your reminders, the AI behind Ask Anchor and the daily reflections, and the hosting that keeps it online. Your donations go straight to those costs, and they’re what keep Anchor free and ad-free.</p>
-        <a class="btn btn-primary btn-lg btn-block" href="${DONATE_URL}" target="_blank" rel="noopener">${icon('heart')} Support Anchor</a>
+        <ul class="onb-kofi">
+          <li>${icon('check')} Buy a one-off coffee or give monthly</li>
+          <li>${icon('check')} Pay by card or PayPal, no account needed</li>
+          <li>${icon('check')} Handled securely by Ko-fi</li>
+        </ul>
+        <a class="btn btn-primary btn-lg btn-block" href="${DONATE_URL}" target="_blank" rel="noopener" aria-label="Buy me a coffee on Ko-fi (opens in a new tab)">${icon('coffee')} Buy me a coffee on Ko-fi</a>
+        <p class="small" style="color:rgba(255,255,255,.55);margin:8px 0 0;text-align:center">ko-fi.com/williamcain</p>
         <p class="serif" style="color:rgba(255,255,255,.75);font-style:italic;font-size:1.1rem;margin:16px 0 0;text-align:center">Every gift, big or small, is very appreciated. Thank you.</p>
-        <p class="small" style="color:rgba(255,255,255,.5);margin:8px 0 0;text-align:center">You can always find this later in Me → About.</p>
+        <p class="small" style="color:rgba(255,255,255,.5);margin:8px 0 0;text-align:center">You can always find this later on Today or in Me → About.</p>
       </div>`;
     } else {
       html += `<div class="onb-step">
