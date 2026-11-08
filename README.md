@@ -127,8 +127,8 @@ Data sources:
 
 ## Analytics
 
-Google Analytics 4 (`G-GZC18324HL`), loaded through **Google Tag Manager** (container `GTM-P5RXXK6B`, in the
-`<head>` of `index.html`, `faq.html` and `privacy.html`). Anchor is a single page, so `js/analytics.js` reports every screen, tab and
+Google Analytics 4 (`G-41V16QZ641`, loaded in the `<head>` of `index.html`, `faq.html` and `privacy.html`).
+Anchor is a single page, so `js/analytics.js` reports every screen, tab and
 sheet as its own **virtual page**, which makes GA's *Pages and screens* report and *Path exploration* show what's
 used and how people move around. Only fixed names, ids and counts are sent: never journal or chat text, names,
 search words or locations.
@@ -167,17 +167,7 @@ Every `page_view` carries **`previous_page`** (where they came from; `(entrance)
 User properties: `launch_mode` (installed / browser), `layout` (phone / tablet / desktop), `theme`, `text_size`,
 `reminders`, `daily_rule_size`.
 
-**One-time setup in Tag Manager** (container `GTM-P5RXXK6B`):
-
-1. **Tags → New → Google tag**, Tag ID `G-GZC18324HL`. Under *Configuration settings* add the parameter
-   `send_page_view` = `false` (the app sends its own page views; without this every visit gets an extra one for `/`).
-   Trigger: **Initialization – All Pages**. If the container already has a GA4 tag for this ID, edit that one
-   instead of adding a second.
-2. **Submit → Publish.** The app's `gtag()` calls (page views and events) go into the shared `dataLayer`, and this
-   Google tag sends them to GA. Nothing else in the container is needed for them.
-3. To check: **Preview** (Tag Assistant) with the site open, then watch *Admin → DebugView* in GA.
-
-**One-time setup in GA** (Admin):
+**Optional setup in GA** (Admin), for cleaner reports:
 
 1. **Data streams → your web stream → Enhanced measurement → ⚙︎**: turn **off** *Page changes based on browser
    history events* (the app sends its own page views; leaving it on adds stray ones). Keep outbound clicks on.

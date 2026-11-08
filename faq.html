@@ -8,17 +8,16 @@
 <meta name="description" content="Common questions about Anchor, the free Catholic prayer app: installing it, reminders, Ask Anchor, your data, and more." />
 <link rel="canonical" href="https://faithanchor.net/faq.html" />
 <link rel="icon" href="icons/favicon.svg" type="image/svg+xml" />
-<!-- Google Tag Manager (container GTM-P5RXXK6B). GA4 and any other tags are configured in the container. -->
-<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-P5RXXK6B"></script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-41V16QZ641"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  // Tag Manager's start event: "All Pages" / "Initialization" triggers in the container fire on this.
-  dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-  // These are plain pages (the app sends its own page views), so report this one here.
-  var dev = !/(^|\.)faithanchor\.net$|\.github\.io$/.test(location.hostname) || /[?&]ga_debug/.test(location.search);
-  gtag('event', 'page_view', dev ? { debug_mode: true } : {});
+  // Visits from anywhere but the live site count as debug traffic (GA treats even debug_mode: false as on).
+  var gaConfig = {};
+  if (!/(^|\.)faithanchor\.net$|\.github\.io$/.test(location.hostname) || /[?&]ga_debug/.test(location.search)) gaConfig.debug_mode = true;
+  gtag('config', 'G-41V16QZ641', gaConfig);
 </script>
 <script>try { var t = JSON.parse(localStorage.getItem('anchor:theme')); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,8 +33,6 @@
 </style>
 </head>
 <body>
-  <!-- Google Tag Manager (noscript) -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P5RXXK6B" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="wrap">
   <a class="back" href="./">← Back to Anchor</a>
   <h1>Questions &amp; answers</h1>

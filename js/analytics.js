@@ -4,9 +4,6 @@
 // screen, tab and sheet as its own virtual page (e.g. /today, /pray/rosary, /saint/st-joseph) so the
 // Pages and screens report and Path exploration show what's used and how people move around.
 //
-// Delivery: everything goes into the dataLayer as gtag() commands. Google Tag Manager
-// (GTM-P5RXXK6B, loaded in index.html) hands them to the GA4 Google tag configured in the container.
-//
 // Rules: only fixed names, ids and counts are ever sent. Never journal text, chat text, names,
 // search words, locations or anything else someone typed.
 import * as store from './store.js';
