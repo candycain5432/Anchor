@@ -8,7 +8,7 @@ import { complete, bumpCount, checkMilestones } from '../practices.js';
 export function openDailyExamen() {
   let i = 0;
   const grat = ['', '', ''];
-  const body = openSheet({ title: 'Daily Examen', full: true, html: '' });
+  const body = openSheet({ title: 'Daily Examen', page: '/pray/examen', full: true, html: '' });
 
   function render() {
     const s = DAILY_EXAMEN[i];
@@ -79,7 +79,7 @@ export function openConfession() {
     <div class="card prayer">${prayerHTML(PRAYERS['Act of Contrition'])}</div>
     <p class="serif muted" style="text-align:center;font-size:1.15rem;font-style:italic">When you are ready, go to Confession and receive God’s mercy.</p>`;
 
-  const body = openSheet({ title: 'Prepare for Confession', full: true, html });
+  const body = openSheet({ title: 'Prepare for Confession', page: '/pray/confession', full: true, html });
 
   const setLast = iso => {
     store.set('lastConfession', iso);

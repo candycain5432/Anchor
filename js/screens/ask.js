@@ -5,8 +5,9 @@ import { esc, openSheet, closeSheet, copyText, shareText, toast, track, relDay }
 import { icon } from '../icons.js';
 import { renderMarkdown, stripMarkdown } from '../markdown.js';
 import { season, isFeria, saintFallback } from '../liturgy.js';
+import { DONATE_URL, hasDonate } from '../donate.js';
 
-const MAX_CHATS = 30, HISTORY_TURNS = 12;
+const MAX_CHATS = 30, HISTORY_TURNS = 10; // the server keeps at most 10 turns anyway
 let root, chatEl, input, sendBtn, ctxEl;
 let chat = null;        // current conversation
 let pendingCtx = null;  // context attached to the next new conversation
@@ -44,7 +45,7 @@ export function mount(el) {
         <textarea id="ask-input" rows="1" placeholder="Ask about faith, prayer, Scripture…" maxlength="2000"></textarea>
         <button class="send" type="submit" aria-label="Send">${icon('send')}</button>
       </form>
-      <div class="disclaimer">Anchor can make mistakes. For serious matters, talk with a priest.</div>
+      <div class="disclaimer">Ask Anchor is an AI, not a priest or counselor. It may get things wrong. <button type="button" data-act="ai-notice">Learn more</button></div>
     </div>`;
   chatEl = el.querySelector('[data-chat]');
   input = el.querySelector('textarea');
@@ -55,9 +56,9 @@ export function mount(el) {
   chat = chats().find(c => c.id === current) || null;
   if (!chat) newChat();
 
-  el.querySelector('[data-form]').addEventListener('submit', e => { e.preventDefault(); controller ? stop() : send(); });
+  el.querySelector('[data-form]').addEventListener('submit', e => { e.preventDefault(); controller ? stop() : send(undefined, 'typed'); });
   input.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && matchMedia('(hover: hover)').matches) { e.preventDefault(); send(); }
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && matchMedia('(hover: hover)').matches) { e.preventDefault(); send(undefined, 'typed'); }
   });
   input.addEventListener('input', autosize);
   el.addEventListener('click', onClick);
@@ -66,6 +67,35 @@ export function mount(el) {
 
 export function show() {
   setTimeout(() => chatEl.scrollTop = chatEl.scrollHeight, 50);
+  // First visit: explain what Ask Anchor is. Deferred because navigate() closes sheets after show().
+  if (!store.get('aiNotice')) setTimeout(() => { if (!store.get('aiNotice') && root.classList.contains('active')) openAiNotice(); }, 350);
+}
+
+function openAiNotice() {
+  store.set('aiNotice', store.isoDate());
+  openSheet({
+    title: 'Before you ask',
+    page: '/ask/notice',
+    html: `<div class="ai-notice">
+      <div class="ai-notice-mark" aria-hidden="true">${icon('spark')}</div>
+      <p><b>Ask Anchor is an AI.</b> It’s guided by Scripture and Church teaching, but it’s <b>not a priest or a counselor</b>, and it <b>may get things wrong</b>. Check anything important with a priest or the Catechism.</p>
+      <p>It can’t hear confessions or give absolution. For spiritual direction, talk with a priest you trust.</p>
+      <p>If you’re struggling or in danger, please reach out to someone you trust or a crisis line. In the US, call or text <b>988</b>.</p>
+      <p class="faint small">Your conversations are saved only on this device. Each message is sent to Anchor’s server and OpenAI to write the reply, and isn’t stored there. <a class="link" href="privacy.html" data-doc-link>Privacy Policy</a></p>
+    </div>`,
+    foot: `<button class="btn btn-primary btn-block" data-ok>I understand</button>`,
+    onMount: (_b, foot) => { foot.onclick = e => { if (e.target.closest('[data-ok]')) closeSheet(); }; },
+  });
+}
+
+/** Shown in place of a reply when the shared daily AI budget is used up. */
+function limitHTML(message) {
+  return `<div class="limit-note">
+    <span class="i" aria-hidden="true">${icon('moon')}</span>
+    <div><b>Ask Anchor is resting until tomorrow</b>
+    <p>${esc(message)}</p>
+    <p class="small">Prayers, readings and your journal all still work. ${hasDonate() ? `<a href="${DONATE_URL}" target="_blank" rel="noopener" data-donate>Help keep Anchor free</a>` : ''}</p></div>
+  </div>`;
 }
 
 function autosize() {
@@ -139,7 +169,8 @@ const tools = () => `<div class="msg-tools">
   <button data-tool="save">${icon('book')} Save</button></div>`;
 
 // ---- Sending ----
-async function send(text) {
+/** `source`: 'typed' | 'starter' | 'ask_about' (from a reading, saint…) | 'retry' — for analytics only. */
+async function send(text, source = 'typed') {
   const message = (text ?? input.value).trim();
   if (!message || controller) return;
   if (pendingCtx && !chat.messages.length) { chat.context = pendingCtx; }
@@ -152,7 +183,7 @@ async function send(text) {
   appendMessage('user', message);
   saveChat();
   renderCtx();
-  track('chat_sent', { context: chat.context?.kind || 'none' });
+  track('chat_sent', { context: chat.context?.kind || 'none', source, turn: Math.ceil(chat.messages.length / 2) });
 
   const el = document.createElement('div');
   el.className = 'msg-ai';
@@ -189,6 +220,12 @@ async function send(text) {
   } catch (err) {
     if (controller?.signal.aborted) {
       full = full || '_Stopped._';
+    } else if (api.isDailyLimit(err)) {
+      cancelAnimationFrame(frame);
+      track('ai_limit_hit', { feature: 'ask' });
+      md.innerHTML = limitHTML(err.message);
+      finishSend(coldTimer);
+      return;
     } else {
       cancelAnimationFrame(frame);
       md.innerHTML = `<p>${esc(navigator.onLine ? err.message || 'Something went wrong.' : 'You appear to be offline. Check your connection and try again.')}</p>`;
@@ -197,7 +234,7 @@ async function send(text) {
         el.remove();
         chat.messages.pop();
         chatEl.lastElementChild?.classList.contains('msg-user') && chatEl.lastElementChild.remove();
-        send(message);
+        send(message, 'retry');
       };
       finishSend(coldTimer);
       return;
@@ -228,7 +265,7 @@ export async function askAbout({ kind, title, text, prompt }) {
   saveChat();
   newChat({ kind, title, text: (text || '').slice(0, 4000) });
   render();
-  if (prompt) send(prompt);
+  if (prompt) send(prompt, 'ask_about');
 }
 
 // ---- History ----
@@ -236,6 +273,7 @@ function openHistory() {
   const all = chats();
   openSheet({
     title: 'Conversations',
+    page: '/ask/history',
     html: all.length ? `<div class="list">${all.map(c => `
       <div class="row tap" data-open="${esc(c.id)}" role="button" tabindex="0">
         <span class="row-icon">${icon('chat')}</span>
@@ -271,15 +309,17 @@ function openHistory() {
 async function onClick(e) {
   const t = e.target;
   const act = t.closest('[data-act]')?.dataset.act;
-  if (act === 'new') { if (controller) stop(); newChat(); pendingCtx = null; render(); input.focus(); return; }
+  if (act === 'new') {
+    track('chat_new', { previous_turns: Math.ceil(chat.messages.length / 2) }); if (controller) stop(); newChat(); pendingCtx = null; render(); input.focus(); return; }
   if (act === 'history') return openHistory();
+  if (act === 'ai-notice') return openAiNotice();
   if (act === 'clear-ctx') { chat.context = null; pendingCtx = null; saveChat(); renderCtx(); return; }
 
   const st = t.closest('[data-starter]');
   if (st) {
     const s = chatEl._starters[+st.dataset.starter];
     if (s.ctx) pendingCtx = s.ctx;
-    return send(s.t);
+    return send(s.t, 'starter');
   }
 
   const tool = t.closest('[data-tool]');

@@ -5,8 +5,12 @@ import { icon } from '../icons.js';
 import { PRACTICES, rule, setRule, log, streak, bestStreak, totalDays, MILESTONES, unlocked, onChange } from '../practices.js';
 import * as push from '../push.js';
 import { donateBanner } from '../donate.js';
+import { isStandalone, openInstallSheet, shareApp } from '../install.js';
+import { event, updateUserProperties } from '../analytics.js';
+const settingEvent = (setting, value) => { event('setting_change', { setting, value: String(value) }); updateUserProperties(); };
 
-export const VERSION = '9.7';
+export const VERSION = '10.0';
+const SUPPORT_EMAIL = 'support@faithanchor.net';
 let root, bound = false;
 
 export function mount(el) {
@@ -35,7 +39,9 @@ function render() {
         <div class="stat"><b>${totalDays()}</b><span>Total days</span></div>
       </div>
     </header>
-    <div class="page stagger">
+    <div class="page">
+     <div class="cols">
+      <div class="col col-main stagger">
       <div class="card">
         <div class="card-label">Last 12 weeks</div>
         ${heatmap()}
@@ -46,6 +52,8 @@ function render() {
         <div class="seal-grid">${MILESTONES.map(m => `
           <button class="seal-cell ${unlocked()[m.id] ? '' : 'locked'}" data-milestone="${m.id}">${sealSVG(m.glyph)}<div class="sn">${esc(m.name)}</div></button>`).join('')}</div>
       </div>
+      </div>
+      <div class="col col-side stagger">
 
       <div class="list-label">Your Daily Rule</div>
       <div class="list">
@@ -87,15 +95,21 @@ function render() {
       </div>
 
       <div class="list-label">About</div>
-      ${donateBanner({ title: 'Support the creator', sub: 'Anchor is free and ad-free, but the server and AI behind it cost money every month. Donations keep it running, and every one is very appreciated.' })}
+      ${donateBanner({ title: 'Support Anchor on Ko-fi', sub: 'Anchor is free and ad-free, but the server and AI behind it cost money every month. Donations keep it running, and every one is very appreciated.' })}
       <div class="list">
-        <button class="row" data-act="onboarding"><span class="row-icon">${icon('spark')}</span><span class="row-main"><span class="row-title">Personalize Anchor again</span></span><span class="row-end">${icon('chev')}</span></button>
-        <button class="row" data-act="privacy"><span class="row-icon">${icon('lock')}</span><span class="row-main"><span class="row-title">Privacy Policy</span></span><span class="row-end">${icon('chev')}</span></button>
+        ${isStandalone() ? '' : `<button class="row" data-act="install"><span class="row-icon">${icon('download')}</span><span class="row-main"><span class="row-title" style="display:block">Install Anchor</span><span class="row-sub" style="display:block">Add it to your home screen</span></span><span class="row-end">${icon('chev')}</span></button>`}
+        <button class="row" data-act="share-app"><span class="row-icon">${icon('share')}</span><span class="row-main"><span class="row-title" style="display:block">Share Anchor</span><span class="row-sub" style="display:block">Send it to someone who’d pray with it</span></span><span class="row-end">${icon('chev')}</span></button>
+        <a class="row" href="mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(`Anchor feedback (v${VERSION})`)}"><span class="row-icon">${icon('mail')}</span><span class="row-main"><span class="row-title" style="display:block">Send feedback</span><span class="row-sub" style="display:block">${SUPPORT_EMAIL}</span></span><span class="row-end">${icon('chev')}</span></a>
+        <a class="row" href="faq.html" data-doc-link><span class="row-icon">${icon('chat')}</span><span class="row-main"><span class="row-title">Questions & answers</span></span><span class="row-end">${icon('chev')}</span></a>
+        <a class="row" href="privacy.html" data-doc-link><span class="row-icon">${icon('lock')}</span><span class="row-main"><span class="row-title">Privacy Policy</span></span><span class="row-end">${icon('chev')}</span></a>
+        <button class="row" data-act="onboarding"><span class="row-icon">${icon('spark')}</span><span class="row-main"><span class="row-title">Show the welcome again</span></span><span class="row-end">${icon('chev')}</span></button>
         <div class="row"><span class="row-icon" style="background:none;overflow:hidden"><img src="icons/icon.svg" alt="" width="40" height="40"></span><span class="row-main"><span class="row-title" style="display:block">Anchor ${VERSION}</span><span class="row-sub" style="display:block">Made with love by William Cain · AI by OpenAI</span></span></div>
         <a class="row" href="https://williamcain.net" target="_blank" rel="noopener"><span class="row-icon">${icon('globe')}</span><span class="row-main"><span class="row-title" style="display:block">William Cain’s portfolio</span><span class="row-sub" style="display:block">williamcain.net</span></span><span class="row-end">${icon('external')}</span></a>
         <a class="row" href="https://github.com/candycain5432" target="_blank" rel="noopener"><span class="row-icon">${icon('github')}</span><span class="row-main"><span class="row-title" style="display:block">William Cain on GitHub</span><span class="row-sub" style="display:block">github.com/candycain5432</span></span><span class="row-end">${icon('external')}</span></a>
         <a class="row" href="mailto:contact@williamcain.net"><span class="row-icon">${icon('mail')}</span><span class="row-main"><span class="row-title" style="display:block">Contact</span><span class="row-sub" style="display:block">contact@williamcain.net</span></span><span class="row-end">${icon('chev')}</span></a>
       </div>
+      </div>
+     </div>
       <p class="faint small serif" style="text-align:center;font-style:italic;font-size:1rem;margin-top:20px">Ad maiorem Dei gloriam</p>
     </div>`;
 }
@@ -140,46 +154,6 @@ function remindersHTML() {
     ${on ? `<button class="row" data-act="test-push"><span class="row-main"><span class="row-title" style="color:var(--gold)">Send a test notification</span></span></button>` : ''}`;
 }
 
-// ---- Privacy policy ----
-function openPrivacy() {
-  const h = 'class="serif" style="font-size:1.25rem;font-weight:600;margin:22px 0 6px"';
-  openSheet({
-    title: 'Privacy Policy',
-    full: true,
-    html: `<div style="font-size:.92rem;line-height:1.7">
-      <p class="faint small" style="text-transform:uppercase;letter-spacing:.08em;font-weight:700">Last updated: October 2026</p>
-      <p>Anchor is a free Catholic prayer companion built and maintained by William Cain. This policy explains plainly what data the app touches, why, and what we do (and don’t do) with it.</p>
-      <h3 ${h}>The short version</h3>
-      <p>There are no accounts, no ads, and we never sell data. Your journal, intentions, progress, and chat history live only on your device. Data leaves your phone only when you use AI features or turn on reminders, and none of it is tied to your identity. We use Google Analytics to understand, in aggregate, which features people use.</p>
-      <h3 ${h}>What stays on your device</h3>
-      <p>Stored only in your browser’s local storage and never sent to us: your name (if you give one), Daily Rule and prayer log, streaks and milestones, prayer intentions, gratitude entries and notes, Ask Anchor conversation history, favorites, novena progress, last-confession date, theme and text settings, your approximate location for finding churches, and cached readings for offline use. You can back it up or erase it anytime from the Me tab.</p>
-      <h3 ${h}>Ask Anchor (AI chat)</h3>
-      <p>When you send a message, its text — along with the last few messages of that conversation and, if you chose “Ask about this,” the reading or saint you’re asking about — is sent to our server to generate a reply using OpenAI. Our server does not log or store your messages and keeps no conversation history; your history stays on your device. OpenAI processes each request under its own privacy policy.</p>
-      <h3 ${h}>“Help me pray” and Lectio Divina</h3>
-      <p>If you ask Anchor to write a prayer for an intention, only that intention’s text is sent to generate the prayer. It is not stored on the server. Lectio Divina questions are generated once per day for everyone from the day’s Gospel — no personal data is involved.</p>
-      <h3 ${h}>Reminders (push notifications)</h3>
-      <p>If you turn on reminders, your browser creates a push subscription (a technical address for delivering notifications). Our server stores it with your timezone and chosen reminder times, only to send your reminders. It isn’t linked to your name, email, or location. Turning reminders off deletes it from our server.</p>
-      <h3 ${h}>Third-party services</h3>
-      <ul style="padding-left:1.2em">
-        <li><b>Google Fonts</b> — loads the app’s typefaces.</li>
-        <li><b>Catholic Readings API</b> (GitHub Pages) and <b>bible-api.com</b> — the liturgical calendar and reading texts.</li>
-        <li><b>bible.org</b> — the verse of the day.</li>
-        <li><b>Wikipedia</b> — saint biographies and images.</li>
-        <li><b>OpenStreetMap (Overpass)</b> — nearby churches; your coordinates are sent only when you search.</li>
-        <li><b>OpenAI</b> (via our server) — AI features, as described above.</li>
-      </ul>
-      <h3 ${h}>Google Analytics</h3>
-      <p>Anchor uses Google Analytics to understand how the app is used — for example, how many people open it, which features are used, device type, and general (country-level) region. We also record anonymous events like “a Rosary was completed” so we know which features help people pray. This data is aggregated; we don’t use it to identify or target individuals. Google Analytics uses cookies and is governed by Google’s Privacy Policy (policies.google.com/privacy). You can opt out with the Google Analytics Opt-out Browser Add-on (tools.google.com/dlpage/gaoptout).</p>
-      <h3 ${h}>Children’s privacy</h3>
-      <p>Anchor does not knowingly collect personal information from children under 13 and requires no personal data to use.</p>
-      <h3 ${h}>Changes</h3>
-      <p>If this policy changes materially, the date above will change. The policy is always available from the Me tab.</p>
-      <h3 ${h}>Contact</h3>
-      <p>Questions? Reach out to <b>William Cain</b> at <a class="link" href="mailto:contact@williamcain.net">contact@williamcain.net</a> or visit <a class="link" href="https://williamcain.net" target="_blank" rel="noopener">williamcain.net</a>.</p>
-    </div>`,
-  });
-}
-
 // ---- Events ----
 async function onClick(e) {
   const t = e.target;
@@ -189,6 +163,7 @@ async function onClick(e) {
     const got = unlocked()[ms.id];
     return openSheet({
       title: ms.name,
+      page: `/me/milestone/${ms.id}`,
       html: `<div style="text-align:center;padding:10px 0 20px">${sealSVG(ms.glyph).replace('class="seal"', `class="seal" style="width:120px;height:120px;margin:0 auto 14px;${got ? '' : 'filter:grayscale(1);opacity:.3'}"`)}
         <p class="serif" style="font-size:1.3rem;margin:0 0 6px">${esc(ms.desc)}</p>
         <p class="faint small">${got ? `Earned ${esc(relDay(got))}` : 'Not yet earned — keep praying!'}</p></div>`,
@@ -196,14 +171,15 @@ async function onClick(e) {
   }
 
   const th = t.closest('[data-theme-set]');
-  if (th) { (await import('../app.js')).applyTheme(th.dataset.themeSet); return render(); }
+  if (th) { (await import('../app.js')).applyTheme(th.dataset.themeSet); settingEvent('theme', th.dataset.themeSet); return render(); }
   const sz = t.closest('[data-size-set]');
-  if (sz) { (await import('../app.js')).applySize(sz.dataset.sizeSet); return render(); }
+  if (sz) { (await import('../app.js')).applySize(sz.dataset.sizeSet); settingEvent('text_size', sz.dataset.sizeSet); return render(); }
 
   const act = t.closest('[data-act]')?.dataset.act;
   if (act === 'edit-name') {
     openSheet({
       title: 'Your name',
+      page: '/me/name',
       html: `<input class="field" data-name value="${esc(store.get('profile', {}).name || '')}" placeholder="First name" maxlength="40" autocomplete="given-name">`,
       foot: `<button class="btn btn-primary btn-block" data-save>Save</button>`,
       onMount(body, foot) {
@@ -211,20 +187,24 @@ async function onClick(e) {
           store.update('profile', {}, p => ({ ...p, name: body.querySelector('[data-name]').value.trim() }));
           closeSheet();
           import('../app.js').then(m => m.refreshAll());
+          settingEvent('name', 'changed');
         };
       },
     });
   }
   if (act === 'test-push') push.test().catch(err => toast(err.message));
-  if (act === 'privacy') openPrivacy();
+  if (act === 'install') openInstallSheet('me');
+  if (act === 'share-app') shareApp('me');
   if (act === 'onboarding') (await import('../onboarding.js')).openOnboarding(true);
   if (act === 'export') {
     const data = JSON.stringify(store.exportAll(), null, 2);
     downloadFile(`anchor-backup-${store.isoDate()}.json`, new Blob([data], { type: 'application/json' }));
     toast('Backup downloaded');
+    event('data_action', { action: 'backup' });
   }
   if (act === 'reset' && await confirmSheet({ title: 'Erase everything?', message: 'Your journal, intentions, streaks, milestones, chats and settings will be permanently removed from this device. Consider backing up first.', confirm: 'Erase', danger: true })) {
     await push.disable();
+    event('data_action', { action: 'erase' });
     store.resetAll();
     location.reload();
   }
@@ -237,6 +217,7 @@ async function onChangeInput(e) {
     if (!ids.length) { t.checked = true; return toast('Keep at least one practice in your Rule'); }
     setRule(ids);
     toast('Daily Rule updated');
+    settingEvent('daily_rule', `${t.checked ? 'add' : 'remove'}:${t.dataset.rule}`);
   }
   if (t.matches('[data-push]')) {
     const sub = root.querySelector('[data-push-sub]');
@@ -259,15 +240,18 @@ async function onChangeInput(e) {
     await push.setReminders(r);
     root.querySelector('[data-reminders]').innerHTML = remindersHTML();
     toast('Reminder times saved');
+    settingEvent('reminder_times', push.SLOTS.filter(sl => r[sl.id]).map(sl => sl.id).join('+') || 'none');
   }
   if (t.matches('[data-confession]')) {
     store.set('confessionWeeks', +t.value);
+    settingEvent('confession_reminder', +t.value ? `${t.value}_weeks` : 'off');
     toast(+t.value ? 'We’ll gently remind you on the Today screen' : 'Confession reminder off');
   }
   if (t.matches('[data-import]') && t.files[0]) {
     try {
       store.importAll(JSON.parse(await t.files[0].text()));
       toast('Backup restored');
+      event('data_action', { action: 'restore' });
       setTimeout(() => location.reload(), 800);
     } catch (err) { toast(err.message || 'That file isn’t an Anchor backup'); }
   }

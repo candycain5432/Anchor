@@ -95,6 +95,7 @@ export function openTimer({ minutes } = {}) {
 
   const body = openSheet({
     title: 'Silent Prayer',
+    page: '/pray/silent-prayer',
     full: true,
     html: pickHTML,
     onClose() { t?.stop(); keepAwake(false); },

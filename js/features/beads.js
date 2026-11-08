@@ -155,6 +155,7 @@ function player(state) {
 
   const body = openSheet({
     title: state.title,
+    page: `/pray/${state.kind}`,
     full: true,
     html,
     onClose() {

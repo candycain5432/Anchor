@@ -32,6 +32,7 @@ export function openNovena(id, onChange) {
   const d = nov.daily(p.day);
   const body = openSheet({
     title: nov.name,
+    page: `/novena/${nov.id}`,
     full: true,
     html: `
       <div style="text-align:center;margin-bottom:14px">
@@ -66,6 +67,7 @@ export function openNovena(id, onChange) {
 function start(nov, onChange) {
   openSheet({
     title: nov.name,
+    page: `/novena/${nov.id}/start`,
     html: `
       <p class="muted" style="margin:0 0 16px">${esc(nov.sub)}. Pray once a day for nine days. Anchor keeps your place and will be here each day.</p>
       <label class="small faint" for="nv-int" style="display:block;margin:0 4px 6px">Your intention (optional, stays on this device)</label>

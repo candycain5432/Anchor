@@ -7,14 +7,14 @@
 <title>Anchor — Catholic Prayer Companion</title>
 <meta name="description" content="Your daily Catholic prayer companion — the guided Rosary, today’s Mass readings, saints, Lectio Divina, a prayer journal, and Ask Anchor." />
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-GZC18324HL"></script>
+<!-- Google Tag Manager (container GTM-P5RXXK6B). GA4 and any other tags are configured in the container. -->
+<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-P5RXXK6B"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
-  gtag('config', 'G-GZC18324HL');
+  // Tag Manager's start event: "All Pages" / "Initialization" triggers in the container fire on this.
+  dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
 </script>
 
 <!-- Apply saved theme before first paint (no flash) -->
@@ -32,6 +32,7 @@
 </script>
 
 <!-- PWA -->
+<link rel="canonical" href="https://faithanchor.net/" />
 <link rel="manifest" href="manifest.json" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
@@ -43,10 +44,14 @@
 
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
+<meta property="og:site_name" content="Anchor" />
+<meta property="og:locale" content="en_US" />
 <meta property="og:title" content="Anchor — Catholic Prayer Companion" />
 <meta property="og:description" content="Pray the Rosary bead by bead, read today’s Mass readings, meet the saints, and keep a prayer journal." />
-<meta property="og:url" content="https://candycain5432.github.io/Anchor/" />
-<meta property="og:image" content="https://candycain5432.github.io/Anchor/icons/og-image.jpg" />
+<meta property="og:url" content="https://faithanchor.net/" />
+<meta property="og:image" content="https://faithanchor.net/icons/og-image.jpg" />
+<meta property="og:image:secure_url" content="https://faithanchor.net/icons/og-image.jpg" />
+<meta property="og:image:type" content="image/jpeg" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:image:alt" content="Anchor — a gold anchor-cross on navy, with the words Catholic Prayer Companion" />
@@ -55,17 +60,42 @@
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Anchor — Catholic Prayer Companion" />
 <meta name="twitter:description" content="Pray the Rosary bead by bead, read today’s Mass readings, meet the saints, and keep a prayer journal." />
-<meta name="twitter:image" content="https://candycain5432.github.io/Anchor/icons/og-image.jpg" />
+<meta name="twitter:image" content="https://faithanchor.net/icons/og-image.jpg" />
+<meta name="twitter:image:alt" content="Anchor — a gold anchor-cross on navy, with the words Catholic Prayer Companion" />
+
+<!-- Structured data for search engines -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Anchor",
+  "alternateName": "Anchor — Catholic Prayer Companion",
+  "url": "https://faithanchor.net/",
+  "description": "A free daily Catholic prayer companion: the guided Rosary, today’s Mass readings, saints, Lectio Divina, a prayer journal, and Ask Anchor.",
+  "applicationCategory": "LifestyleApplication",
+  "operatingSystem": "Any (web browser; installable on iPhone, Android and desktop)",
+  "browserRequirements": "Requires JavaScript",
+  "inLanguage": "en",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "image": "https://faithanchor.net/icons/og-image.jpg",
+  "screenshot": "https://faithanchor.net/screenshots/hero.webp",
+  "author": { "@type": "Person", "name": "William Cain", "url": "https://williamcain.net" }
+}
+</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/tokens.css" />
 <link rel="stylesheet" href="css/app.css" />
+<link rel="stylesheet" href="css/doc.css" />
 <link rel="modulepreload" href="js/app.js" />
 <link rel="modulepreload" href="js/screens/today.js" />
 </head>
 <body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P5RXXK6B" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- Shared SVG paint servers -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>

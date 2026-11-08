@@ -1,5 +1,6 @@
 // Shared UI: escaping, the bottom sheet, toasts, haptics, sharing, analytics.
 import { icon, iconPaths } from './icons.js';
+import { overlayView, overlayClosed, slug, event } from './analytics.js';
 
 export const $ = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -19,9 +20,8 @@ export function haptic(pattern = 8) {
   try { navigator.vibrate?.(pattern); } catch {}
 }
 
-export function track(event, params = {}) {
-  try { window.gtag?.('event', event, params); } catch {}
-}
+/** Sends an analytics event (see js/analytics.js). */
+export function track(name, params = {}) { event(name, params); }
 
 // ---- Toast ----
 let toastTimer;
@@ -35,15 +35,17 @@ export function toast(msg, { action, onAction, ms = 2600 } = {}) {
 }
 
 // ---- Bottom sheet ----
-// openSheet({ title, html | node, full, foot, onClose, onMount }) — one sheet at a time.
+// openSheet({ title, html | node, full, foot, onClose, onMount, page }) — one sheet at a time.
+// `page` is the virtual page reported to analytics (default /sheet/<title>); false for none.
 let sheetClose = null;
 
-export function openSheet({ title = '', html = '', node = null, full = false, foot = '', onClose, onMount, back } = {}) {
+export function openSheet({ title = '', html = '', node = null, full = false, foot = '', onClose, onMount, back, page } = {}) {
   const wrap = $('#sheet');
   const sheet = $('.sheet', wrap);
   if (sheetClose && wrap.classList.contains('open')) {
     const prev = sheetClose; sheetClose = null; prev(true);
   }
+  if (page !== false) overlayView(page || `/sheet/${slug(title)}`, title);
   sheet.classList.toggle('full', full);
   sheet.style.transform = '';
   $('.sheet-title', wrap).textContent = title;
@@ -77,6 +79,7 @@ export function closeSheet() {
   delete document.body.dataset.sheet;
   const fn = sheetClose; sheetClose = null;
   fn?.(false);
+  overlayClosed();
 }
 
 export function setSheetTitle(t) { $('#sheet .sheet-title').textContent = t; }
@@ -120,6 +123,7 @@ export function confirmSheet({ title, message, confirm = 'Confirm', danger = fal
     let done = false;
     openSheet({
       title,
+      page: false, // confirmations aren't pages
       html: `<p class="muted" style="margin:0 0 6px">${esc(message)}</p>`,
       foot: `<button class="btn btn-soft btn-block" data-act="no">Cancel</button><button class="btn ${danger ? 'btn-danger' : 'btn-primary'} btn-block" data-act="yes">${esc(confirm)}</button>`,
       onMount: (_b, foot) => {

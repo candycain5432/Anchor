@@ -55,6 +55,8 @@ export function complete(id, { quiet = false } = {}) {
     }
     emit();
     checkMilestones();
+    // First prayer → offer reminders; after a day of use → one-time donation ask. Waits until the screen is clear.
+    import('./nudges.js').then(m => m.afterPrayer()).catch(() => {});
   }
   return first;
 }
@@ -142,6 +144,7 @@ function celebrate(m) {
 // ---- Launching a practice ----
 // Features are loaded on demand to keep first paint fast.
 export async function launch(id, opts = {}) {
+  track('practice_start', { practice: id });
   switch (id) {
     case 'rosary':   return (await import('./features/beads.js')).openRosary(opts);
     case 'chaplet':  return (await import('./features/beads.js')).openChaplet(opts);

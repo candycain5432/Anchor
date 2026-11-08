@@ -1,4 +1,5 @@
 // Prayer reader and the full Mass readings view.
+import { slug, event } from '../analytics.js';
 import { PRAYERS, PRAYER_LIBRARY } from '../data/prayers.js';
 import * as store from '../store.js';
 import * as api from '../api.js';
@@ -23,6 +24,7 @@ export function openPrayer(name, { practice } = {}) {
   const title = meta?.title || name;
 
   openSheet({
+    page: `/prayer/${slug(name)}`,
     title,
     html: `
       <div class="prayer" style="--reader:${readerScale}">
@@ -47,6 +49,7 @@ export function openPrayer(name, { practice } = {}) {
           prayer.style.setProperty('--reader', readerScale);
         } else if (act === 'fav') {
           const on = toggleFav(name);
+          event('favorite', { item_type: 'prayer', item_name: name, action: on ? 'add' : 'remove' });
           e.target.closest('button').classList.toggle('on', on);
           toast(on ? 'Added to favorites' : 'Removed from favorites');
         } else if (act === 'share') {
@@ -66,6 +69,7 @@ export function openPrayer(name, { practice } = {}) {
 export async function openReadings({ focus } = {}) {
   const body = openSheet({
     title: 'Today’s Readings',
+    page: '/readings',
     full: true,
     html: `<div class="skel skel-line" style="width:60%"></div><div class="skel skel-line"></div><div class="skel skel-line" style="width:80%"></div>`,
   });

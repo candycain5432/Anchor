@@ -1,62 +1,62 @@
-// First-run welcome: name → appearance → Daily Rule → about the maker → support → reminders.
+// First-run welcome: welcome (privacy) → about the maker → install (only in a browser tab) → where to begin.
+// It must never block the app: it's marked seen as soon as it opens, Skip/Esc always close it,
+// and if anything goes wrong it removes itself.
 import * as store from './store.js';
-import { esc, toast } from './ui.js';
+import { esc, track } from './ui.js';
 import { icon } from './icons.js';
-import { PRACTICES, rule, setRule } from './practices.js';
-import * as push from './push.js';
-import { DONATE_URL } from './donate.js';
+import { PRACTICES } from './practices.js';
+import { isStandalone, installHTML, installDemoHTML, playDemos, onInstallChange, canPrompt } from './install.js';
+import { overlayView, overlayClosed, via } from './analytics.js';
 
 export function needsOnboarding() { return !store.get('onboarded'); }
 
-const STEPS = ['welcome', 'theme', 'rule', 'about', 'donate', 'remind'];
-const THEMES = [['auto', 'Automatic', 'Matches your device'], ['light', 'Light', 'Parchment & gold'], ['dark', 'Dark', 'Easy on the eyes at night']];
 const LINKS = [
   ['globe', 'Portfolio', 'williamcain.net', 'https://williamcain.net'],
   ['github', 'GitHub', 'github.com/candycain5432', 'https://github.com/candycain5432'],
   ['mail', 'Email', 'contact@williamcain.net', 'mailto:contact@williamcain.net'],
 ];
 
+/** A short prayer that fits the time of day, offered on the last step. */
+function prayerForNow(h = new Date().getHours()) {
+  return h >= 4 && h < 12 ? 'morning' : h < 15 ? 'angelus' : h < 17 ? 'chaplet' : 'night';
+}
+
+function beginChoices() {
+  const now = prayerForNow();
+  return [
+    { id: 'rosary', ic: 'rosary', title: 'Pray the Rosary', sub: 'Guided, bead by bead' },
+    { id: 'readings', ic: 'book', title: 'Today’s readings', sub: 'The Mass readings for today' },
+    { id: now, ic: PRACTICES[now].icon, title: PRACTICES[now].name, sub: `A short prayer · ~${PRACTICES[now].min} min` },
+    { id: 'ask', ic: 'spark', title: 'Ask Anchor', sub: 'A question about the faith' },
+  ];
+}
+
 export function openOnboarding(again = false) {
+  if (document.querySelector('.onb')) return;
+  if (!again) store.set('onboarded', store.isoDate()); // seen once is enough, even if the tab closes mid-way
+  const steps = ['welcome', 'about', ...(isStandalone() ? [] : ['install']), 'begin'];
   let step = 0;
-  const data = {
-    name: store.get('profile', {}).name || '',
-    theme: store.get('theme', 'auto'),
-    rule: [...rule()],
-    reminders: { ...push.reminders() },
-  };
+
   const el = document.createElement('div');
   el.className = 'onb';
   el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-modal', 'true');
   el.setAttribute('aria-label', 'Welcome to Anchor');
   document.body.append(el);
+  track(again ? 'onboarding_reopen' : 'onboarding_start', { install_step: steps.includes('install') });
+
+  const offInstall = onInstallChange(() => { if (steps[step] === 'install') render(); });
 
   function render() {
-    let html = `<button class="onb-skip" data-act="skip">${again ? 'Close' : 'Skip'}</button>`;
-    const id = STEPS[step];
+    const id = steps[step];
+    overlayView(`/welcome/${id}`, { welcome: 'Welcome', about: 'About the maker', install: 'Install step', begin: 'Where to begin' }[id]);
+    let html = `<button class="onb-skip" data-act="close">${again ? 'Close' : 'Skip'}</button>`;
     if (id === 'welcome') {
       html += `<div class="onb-step">
         <img class="onb-mark" src="icons/icon.svg" alt="" width="84" height="84">
         <h1>Welcome to <em>Anchor</em></h1>
-        <p class="lead">A daily companion for prayer — the Rosary bead by bead, today’s readings, the saints, and a place to bring your intentions to God.</p>
-        <label class="eyebrow" for="onb-name" style="display:block;margin-bottom:8px">What should we call you?</label>
-        <input id="onb-name" class="field field-hero" value="${esc(data.name)}" placeholder="Your first name (optional)" maxlength="40" autocomplete="given-name">
-      </div>`;
-    } else if (id === 'theme') {
-      html += `<div class="onb-step">
-        <h1>Light or <em>dark?</em></h1>
-        <p class="lead">Pick what’s easiest on your eyes. You can change it anytime in Me → Appearance.</p>
-        <div class="themes">${THEMES.map(([v, label, sub]) => `
-          <button class="${data.theme === v ? 'on' : ''}" data-theme-pick="${v}" aria-pressed="${data.theme === v}">
-            <span class="tp tp-${v}" aria-hidden="true"><i></i><i></i><i></i></span>
-            <b>${label}</b><span>${sub}</span>
-          </button>`).join('')}</div>
-      </div>`;
-    } else if (id === 'rule') {
-      html += `<div class="onb-step">
-        <h1>Your <em>Daily Rule</em></h1>
-        <p class="lead">Choose a few practices to make your own. Anchor will help you keep them — and celebrate when you do. You can change this anytime.</p>
-        <div class="pick">${Object.entries(PRACTICES).map(([id, p]) => `
-          <button class="${data.rule.includes(id) ? 'on' : ''}" data-pick="${id}" aria-pressed="${data.rule.includes(id)}"><span class="e">${icon(p.icon)}</span><b>${esc(p.name)}</b><span>~${p.min} min</span></button>`).join('')}</div>
+        <p class="lead">A daily companion for Catholic prayer: the Rosary bead by bead, today’s readings, the saints, and a quiet place for your intentions.</p>
+        <div class="onb-privacy">${icon('lock')}<span><b>Free, private, no account.</b> Your journal and prayers stay on this device. No ads, ever.</span></div>
       </div>`;
     } else if (id === 'about') {
       html += `<div class="onb-step">
@@ -70,92 +70,68 @@ export function openOnboarding(again = false) {
           </a>`).join('')}
         <p class="serif" style="color:rgba(255,255,255,.6);font-style:italic;font-size:1.1rem;margin:14px 0 0">If Anchor helps you pray, say one for me too.</p>
       </div>`;
-    } else if (id === 'donate') {
+    } else if (id === 'install') {
+      const demo = installDemoHTML();
       html += `<div class="onb-step">
-        <div class="onb-heart" aria-hidden="true">${icon('heart')}</div>
-        <div class="eyebrow" style="color:var(--gold-2);margin-bottom:8px">Completely optional</div>
-        <h1>Help keep Anchor <em>free</em></h1>
-        <p class="lead" style="margin-bottom:14px">Anchor is free and ad-free, and I want it to stay that way for everyone. No subscriptions, no paywalls, no ads.</p>
-        <p class="lead">Running Anchor still costs money every month. I pay for the server that sends your reminders, the AI behind Ask Anchor and the daily reflections, and the hosting that keeps it online. Your donations go straight to those costs, and they’re what keep Anchor free and ad-free.</p>
-        <a class="btn btn-primary btn-lg btn-block" href="${DONATE_URL}" target="_blank" rel="noopener">${icon('heart')} Support Anchor</a>
-        <p class="serif" style="color:rgba(255,255,255,.75);font-style:italic;font-size:1.1rem;margin:16px 0 0;text-align:center">Every gift, big or small, is very appreciated. Thank you.</p>
-        <p class="small" style="color:rgba(255,255,255,.5);margin:8px 0 0;text-align:center">You can always find this later in Me → About.</p>
+        <div class="eyebrow" style="color:var(--gold-2);margin-bottom:8px">Optional</div>
+        <h1>Keep Anchor <em>close</em></h1>
+        <p class="lead">${demo
+          ? 'Add it to your home screen. It opens like an app and works offline.'
+          : 'Add it to your home screen. It opens like an app, works offline, and can send gentle reminders to pray.'}</p>
+        ${demo}
+        <div class="onb-install">${installHTML()}</div>
       </div>`;
     } else {
       html += `<div class="onb-step">
-        <h1>A gentle <em>nudge</em></h1>
-        <p class="lead">Small reminders, at the times you choose. Never spam — just an invitation to pray.</p>
-        ${push.SLOTS.map(sl => `
-          <div class="remind">
-            <div class="t"><b>${sl.label}</b><span>${sl.sub}</span></div>
-            <input type="time" data-time="${sl.id}" value="${data.reminders[sl.id] || sl.def}" aria-label="${sl.label} time">
-            <span class="switch"><input type="checkbox" data-slot="${sl.id}" ${data.reminders[sl.id] ? 'checked' : ''} aria-label="${sl.label} reminder"><span></span></span>
-          </div>`).join('')}
-        <p class="small" style="color:rgba(255,255,255,.55);margin-top:6px">${push.supported() ? 'Your browser will ask for permission.' : 'On iPhone, add Anchor to your Home Screen first to receive reminders.'}</p>
+        <h1>Where would you like to <em>begin?</em></h1>
+        <p class="lead">Pick one to start now. Everything else is a tap away.</p>
+        <div class="onb-begin">${beginChoices().map(c => `
+          <button data-begin="${c.id}"><span class="i">${icon(c.ic)}</span><span class="t"><b>${esc(c.title)}</b><span>${esc(c.sub)}</span></span>${icon('chev')}</button>`).join('')}
+        </div>
       </div>`;
     }
+    const last = step === steps.length - 1;
     html += `<div class="onb-foot">
-      <div class="onb-dots">${STEPS.map((_, i) => `<i class="${i === step ? 'on' : ''}"></i>`).join('')}</div>
-      ${id === 'remind' ? `<button class="btn btn-ghost" data-act="finish" style="color:rgba(255,255,255,.7)">Maybe later</button>` : ''}
-      <button class="btn btn-primary btn-lg" data-act="next">${id === 'remind' ? `${icon('bell')} Turn on` : `Continue ${icon('chev')}`}</button>
+      <div class="onb-dots" aria-hidden="true">${steps.map((_, i) => `<i class="${i === step ? 'on' : ''}"></i>`).join('')}</div>
+      ${last
+        ? `<button class="btn btn-ghost" data-act="close" style="color:rgba(255,255,255,.8)">Just look around</button>`
+        : `<button class="btn ${id === 'install' && canPrompt() ? 'btn-ghost' : 'btn-primary'} btn-lg" data-act="next" ${id === 'install' && canPrompt() ? 'style="color:rgba(255,255,255,.8)"' : ''}>${id === 'install' ? (canPrompt() ? 'Not now' : 'Continue') : id === 'welcome' ? 'Get started' : 'Continue'} ${icon('chev')}</button>`}
     </div>`;
     el.innerHTML = html;
-    if (id === 'welcome') setTimeout(() => el.querySelector('#onb-name')?.focus(), 400);
+    el.scrollTop = 0;
+    playDemos(el);
+    setTimeout(() => el.querySelector('.onb-step button, .onb-foot .btn')?.focus({ preventScroll: true }), 350);
   }
 
-  function collect() {
-    const n = el.querySelector('#onb-name');
-    if (n) data.name = n.value.trim();
-    el.querySelectorAll('[data-slot]').forEach(cb => {
-      const t = el.querySelector(`[data-time="${cb.dataset.slot}"]`).value;
-      data.reminders[cb.dataset.slot] = cb.checked ? t : null;
-    });
-  }
-
-  async function finish(enablePush) {
-    collect();
-    store.update('profile', {}, p => ({ ...p, name: data.name }));
-    if (data.rule.length) setRule(data.rule);
-    store.set('reminders', data.reminders);
-    store.set('onboarded', store.isoDate());
-    if (enablePush) {
-      try { await push.enable(); toast('Reminders are on'); }
-      catch (err) { toast(err.message, { ms: 5000 }); }
-    }
-    el.style.transition = 'opacity .35s';
+  let closed = false;
+  async function close(target) {
+    if (closed) return;
+    closed = true;
+    offInstall();
+    document.removeEventListener('keydown', onKey);
+    if (!again) track('onboarding_complete', { step: steps[step], begin: target || 'none' });
+    el.style.transition = 'opacity .3s';
     el.style.opacity = '0';
-    setTimeout(() => el.remove(), 350);
-    (await import('./app.js')).refreshAll();
+    setTimeout(() => el.remove(), 300);
+    overlayClosed();
+    if (target) {
+      try { via('onboarding'); (await import('./app.js')).openTarget(target, 'onboarding'); } catch (e) { console.error(e); }
+    }
   }
+
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', onKey);
 
   el.addEventListener('click', e => {
-    const pick = e.target.closest('[data-pick]');
-    if (pick) {
-      const id = pick.dataset.pick;
-      data.rule = data.rule.includes(id) ? data.rule.filter(x => x !== id) : [...data.rule, id];
-      pick.classList.toggle('on');
-      pick.setAttribute('aria-pressed', data.rule.includes(id));
-      return;
-    }
-    const th = e.target.closest('[data-theme-pick]');
-    if (th) {
-      data.theme = th.dataset.themePick;
-      el.querySelectorAll('[data-theme-pick]').forEach(b => {
-        b.classList.toggle('on', b === th);
-        b.setAttribute('aria-pressed', b === th);
-      });
-      import('./app.js').then(m => m.applyTheme(data.theme));
-      return;
-    }
+    const begin = e.target.closest('[data-begin]');
+    if (begin) return close(begin.dataset.begin);
     const act = e.target.closest('[data-act]')?.dataset.act;
-    if (act === 'skip') { if (again) el.remove(); else finish(false); }
-    if (act === 'finish') finish(false);
-    if (act === 'next') {
-      collect();
-      if (STEPS[step] === 'rule' && !data.rule.length) return toast('Choose at least one practice');
-      if (step < STEPS.length - 1) { step++; render(); } else finish(true);
-    }
+    if (act === 'close') return close();
+    if (act === 'next') { step = Math.min(step + 1, steps.length - 1); render(); }
   });
-  el.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'onb-name') el.querySelector('[data-act="next"]').click(); });
-  render();
+  // Accepting the browser's install dialog moves straight on.
+  window.addEventListener('appinstalled', () => { if (!closed && steps[step] === 'install') { step++; render(); } }, { once: true });
+
+  try { render(); }
+  catch (err) { console.error('[Anchor] onboarding failed:', err); close(); }
 }

@@ -1,5 +1,6 @@
 // Saint detail sheet + library helpers.
 import { SAINTS } from '../data/saints.js';
+import { slug, event } from '../analytics.js';
 import * as store from '../store.js';
 import * as api from '../api.js';
 import { openSheet, closeSheet, esc, prayerHTML, toast } from '../ui.js';
@@ -50,6 +51,7 @@ export async function openSaint(name, { quote, description } = {}) {
   const saintish = isSaint(name) || !!local;
   const body = openSheet({
     title: local?.name || name,
+    page: `/saint/${slug(local?.name || name)}`,
     html: `
       <div data-img></div>
       ${quote ? `<p class="serif" style="font-size:1.3rem;font-style:italic;line-height:1.45;margin:0 0 14px">“${esc(quote)}”</p>` : ''}
@@ -69,6 +71,7 @@ export async function openSaint(name, { quote, description } = {}) {
           const favs = store.get('favSaints', []);
           const on = !favs.includes(n);
           store.set('favSaints', on ? [...favs, n] : favs.filter(x => x !== n));
+          event('favorite', { item_type: 'saint', item_name: n, action: on ? 'add' : 'remove' });
           e.target.closest('button').classList.toggle('on', on);
           toast(on ? 'Added to your saints' : 'Removed from your saints');
         }

@@ -1,9 +1,16 @@
 // Journal: prayer intentions, gratitude, notes. Everything stays on the device.
 import * as store from '../store.js';
 import * as api from '../api.js';
-import { esc, openSheet, closeSheet, toast, relDay, confirmSheet, haptic } from '../ui.js';
+import { esc, openSheet, closeSheet, toast, relDay, confirmSheet, haptic, track } from '../ui.js';
 import { icon } from '../icons.js';
 import { complete, bumpCount } from '../practices.js';
+import { screenView, event, via } from '../analytics.js';
+
+const PAGES = { intentions: ['/journal', 'Journal'], gratitude: ['/journal/gratitude', 'Gratitude'], notes: ['/journal/notes', 'Notes'] };
+/** The virtual page for analytics (used by app.js navigate). */
+export function page() { const [path, title] = PAGES[tab]; return { path, title }; }
+/** Journal activity: which kind of entry and what was done, never what it says. */
+const journalEvent = (item, action) => event('journal_action', { item, action });
 
 let root, tab = 'intentions', filter = 'active';
 const uid = () => crypto.randomUUID?.() || String(Date.now() + Math.random());
@@ -29,6 +36,7 @@ export function openGratitude() {
   const today = store.get('gratitude', {})[store.isoDate()] || [];
   openSheet({
     title: 'Gratitude',
+    page: '/journal/gratitude/add',
     html: `
       <p class="serif muted" style="font-size:1.15rem;margin:0 0 14px">“Give thanks in all circumstances; for this is the will of God in Christ Jesus for you.” — 1 Thessalonians 5:18</p>
       ${today.length ? `<div class="card"><div class="card-label">Already today</div>${today.map(g => `<div style="padding:4px 0">✦ ${esc(g)}</div>`).join('')}</div>` : ''}
@@ -41,6 +49,7 @@ export function openGratitude() {
         const items = [...body.querySelectorAll('[data-g]')].map(i => i.value.trim()).filter(Boolean);
         if (!items.length) return toast('Write at least one thing');
         saveGratitude(items);
+        event('journal_action', { item: 'gratitude', action: 'add', count: items.length });
         toast('Gratitude saved');
         closeSheet();
       };
@@ -156,6 +165,7 @@ function openNote(id) {
   const n = notes.find(x => x.id === id) || { id: uid(), title: '', text: '', created: Date.now() };
   openSheet({
     title: id ? 'Note' : 'New note',
+    page: '/journal/note',
     html: `<input class="field" data-t placeholder="Title" value="${esc(n.title)}" style="margin-bottom:10px">
       <textarea class="field" data-x placeholder="Write…" style="min-height:240px">${esc(n.text)}</textarea>`,
     foot: `${id ? `<button class="icon-btn" data-act="del" aria-label="Delete note">${icon('trash')}</button>` : ''}<button class="btn btn-primary btn-block" data-act="save">Save</button>`,
@@ -166,10 +176,12 @@ function openNote(id) {
           const t = body.querySelector('[data-t]').value.trim(), x = body.querySelector('[data-x]').value.trim();
           if (!t && !x) return closeSheet();
           store.set('notes', [{ ...n, title: t, text: x }, ...notes.filter(o => o.id !== n.id)]);
+          journalEvent('note', id ? 'edit' : 'add');
           closeSheet(); render();
         }
         if (act === 'del' && await confirmSheet({ title: 'Delete note?', message: 'This can’t be undone.', confirm: 'Delete', danger: true })) {
           store.set('notes', notes.filter(o => o.id !== n.id)); render();
+          journalEvent('note', 'delete');
         }
       };
     },
@@ -191,11 +203,17 @@ async function compose(id, btn) {
   btn.disabled = true;
   btn.innerHTML = `<span class="typing"><i></i><i></i><i></i></span>`;
   try {
+    journalEvent('intention', 'help_me_pray');
     const { prayer } = await api.composePrayer(it.text);
     updateIntention(id, i => ({ ...i, composed: prayer }));
     render();
   } catch (err) {
-    toast(err.message || 'Couldn’t write a prayer right now');
+    if (api.isDailyLimit(err)) {
+      track('ai_limit_hit', { feature: 'compose' });
+      toast('“Help me pray” has reached today’s limit. It’ll be back tomorrow; your journal works as usual.', { ms: 6000 });
+    } else {
+      toast(err.message || 'Couldn’t write a prayer right now');
+    }
     render();
   }
 }
@@ -203,6 +221,7 @@ async function compose(id, btn) {
 function markAnswered(id) {
   openSheet({
     title: 'Prayer answered',
+    page: '/journal/answered',
     html: `<p class="muted" style="margin:0 0 12px">How did God answer? A few words now will be a gift to remember later.</p>
       <textarea class="field" data-note maxlength="300" placeholder="He answered by…"></textarea>`,
     foot: `<button class="btn btn-primary btn-block btn-lg" data-act="save">Thanks be to God</button>`,
@@ -210,6 +229,7 @@ function markAnswered(id) {
       foot.onclick = e => {
         if (!e.target.closest('[data-act="save"]')) return;
         updateIntention(id, i => ({ ...i, answered: { date: store.isoDate(), note: body.querySelector('[data-note]').value.trim() } }));
+        journalEvent('intention', 'answered');
         bumpCount('answered');
         import('../practices.js').then(m => m.checkMilestones());
         haptic([10, 40, 10]);
@@ -224,7 +244,7 @@ function markAnswered(id) {
 async function onClick(e) {
   const t = e.target;
   const tb = t.closest('[data-tab]');
-  if (tb) { tab = tb.dataset.tab; return render(); }
+  if (tb) { tab = tb.dataset.tab; render(); const p = page(); via('screen_tab'); return screenView(p.path, p.title); }
   const f = t.closest('[data-filter]');
   if (f) { filter = f.dataset.filter; return render(); }
 
@@ -246,6 +266,7 @@ async function onClick(e) {
       bumpCount('intentionPrayed');
       haptic(12);
       toast('Lord, hear our prayer.');
+      journalEvent('intention', 'prayed');
       import('../practices.js').then(m => m.checkMilestones());
       render();
     }
@@ -253,6 +274,7 @@ async function onClick(e) {
     if (a === 'answered') markAnswered(id);
     if (a === 'delete' && await confirmSheet({ title: 'Remove intention?', message: 'This can’t be undone.', confirm: 'Remove', danger: true })) {
       store.update('intentions', [], all => all.filter(i => i.id !== id));
+      journalEvent('intention', 'delete');
       render();
     }
   }
@@ -266,6 +288,7 @@ document.addEventListener('submit', e => {
   const text = ta.value.trim();
   if (!text) return;
   store.update('intentions', [], all => [{ id: uid(), text, created: Date.now(), prayed: [] }, ...all]);
+  journalEvent('intention', 'add');
   filter = 'active';
   render();
   toast('Intention added');

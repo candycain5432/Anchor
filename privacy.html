@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#14203f" />
+<title>Privacy Policy · Anchor</title>
+<meta name="description" content="What data Anchor, the free Catholic prayer app, touches, why, and what we do (and don’t do) with it." />
+<link rel="canonical" href="https://faithanchor.net/privacy.html" />
+<link rel="icon" href="icons/favicon.svg" type="image/svg+xml" />
+<!-- Google Tag Manager (container GTM-P5RXXK6B). GA4 and any other tags are configured in the container. -->
+<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-P5RXXK6B"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  // Tag Manager's start event: "All Pages" / "Initialization" triggers in the container fire on this.
+  dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+  // These are plain pages (the app sends its own page views), so report this one here.
+  var dev = !/(^|\.)faithanchor\.net$|\.github\.io$/.test(location.hostname) || /[?&]ga_debug/.test(location.search);
+  gtag('event', 'page_view', dev ? { debug_mode: true } : {});
+</script>
+<script>try { var t = JSON.parse(localStorage.getItem('anchor:theme')); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css" />
+<link rel="stylesheet" href="css/doc.css" />
+<style>
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-ui); }
+  .wrap { max-width: 680px; margin: 0 auto; padding: calc(var(--safe-top) + 20px) 20px 48px; }
+  .back { display: inline-flex; align-items: center; gap: 6px; color: var(--gold); font-weight: 700; text-decoration: none; padding: 8px 0; }
+  h1 { font-family: var(--font-display); font-weight: 500; font-size: 2.6rem; line-height: 1.05; margin: 14px 0 8px; }
+</style>
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P5RXXK6B" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<div class="wrap">
+  <a class="back" href="./">← Back to Anchor</a>
+  <h1>Privacy Policy</h1>
+  <article class="doc" data-doc>
+    <p class="updated">Last updated: November 2026</p>
+    <p>Anchor is a free Catholic prayer companion built and maintained by William Cain. This policy explains plainly what data the app touches, why, and what we do (and don’t do) with it.</p>
+
+    <h2>The short version</h2>
+    <p>There are no accounts, no ads, and we never sell data. Your journal, intentions, progress and chat history live only on your device. Data leaves your phone only when you use the AI features or turn on reminders, and none of it is tied to your name or identity. We use Google Analytics to understand, in aggregate, which features people use.</p>
+
+    <h2>What stays on your device</h2>
+    <p>These are stored only in your browser’s local storage and never sent to us: your name (if you give one), your Daily Rule and prayer log, streaks and milestones, prayer intentions, gratitude entries and notes, Ask Anchor conversation history, favorites, novena progress, your last-confession date, theme and text settings, your approximate location for finding churches, and cached readings for offline use. You can back it up or erase it anytime from the Me tab.</p>
+
+    <h2>Ask Anchor (AI chat)</h2>
+    <p>When you send a message, our server receives its text, up to the last 10 messages of that conversation, and, if you chose “Ask about this,” the reading, verse, reflection or saint you’re asking about. It passes them to OpenAI to write the reply. Our server doesn’t log or store the content of your messages and keeps no conversation history; your history stays on your device.</p>
+    <p>OpenAI processes each request under its API terms. Under those terms, API data isn’t used to train OpenAI’s models, and OpenAI may keep it for up to 30 days to monitor for abuse.</p>
+    <p>Ask Anchor is an AI. It isn’t a priest or a counselor, and it can get things wrong.</p>
+
+    <h2>“Help me pray”</h2>
+    <p>If you ask Anchor to write a prayer for one of your intentions, only that intention’s text is sent (through our server, to OpenAI) to write the prayer. Nothing else from your journal goes with it, and it isn’t stored on our server. Anchor asks before the first time.</p>
+
+    <h2>Daily reflection and Lectio Divina</h2>
+    <p>These are written once a day for everyone, from the day’s feast, season and Gospel. No personal data is involved.</p>
+
+    <h2>Reminders (push notifications)</h2>
+    <p>Anchor only asks about reminders after you’ve finished a prayer, or when you turn them on in Me. If you turn them on, your browser creates a push subscription (a technical address for delivering notifications). Our server stores it with your timezone and chosen reminder times, only to send your reminders. It isn’t linked to your name, email or location. Turning reminders off deletes it from our server.</p>
+
+    <h2>Our server</h2>
+    <p>To stop abuse, our server briefly keeps your IP address in memory to limit how many AI requests can come from one place. It isn’t logged or written to disk, and it’s forgotten within an hour. To keep costs under control, the server also counts how many AI requests everyone makes in total each day; that count contains no personal information. Like any web host, our hosting providers may keep standard technical logs (such as IP address and time of a request), but never the content of your messages.</p>
+
+    <h2>Third-party services</h2>
+    <ul>
+      <li><b>GitHub Pages</b>: hosts the app itself.</li>
+      <li><b>Render</b>: hosts our server (AI features and reminders).</li>
+      <li><b>OpenAI</b> (through our server): the AI features, as described above.</li>
+      <li><b>Google Fonts</b>: loads the app’s typefaces.</li>
+      <li><b>Catholic Readings API</b> (GitHub Pages) and <b>bible-api.com</b>: the liturgical calendar and reading texts.</li>
+      <li><b>bible.org</b>: the verse of the day.</li>
+      <li><b>Wikipedia</b>: saint biographies and images.</li>
+      <li><b>OpenStreetMap (Overpass)</b>: nearby churches. Your coordinates are sent only when you search.</li>
+      <li><b>Ko-fi</b>: only if you choose to donate. Ko-fi’s own privacy policy applies there.</li>
+    </ul>
+
+    <h2>Google Analytics</h2>
+    <p>Anchor uses Google Analytics to understand how the app is used: for example, how many people open it, which features are used, device type, and general (country-level) region. We also record anonymous events like “a Rosary was completed” or “the app was installed” so we know what helps people pray. This data is aggregated; we don’t use it to identify or target individuals. Google Analytics uses cookies and is governed by <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google’s Privacy Policy</a>. You can opt out with the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">Google Analytics opt-out add-on</a>.</p>
+
+    <h2>Children’s privacy</h2>
+    <p>Anchor doesn’t knowingly collect personal information from children under 13 and requires no personal data to use.</p>
+
+    <h2>Changes</h2>
+    <p>If this policy changes materially, the date above will change. It’s always available from Me → About in the app and at faithanchor.net/privacy.html.</p>
+
+    <h2>Contact</h2>
+    <p>Questions? Email <a href="mailto:support@faithanchor.net">support@faithanchor.net</a>.</p>
+  </article>
+</div>
+</body>
+</html>

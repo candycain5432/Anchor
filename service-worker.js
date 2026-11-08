@@ -1,19 +1,26 @@
-const CACHE_NAME = 'anchor-v9.7';
+const CACHE_NAME = 'anchor-v10.0';
 
 // App shell. index.html is network-first (below) but precached for offline use.
 const STATIC_ASSETS = [
   './',
   './index.html',
   './offline.html',
+  './faq.html',
+  './privacy.html',
   './manifest.json',
   './css/tokens.css',
   './css/app.css',
+  './css/doc.css',
   './js/app.js',
+  './js/analytics.js',
   './js/api.js',
+  './js/docs.js',
   './js/donate.js',
   './js/icons.js',
+  './js/install.js',
   './js/liturgy.js',
   './js/markdown.js',
+  './js/nudges.js',
   './js/onboarding.js',
   './js/practices.js',
   './js/push.js',
@@ -124,23 +131,32 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // Install walkthrough videos: straight to the network. Video uses range requests (Safari needs
+  // the 206 responses untouched), and they're only shown during onboarding, so don't cache them.
+  if (url.origin === self.location.origin && url.pathname.includes('/media/')) return;
+
   // Google Fonts: cache-first (rarely changes)
   if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
     event.respondWith(cacheFirst(event.request));
     return;
   }
 
-  // Navigation (index.html): network-first so updates are seen immediately
+  // Navigation: network-first so updates are seen immediately. The app shell (/ or index.html,
+  // with any ?open= deep link) is cached as index.html; other pages (faq.html, privacy.html) under their own URL.
   if (event.request.mode === 'navigate') {
+    const scope = new URL(self.registration.scope);
+    const isShell = url.origin === scope.origin && (url.pathname === scope.pathname || url.pathname === scope.pathname + 'index.html');
+    const key = isShell ? './index.html' : url.origin + url.pathname;
     event.respondWith(
       fetch(event.request).then(response => {
-        if (response.ok) {
+        if (response.ok && url.origin === self.location.origin) {
           const clone = response.clone();
-          caches.open(CACHE_NAME).then(c => c.put('./index.html', clone));
+          caches.open(CACHE_NAME).then(c => c.put(key, clone));
         }
         return response;
       }).catch(() =>
-        caches.match('./index.html').then(cached => cached || caches.match('./offline.html'))
+        caches.match(key).then(cached => cached || caches.match(isShell ? './offline.html' : './index.html'))
+          .then(cached => cached || caches.match('./offline.html'))
       )
     );
     return;

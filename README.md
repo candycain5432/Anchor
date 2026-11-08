@@ -8,7 +8,7 @@
 
 Pray the Rosary bead by bead, read today's Mass readings, meet the saints,<br>and keep a journal of everything you're bringing to God.
 
-**[Open Anchor →](https://candycain5432.github.io/Anchor/)**
+**[Open Anchor →](https://faithanchor.net/)**
 
 <sub>Free · No account · Works offline · Your data stays on your device</sub>
 
@@ -63,28 +63,47 @@ Anchor is a web app, so there's no app store. Add it to your home screen and it 
 
 - **iPhone / iPad**: open the link in Safari, tap **Share**, then **Add to Home Screen**. You need to do this before you can turn on reminders.
 - **Android**: open the link in Chrome and tap **Install app** (or ⋮ → **Add to Home screen**).
-- **Desktop**: in Chrome or Edge, click the install icon in the address bar.
+- **Desktop**: in Chrome or Edge, click the install icon in the address bar. In Safari on a Mac, File → **Add to Dock**.
+- **Opened from Instagram, Facebook or TikTok?** Their built-in browsers can't install apps. Tap ••• / ⋮ → **Open in browser** first.
+
+<table>
+<tr>
+<td align="center"><img src="media/install-iphone.gif" width="240" alt="Installing Anchor on iPhone: Share, Add to Home Screen, Add"><br><sub>iPhone (Safari)</sub></td>
+<td align="center"><img src="media/install-android.gif" width="240" alt="Installing Anchor on Android: Install Anchor, Install"><br><sub>Android (Chrome)</sub></td>
+</tr>
+</table>
+
+The same steps are in the app under **Me → About → Install Anchor**, and in the [FAQ](https://faithanchor.net/faq.html).
+Vertical MP4 versions for social posts are in `media/` (`install-iphone.mp4`, `install-android.mp4`).
 
 ## Privacy
 
 Your journal, intentions, chats, streaks and settings live **only on your device** (`localStorage`). There's no account. The server keeps no logs, and it only sees what it needs to answer:
 
-- When you ask Anchor a question, it gets your message and the last few turns of that conversation.
+- When you ask Anchor a question, it gets your message, up to the last 10 turns of that conversation, and the reading or saint if you used "Ask about this".
+- "Help me pray" sends only that intention's text.
 - If you turn on reminders, it stores your push subscription, timezone and chosen times.
 
-The full policy is in the app under **Me → Privacy Policy**.
+The full policy is at [faithanchor.net/privacy.html](https://faithanchor.net/privacy.html) and in the app under **Me → About → Privacy Policy**.
 
 ---
 
 ## How it's built
 
-No build step: plain HTML, CSS and native ES modules, hosted on GitHub Pages. The backend is [Project-Veritas](https://github.com/candycain5432/Project-Veritas), an Express server on Render. It handles Ask Anchor (OpenAI), daily reflections and push reminders.
+No build step: plain HTML, CSS and native ES modules, hosted on GitHub Pages at faithanchor.net. The backend is [Project-Veritas](https://github.com/candycain5432/Project-Veritas), an Express server on Render. It handles Ask Anchor (OpenAI), daily reflections and push reminders.
 
 ```
 index.html          app shell
 css/tokens.css      colors, themes, liturgical colors, type scale
-css/app.css         components
-js/app.js           boot, router, theme, service worker
+css/app.css         components; responsive: phone < 600px, tablet, desktop sidebar ≥ 900px, two columns ≥ 1100px
+css/doc.css         long-form text (FAQ, privacy) in the app and on the pages
+js/app.js           boot, router, theme, service worker, in-app browser banner
+js/onboarding.js    first-run welcome: privacy → about the maker → install (browser only) → where to begin
+js/install.js       install instructions per device, beforeinstallprompt, Share Anchor, in-app browser detection
+js/nudges.js        one-time asks: reminders after the first prayer, Ko-fi once Anchor has been used for a day
+js/donate.js        Ko-fi link, goal text and the pop-up
+js/docs.js          opens faq.html / privacy.html in a sheet
+js/analytics.js     Google Analytics: virtual page views, navigation source, events, user properties
 js/store.js         localStorage wrapper + migration from pre-9.0 keys
 js/api.js           every network call (calendar, readings, verse, backend, Wikipedia, Overpass)
 js/icons.js         line icon set (used everywhere instead of emoji)
@@ -93,6 +112,8 @@ js/screens/         today, pray, ask, journal, me, saints
 js/features/        beads (Rosary/Chaplet), lectio, timer, examen, novena, reader, share-card
 js/data/            prayers, novenas, saints
 service-worker.js   offline cache, push, notification deep links
+faq.html            FAQ (standalone page, also shown in Me → About)
+privacy.html        Privacy Policy (same)
 icons/              app icons; regenerate with tools/make-icons.mjs
 screenshots/        images for this README
 ```
@@ -103,6 +124,75 @@ Data sources:
 - **Verse of the day**: bible.org.
 - **Saint biographies**: Wikipedia.
 - **Nearby churches**: OpenStreetMap.
+
+## Analytics
+
+Google Analytics 4 (`G-GZC18324HL`), loaded through **Google Tag Manager** (container `GTM-P5RXXK6B`, in the
+`<head>` of `index.html`, `faq.html` and `privacy.html`). Anchor is a single page, so `js/analytics.js` reports every screen, tab and
+sheet as its own **virtual page**, which makes GA's *Pages and screens* report and *Path exploration* show what's
+used and how people move around. Only fixed names, ids and counts are sent: never journal or chat text, names,
+search words or locations.
+
+| Page path | What it is |
+|---|---|
+| `/today`, `/ask`, `/me` | Main screens |
+| `/pray`, `/pray/prayers`, `/pray/saints` · `/journal`, `/journal/gratitude`, `/journal/notes` | Screens and their tabs |
+| `/pray/rosary`, `/pray/chaplet`, `/pray/lectio-divina`, `/pray/examen`, `/pray/confession`, `/pray/silent-prayer` | Guided practices |
+| `/readings` · `/prayer/<name>` · `/saint/<name>` · `/novena/<id>` (`/start`) | Readings, prayers, saints, novenas |
+| `/welcome/welcome` → `/about` → `/install` → `/begin` | Onboarding steps |
+| `/ask/notice`, `/ask/history`, `/install`, `/faq`, `/privacy`, `/me/name`, `/me/milestone/<id>`, `/journal/note`, … | Other sheets |
+| `/prompt/reminders`, `/prompt/donate` | One-time asks |
+| `/sheet/<title>` | Any sheet without a name of its own |
+
+Every `page_view` carries **`previous_page`** (where they came from; `(entrance)` for the first) and **`nav_source`**:
+`launch`, `tab_bar`, `sidebar`, `screen_tab`, `deep_link` (notification or home-screen shortcut opening the app),
+`notification` (tapped while the app was open), `onboarding`, or `in_app` (a card, button or link inside the app).
+
+| Event | Parameters |
+|---|---|
+| `practice_start`, `practice_completed` | `practice` |
+| `chat_sent` | `context` (reading, saint…), `source` (`typed`, `starter`, `ask_about`, `retry`), `turn` |
+| `chat_new` | `previous_turns` |
+| `journal_action` | `item` (`intention`, `gratitude`, `note`), `action` (`add`, `edit`, `delete`, `prayed`, `answered`, `help_me_pray`), `count` |
+| `favorite` | `item_type` (`prayer`, `saint`), `item_name`, `action` |
+| `library_search` | `search_type` (`prayers`, `saints`), `has_results`, `results` |
+| `patron_filter` | `patron` |
+| `setting_change` | `setting` (`theme`, `text_size`, `daily_rule`, `reminder_times`, `confession_reminder`, `name`), `value` |
+| `data_action` | `action` (`backup`, `restore`, `erase`) |
+| `find_churches` | `results` |
+| `scroll` | `percent_scrolled` (90, inside the current screen or sheet) |
+| `exception` | `description` (JavaScript error message) |
+| also | `milestone`, `share`, `share_app`, `doc_open`, `install_prompt`, `install_help`, `app_installed`, `inapp_browser`, `onboarding_start`/`_complete`, `reminder_ask`, `reminders_enabled`/`_disabled`, `donate_popup`, `donate_click`, `ai_limit_hit` |
+
+User properties: `launch_mode` (installed / browser), `layout` (phone / tablet / desktop), `theme`, `text_size`,
+`reminders`, `daily_rule_size`.
+
+**One-time setup in Tag Manager** (container `GTM-P5RXXK6B`):
+
+1. **Tags → New → Google tag**, Tag ID `G-GZC18324HL`. Under *Configuration settings* add the parameter
+   `send_page_view` = `false` (the app sends its own page views; without this every visit gets an extra one for `/`).
+   Trigger: **Initialization – All Pages**. If the container already has a GA4 tag for this ID, edit that one
+   instead of adding a second.
+2. **Submit → Publish.** The app's `gtag()` calls (page views and events) go into the shared `dataLayer`, and this
+   Google tag sends them to GA. Nothing else in the container is needed for them.
+3. To check: **Preview** (Tag Assistant) with the site open, then watch *Admin → DebugView* in GA.
+
+**One-time setup in GA** (Admin):
+
+1. **Data streams → your web stream → Enhanced measurement → ⚙︎**: turn **off** *Page changes based on browser
+   history events* (the app sends its own page views; leaving it on adds stray ones). Keep outbound clicks on.
+2. **Custom definitions → Create custom dimension** for each parameter you want in reports. Event-scoped:
+   `previous_page`, `nav_source`, `practice`, `source`, `context`, `item`, `action`, `item_type`, `item_name`,
+   `setting`, `value`, `search_type`, `has_results`, `patron`, `from`, `method`, `outcome`, `step`, `begin`.
+   User-scoped: `launch_mode`, `layout`, `theme`, `text_size`, `reminders`, `daily_rule_size`.
+   (Custom metrics, optional: `turn`, `results`, `count`.) Dimensions only fill in from the day they're created.
+3. **Data filters → Developer traffic → Active.** Visits from anywhere other than faithanchor.net (localhost, your
+   home network) are sent with `debug_mode` (set in `js/analytics.js`), so this keeps your own testing out of the numbers.
+
+**Where to look:** *Reports → Engagement → Pages and screens* (by *Page path*) for what's used;
+*Explore → Path exploration* (start from `page_view` → `/today`) for how people move around; *Explore → Free form*
+with `nav_source` or `previous_page` for how they reach a page. To watch events live, open the live app with
+`?ga_debug=1` and use *Admin → DebugView*.
 
 ## Develop
 
@@ -122,24 +212,9 @@ Console helpers: `Anchor.forceUpdate()`, `Anchor.clearCaches()`, `Anchor.listCac
 
 Deep links (used by notifications and home-screen shortcuts): `./?open=rosary|chaplet|readings|examen|lectio|confession|ask|journal|me`.
 
-## Moving to a custom domain
+## Hosting
 
-Every path in the app is relative, so it works the same at `example.com/` as at `candycain5432.github.io/Anchor/`. To switch:
-
-1. **DNS** at your registrar:
-   - Subdomain (e.g. `anchor.example.com`): one `CNAME` record → `candycain5432.github.io`
-   - Apex (e.g. `example.com`): `A` records → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
-     (and optionally `AAAA` → `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153`), plus a `CNAME` for `www` → `candycain5432.github.io`
-2. **GitHub** → repo Settings → Pages → *Custom domain*: enter it and save (this commits a `CNAME` file — pull it). Once the certificate is issued, tick **Enforce HTTPS**.
-3. **Links**: replace the old URL in the link-preview tags in `index.html` and the links in this README:
-   ```sh
-   sed -i 's#https://candycain5432.github.io/Anchor/#https://YOUR-DOMAIN/#g' index.html README.md
-   ```
-4. **Analytics**: update the stream URL in Google Analytics (Admin → Data streams). Optional — data keeps flowing either way.
-
-Nothing changes on the backend (CORS is open to any origin).
-
-**Heads-up for existing users:** a new domain is a new origin, so the browser treats it as a different site. GitHub redirects the old address automatically, but localStorage (streaks, journal, chats) and push subscriptions stay with the old origin. Before switching, ask people to use **Me → Back up**, then **Restore a backup** on the new domain, and to re-enable reminders and re-add the app to their home screen.
+The app is served by GitHub Pages at **[faithanchor.net](https://faithanchor.net/)** (see `CNAME`). The old `candycain5432.github.io/Anchor/` address redirects there. Every path in the app is relative, so it would work the same under any domain or sub-path.
 
 ---
 

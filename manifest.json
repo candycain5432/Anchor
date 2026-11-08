@@ -3,6 +3,8 @@
   "name": "Anchor — Catholic Prayer Companion",
   "short_name": "Anchor",
   "description": "Your daily Catholic prayer companion — the guided Rosary, today's Mass readings, saints, Lectio Divina, a prayer journal, and Ask Anchor.",
+  "lang": "en",
+  "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -92,6 +94,43 @@
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "monochrome"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/today.webp",
+      "sizes": "600x1298",
+      "type": "image/webp",
+      "form_factor": "narrow",
+      "label": "Today: your daily prayer, readings and saint"
+    },
+    {
+      "src": "screenshots/rosary.webp",
+      "sizes": "600x1298",
+      "type": "image/webp",
+      "form_factor": "narrow",
+      "label": "The Rosary, bead by bead"
+    },
+    {
+      "src": "screenshots/ask.webp",
+      "sizes": "600x1298",
+      "type": "image/webp",
+      "form_factor": "narrow",
+      "label": "Ask Anchor about the faith"
+    },
+    {
+      "src": "screenshots/journal.webp",
+      "sizes": "600x1298",
+      "type": "image/webp",
+      "form_factor": "narrow",
+      "label": "A private prayer journal"
+    },
+    {
+      "src": "screenshots/hero.webp",
+      "sizes": "1600x840",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "Anchor, a Catholic prayer companion"
     }
   ]
 }

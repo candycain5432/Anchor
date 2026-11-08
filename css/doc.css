@@ -1,0 +1,24 @@
+/* Long-form text (FAQ, Privacy Policy). Used by faq.html / privacy.html and,
+   when those pages are opened inside the app, by the sheet that shows them. */
+.doc { font-size: .95rem; line-height: 1.7; color: var(--ink); }
+.doc .updated { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; color: var(--ink-3); margin: 0 0 14px; }
+.doc h2 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; line-height: 1.2; margin: 26px 0 6px; }
+.doc p, .doc ul, .doc ol { margin: 0 0 12px; }
+.doc ul, .doc ol { padding-left: 1.2em; }
+.doc li { margin-bottom: 6px; }
+.doc a { color: var(--gold); font-weight: 600; }
+.doc .demos { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 4px 0 14px; max-width: 520px; }
+.doc .demos figure { margin: 0; }
+.doc .demos img { display: block; width: 100%; height: auto; border-radius: 14px; background: #14203f; box-shadow: 0 10px 24px -14px rgba(0,0,0,.6); }
+.doc .demos figcaption { margin-top: 6px; text-align: center; font-size: .78rem; font-weight: 700; color: var(--ink-3); }
+.doc details { border-bottom: 1px solid var(--line); padding: 4px 0; }
+.doc details:first-of-type { border-top: 1px solid var(--line); }
+.doc summary {
+  list-style: none; cursor: pointer; padding: 12px 28px 12px 0; position: relative;
+  font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; line-height: 1.25;
+}
+.doc summary::-webkit-details-marker { display: none; }
+.doc summary::after { content: '+'; position: absolute; right: 4px; top: 10px; font-family: var(--font-ui); font-weight: 400; font-size: 1.3rem; color: var(--gold); transition: transform .2s; }
+.doc details[open] summary::after { transform: rotate(45deg); }
+.doc details > :not(summary) { margin-top: 0; }
+.doc details > :last-child { margin-bottom: 14px; }

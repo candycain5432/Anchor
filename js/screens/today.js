@@ -1,9 +1,10 @@
 // Today: the home screen.
 import * as store from '../store.js';
 import * as api from '../api.js';
-import { esc, greeting, fmtDate, track } from '../ui.js';
+import { esc, greeting, fmtDate } from '../ui.js';
+import { event } from '../analytics.js';
 import { icon } from '../icons.js';
-import { donateBanner } from '../donate.js';
+import { isStandalone, platform, inAppBrowser, canPrompt, installHTML, installDemoHTML, playDemos, onInstallChange } from '../install.js';
 import { PRACTICES, rule, dayLog, streak, launch, onChange, complete } from '../practices.js';
 import { season, rank, isFeria, litColor, isSaint, saintFallback, COLOR_NAMES, COLOR_HEX, mysterySet } from '../liturgy.js';
 
@@ -24,7 +25,9 @@ export function mount(el) {
       <p class="hero-sub" data-day-name>&nbsp;</p>
       <div class="hero-day" data-day-pills></div>
     </header>
-    <div class="page stagger">
+    <div class="page">
+     <div class="cols">
+      <div class="col col-main stagger">
       <div class="card now-card" role="button" tabindex="0" data-now></div>
       <div class="card rule-card" data-rule></div>
       <div class="card" data-confession hidden></div>
@@ -39,6 +42,8 @@ export function mount(el) {
         <div class="card-label">Daily Reflection</div>
         <p class="reflect-text skel">Loading today’s reflection, one moment…</p>
       </div>
+      </div>
+      <div class="col col-side stagger">
 
       <div class="card saint-card" role="button" tabindex="0" data-saint>
         <div class="saint-art"><span class="glyph">✝︎</span></div>
@@ -59,15 +64,15 @@ export function mount(el) {
       </div>
 
       <div class="card" data-install hidden></div>
-
-      ${donateBanner()}
+      </div>
+     </div>
 
       <p class="faint small serif" style="text-align:center;font-style:italic;font-size:1rem;margin:22px 0 0">“We have this as a sure and steadfast anchor of the soul.” — Hebrews 6:19</p>
     </div>`;
 
   el.addEventListener('click', onClick);
   el.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('[data-now],[data-saint]')) onClick(e); });
-  if (!bound) { onChange(() => { renderPractice(); renderConfession(); }); bound = true; }
+  if (!bound) { onChange(() => { renderPractice(); renderConfession(); }); onInstallChange(setupInstall); bound = true; }
 
   renderPractice();
   renderConfession();
@@ -336,6 +341,7 @@ async function findChurches(quiet = false) {
   if (!quiet) el.innerHTML = `<p class="muted small">Finding churches nearby…</p>`;
   try {
     const list = await api.nearbyChurches(loc.lat, loc.lon);
+    if (!quiet) event('find_churches', { results: list.length });
     store.set('churches', { ts: Date.now(), list });
     renderChurches(list);
   } catch {
@@ -343,23 +349,20 @@ async function findChurches(quiet = false) {
   }
 }
 
-// ---- Install prompt ----
-let deferredInstall = null;
-window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; setupInstall(); });
-
+// ---- Install card (instructions and the Install button live in install.js) ----
 function setupInstall() {
-  if (!root) return;
-  const card = root.querySelector('[data-install]');
-  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  if (standalone || store.get('installDismissed') || (!deferredInstall && !ios)) { card.hidden = true; return; }
-  card.hidden = false;
+  const card = root?.querySelector('[data-install]');
+  if (!card) return;
+  const show = !isStandalone() && !store.get('installDismissed') && (canPrompt() || platform() === 'ios' || inAppBrowser());
+  card.hidden = !show;
+  if (!show) return;
   card.innerHTML = `
     <div class="card-label">Keep Anchor close<span class="spacer"></span><button class="icon-btn" style="width:30px;height:30px" data-act="dismiss-install" aria-label="Dismiss">${icon('x')}</button></div>
-    <p class="muted small" style="margin:0 0 12px">${deferredInstall
-      ? 'Add Anchor to your home screen for one-tap prayer, offline readings, and daily reminders.'
-      : 'Tap the Share button in Safari, then “Add to Home Screen” — for one-tap prayer and daily reminders.'}</p>
-    ${deferredInstall ? `<button class="btn btn-primary btn-block" data-act="install">${icon('download')} Add to Home Screen</button>` : ''}`;
+    <p class="muted small" style="margin:0 0 12px">Add Anchor to your home screen for one-tap prayer, offline readings and daily reminders.</p>
+    ${installDemoHTML()}
+    ${installHTML()}
+    <p class="faint small" style="margin:10px 0 0">You can find this later in Me → About.</p>`;
+  playDemos(card);
 }
 
 // ---- Events ----
@@ -411,12 +414,6 @@ async function onClick(e) {
     (await import('./ask.js')).askAbout({ kind: 'reflection', title: 'Today’s reflection', text: reflectionText, prompt: 'I’d like to talk about today’s reflection. How can I put it into practice?' });
   } else if (act === 'churches') {
     findChurches(false);
-  } else if (act === 'install' && deferredInstall) {
-    deferredInstall.prompt();
-    const { outcome } = await deferredInstall.userChoice;
-    track('install_prompt', { outcome });
-    deferredInstall = null;
-    setupInstall();
   } else if (act === 'dismiss-install') {
     store.set('installDismissed', true);
     setupInstall();

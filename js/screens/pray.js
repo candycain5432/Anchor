@@ -7,6 +7,11 @@ import { NOVENAS } from '../data/novenas.js';
 import { launch, dayLog, onChange } from '../practices.js';
 import { mysterySet } from '../liturgy.js';
 import { searchSaints, PATRON_TAGS, isFavSaint } from './saints.js';
+import { screenView, event, via } from '../analytics.js';
+
+const PAGES = { guided: ['/pray', 'Pray'], prayers: ['/pray/prayers', 'Prayers'], saints: ['/pray/saints', 'Saints'] };
+/** The virtual page for analytics (used by app.js navigate). */
+export function page() { const [path, title] = PAGES[tab]; return { path, title }; }
 
 let root, tab = 'guided', saintTag = null, bound = false;
 
@@ -79,7 +84,7 @@ function guided() {
     </div>
 
     <div class="section-head"><h2 class="section-title">Novenas</h2><span class="faint small">Nine days of prayer</span></div>
-    <div class="list">
+    <div class="list list-2">
       ${NOVENAS.map(n => {
         const a = novenas[n.id];
         return `<button class="row" data-novena="${n.id}">
@@ -150,7 +155,7 @@ function renderSaints(q) {
 async function onClick(e) {
   const t = e.target;
   const tb = t.closest('[data-tab]');
-  if (tb) { tab = tb.dataset.tab; return render(); }
+  if (tb) { tab = tb.dataset.tab; render(); const p = page(); via('screen_tab'); return screenView(p.path, p.title); }
 
   const ln = t.closest('[data-launch]');
   if (ln) return launch(ln.dataset.launch);
@@ -164,6 +169,7 @@ async function onClick(e) {
   const tag = t.closest('[data-tag]');
   if (tag) {
     saintTag = saintTag === tag.dataset.tag ? null : tag.dataset.tag;
+    if (saintTag) event('patron_filter', { patron: saintTag });
     root.querySelectorAll('[data-tag]').forEach(c => c.classList.toggle('active', c.dataset.tag === saintTag));
     return renderSaints(root.querySelector('[data-search="saints"]').value);
   }
@@ -172,8 +178,15 @@ async function onClick(e) {
   if (st) return (await import('./saints.js')).openSaint(st.dataset.saint);
 }
 
+let searchTimer;
 function onInput(e) {
   const s = e.target.dataset.search;
   if (s === 'prayers') renderPrayers(e.target.value);
   if (s === 'saints') renderSaints(e.target.value);
+  // Count searches and whether they found anything; never the words typed.
+  clearTimeout(searchTimer);
+  if (s && e.target.value.trim()) searchTimer = setTimeout(() => {
+    const results = root.querySelectorAll('[data-list] .row').length;
+    event('library_search', { search_type: s, has_results: results > 0 ? 'yes' : 'no', results });
+  }, 1500);
 }

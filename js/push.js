@@ -1,6 +1,8 @@
 // Push notification subscription + per-slot reminder times (sent with the timezone).
 import * as store from './store.js';
 import * as api from './api.js';
+import { track } from './ui.js';
+import { updateUserProperties } from './analytics.js';
 
 // Must match VAPID_PUBLIC_KEY on the backend.
 const VAPID_PUBLIC_KEY = 'BHj4SyHudAtLYj2oF8tIlyElHab33gn5Ip0nhu275oOhHdhS-wzN_os_bakSewPR96NVjrD-DtyT_Kd1iVMlF2s';
@@ -44,6 +46,8 @@ export async function enable() {
   });
   await api.subscribe({ subscription: sub.toJSON(), tz: tz(), reminders: reminders() });
   store.set('push', true);
+  track('reminders_enabled');
+  updateUserProperties();
 }
 
 export async function disable() {
@@ -52,7 +56,9 @@ export async function disable() {
     const sub = await reg.pushManager.getSubscription();
     if (sub) { await api.unsubscribe(sub.endpoint).catch(() => {}); await sub.unsubscribe(); }
   } catch {}
+  if (store.get('push')) track('reminders_disabled');
   store.set('push', false);
+  updateUserProperties();
 }
 
 export async function setReminders(r) {

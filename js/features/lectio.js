@@ -18,6 +18,7 @@ export async function openLectio() {
 
   const body = openSheet({
     title: 'Lectio Divina',
+    page: '/pray/lectio-divina',
     full: true,
     html: `<div class="skel skel-line" style="width:50%;margin:30px auto"></div><div class="skel skel-line"></div><div class="skel skel-line"></div>`,
     onClose() { timer?.stop(); },

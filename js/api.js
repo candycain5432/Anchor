@@ -8,13 +8,22 @@ const CAL = 'https://cpbjr.github.io/catholic-readings-api';
 
 async function getJSON(url, opts = {}) {
   const r = await fetch(url, { ...opts, signal: opts.signal || AbortSignal.timeout?.(opts.timeout || 15000) });
-  if (!r.ok) {
-    let msg = `Request failed (${r.status})`;
-    try { msg = (await r.json()).error || msg; } catch {}
-    const err = new Error(msg); err.status = r.status; throw err;
-  }
+  if (!r.ok) throw await httpError(r);
   return r.json();
 }
+
+/** An Error with the server's message, plus .status and .code ('daily_limit', 'rate_limited', …). */
+async function httpError(r) {
+  let body = null;
+  try { body = await r.json(); } catch {}
+  const err = new Error(body?.error || `Request failed (${r.status})`);
+  err.status = r.status;
+  err.code = body?.code || '';
+  return err;
+}
+
+/** True when the backend's shared daily AI budget is used up (resets at midnight). */
+export const isDailyLimit = err => err?.code === 'daily_limit';
 
 function postJSON(path, body, opts = {}) {
   return getJSON(API_BASE + path, {
@@ -160,10 +169,9 @@ export async function chat({ message, history, context, signal, onToken }) {
     return full;
   }
 
-  if (res && res.status === 429) {
-    let msg = 'Please wait a moment and try again.';
-    try { msg = (await res.json()).error || msg; } catch {}
-    throw new Error(msg);
+  // A JSON error from the server (rate limit, daily limit, bad request): report it, don't retry.
+  if (res && !res.ok && (res.headers.get('content-type') || '').includes('application/json')) {
+    throw await httpError(res);
   }
 
   // Fallback: one-shot reply
