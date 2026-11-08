@@ -10,9 +10,14 @@ import * as store from './store.js';
 
 const gtag = (...args) => { try { window.gtag?.(...args); } catch {} };
 // Anywhere but the live site (localhost, your home network) counts as debug traffic: it shows in GA's
-// DebugView and the "Developer traffic" filter keeps it out of reports. Add ?ga_debug to test live.
+// DebugView and the "Developer traffic" filter keeps it out of reports.
+// On the live site, open ?ga_debug=1 once to turn test mode on for this browser (it sticks, and shows an
+// on-screen log of what's sent); ?ga_debug=0 turns it off again.
 // (debug_mode is left out entirely otherwise: GA treats even `false` as on.)
-const DEV = !/(^|\.)faithanchor\.net$|\.github\.io$/.test(location.hostname) || /[?&]ga_debug/.test(location.search);
+const debugParam = /[?&]ga_debug=?([^&]*)/.exec(location.search);
+if (debugParam) debugParam[1] === '0' ? store.del('gaDebug') : store.set('gaDebug', true);
+const DEBUG_ON = !!store.get('gaDebug');
+const DEV = DEBUG_ON || !/(^|\.)faithanchor\.net$|\.github\.io$/.test(location.hostname);
 const withDebug = params => (DEV ? { ...params, debug_mode: true } : params);
 const BASE = location.origin + location.pathname.replace(/index\.html$/, '').replace(/\/$/, '');
 
@@ -37,6 +42,7 @@ function send(path, title) {
   // Later events (practice_completed, chat_sent…) are attributed to this page too.
   gtag('set', { page_location, page_title });
   gtag('event', 'page_view', withDebug({ page_location, page_title, previous_page: prev, nav_source: source }));
+  debugLog('page_view', { page: path, from: prev, via: source });
   source = 'in_app';
 }
 
@@ -61,7 +67,7 @@ export function overlayClosed() {
   gtag('set', { page_location: BASE + screen.path, page_title: `${screen.title} · Anchor` });
 }
 
-export function event(name, params = {}) { gtag('event', name, withDebug(params)); }
+export function event(name, params = {}) { gtag('event', name, withDebug(params)); debugLog(name, params); }
 
 // ---- User properties (all non-personal settings) ----
 const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
@@ -98,3 +104,47 @@ function exception(msg) {
 }
 window.addEventListener('error', e => { if (e.message) exception(`${e.message} @ ${(e.filename || '').split('/').pop()}:${e.lineno || 0}`); });
 window.addEventListener('unhandledrejection', e => exception(e.reason?.message || e.reason));
+
+// ---- Test mode: an on-screen log of what's sent (only after ?ga_debug=1) ----
+// Shows each event the app hands to Google Analytics, and each request that actually leaves for
+// google-analytics.com, so you can tell "the app didn't send it" from "Google hasn't shown it yet".
+let logEl = null, sent = 0, failed = 0;
+const logLines = [];
+function debugLog(name, params) {
+  if (!DEBUG_ON) return;
+  const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const detail = params.page || params.practice || params.setting || params.item || '';
+  logLines.unshift(`${t}  ${name}${detail ? '  ' + detail : ''}`);
+  logLines.length = Math.min(logLines.length, 12);
+  renderLog();
+}
+function renderLog() {
+  if (!logEl) return;
+  const lib = !!(window.google_tag_data || window.google_tag_manager);
+  logEl.querySelector('[data-s]').textContent =
+    `GA library: ${lib ? 'loaded' : 'NOT loaded (blocked?)'} · requests to Google: ${sent} sent${failed ? `, ${failed} failed` : ''}`;
+  logEl.querySelector('[data-l]').textContent = logLines.join('\n') || '(nothing sent yet)';
+}
+if (DEBUG_ON) {
+  const isGA = url => /google-analytics\.com|googletagmanager\.com\/.*collect|\/g\/collect/.test(String(url));
+  const beacon = navigator.sendBeacon?.bind(navigator);
+  if (beacon) navigator.sendBeacon = (url, data) => { const ok = beacon(url, data); if (isGA(url)) { ok ? sent++ : failed++; renderLog(); } return ok; };
+  const realFetch = window.fetch.bind(window);
+  window.fetch = (input, init) => {
+    const url = typeof input === 'string' ? input : input?.url;
+    const p = realFetch(input, init);
+    if (isGA(url)) p.then(() => { sent++; renderLog(); }, () => { failed++; renderLog(); });
+    return p;
+  };
+  const show = () => {
+    logEl = document.createElement('div');
+    logEl.setAttribute('aria-hidden', 'true');
+    logEl.style.cssText = 'position:fixed;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom) + 92px);z-index:99;max-width:420px;padding:8px 10px;border-radius:12px;background:rgba(10,15,30,.88);color:#e8f0ff;font:11px/1.45 ui-monospace,Menlo,monospace;white-space:pre-wrap;pointer-events:auto';
+    logEl.innerHTML = '<b style="color:#d9b866">Analytics test mode</b> <span style="opacity:.6">(?ga_debug=0 to turn off · tap to hide)</span>\n<span data-s></span>\n<span data-l></span>';
+    logEl.onclick = () => { logEl.style.display = 'none'; };
+    document.body.append(logEl);
+    renderLog();
+    setInterval(renderLog, 2000);
+  };
+  document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', show) : show();
+}
