@@ -25,26 +25,36 @@ export function wreathSVG({ mini = false } = {}) {
   const cx = 160, cy = 146, rx = 128, ry = 38;
   const candles = [[106, 62, '#6a4a9c'], [142, 74, '#6a4a9c'], [178, 74, '#d07a9c'], [214, 62, '#6a4a9c']];
   const lit = w => t >= (w - 1) * 7 + 1;
+  const BASE = 178; // candle feet sit in the front of the ring, which is drawn over them
+  // The ring is drawn in two halves: the back half behind the candles, the front half in front of them.
+  const ring = back => {
+    const [x0, x1] = back ? [cx - rx, cx + rx] : [cx + rx, cx - rx];
+    const arc = (dy, w, paint) => `<path d="M${x0} ${cy + dy} A${rx} ${ry} 0 0 1 ${x1} ${cy + dy}" fill="none" stroke-width="${w}" ${paint}/>`;
+    return arc(-2, 20, 'stroke="#1f4630"') + arc(0, 14, 'stroke="#2f5a3c"') + arc(0, 7, 'stroke="#3e7350" stroke-dasharray="2 11" opacity=".9"');
+  };
+  const beads = back => {
+    let b = '';
+    for (let n = 1; n <= TOTAL; n++) {
+      const a = Math.PI / 2 + 0.35 + (n - 1) * (2 * Math.PI / TOTAL);
+      if ((Math.sin(a) < 0) !== back) continue;
+      const x = cx + rx * Math.cos(a), y = cy + ry * Math.sin(a);
+      const cls = done[n] ? 'd-done' : n === t ? 'd-today' : n < t ? 'd-missed' : 'd-future';
+      b += `<circle class="${cls}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${done[n] ? 5.4 : 4.4}"/>`;
+    }
+    return b;
+  };
   let s = `<svg class="wreath${mini ? ' mini' : ''}" viewBox="${mini ? '24 30 272 160' : '0 0 320 200'}" role="img" aria-label="Advent wreath: ${doneCount()} of ${TOTAL} days prayed">
     <defs><radialGradient id="flm" cx=".5" cy=".7" r=".6"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="#ffe39a"/><stop offset="1" stop-color="#f6a53c"/></radialGradient>
     <radialGradient id="hal" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="rgba(255,214,140,.55)"/><stop offset="1" stop-color="rgba(255,214,140,0)"/></radialGradient></defs>
-    <ellipse cx="${cx}" cy="${cy - 2}" rx="${rx}" ry="${ry}" fill="none" stroke="#1f4630" stroke-width="20"/>`;
+    ${ring(true)}${beads(true)}`;
   candles.forEach(([x, h, c], i) => {
     const top = cy - h, on = lit(i + 1);
     if (on) s += `<circle cx="${x}" cy="${top - 14}" r="30" fill="url(#hal)"/>`;
-    s += `<rect x="${x - 9}" y="${top}" width="18" height="${h}" rx="3" fill="${c}"/><rect x="${x - 9}" y="${top}" width="6" height="${h}" rx="3" fill="rgba(255,255,255,.18)"/>
+    s += `<rect x="${x - 9}" y="${top}" width="18" height="${BASE - top}" rx="3" fill="${c}"/><rect x="${x - 9}" y="${top}" width="6" height="${BASE - top}" rx="3" fill="rgba(255,255,255,.18)"/>
       <line x1="${x}" y1="${top}" x2="${x}" y2="${top - 6}" stroke="#2a2320" stroke-width="1.6"/>`;
     if (on) s += `<path class="flame" d="M${x} ${top - 26} C${x + 6} ${top - 17} ${x + 6} ${top - 9} ${x} ${top - 6} C${x - 6} ${top - 9} ${x - 6} ${top - 17} ${x} ${top - 26}Z" fill="url(#flm)"/>`;
   });
-  s += `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="none" stroke="#2f5a3c" stroke-width="14"/>
-    <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="none" stroke="#3e7350" stroke-width="7" stroke-dasharray="2 11" opacity=".9"/>`;
-  for (let n = 1; n <= TOTAL; n++) {
-    const a = Math.PI / 2 + 0.35 + (n - 1) * (2 * Math.PI / TOTAL);
-    const x = cx + rx * Math.cos(a), y = cy + ry * Math.sin(a);
-    const cls = done[n] ? 'd-done' : n === t ? 'd-today' : n < t ? 'd-missed' : 'd-future';
-    s += `<circle class="${cls}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${done[n] ? 5.4 : 4.4}"/>`;
-  }
-  return s + '</svg>';
+  return s + ring(false) + beads(false) + '</svg>';
 }
 
 // ---- Today card ----

@@ -183,19 +183,29 @@
     var n = dayNum(new Date()), s = '';
     s += '<defs><radialGradient id="flm" cx=".5" cy=".7" r=".6"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="#ffe39a"/><stop offset="1" stop-color="#f6a53c"/></radialGradient>' +
       '<radialGradient id="hal" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="rgba(255,214,140,.55)"/><stop offset="1" stop-color="rgba(255,214,140,0)"/></radialGradient></defs>';
-    s += '<ellipse cx="160" cy="144" rx="128" ry="38" fill="none" stroke="#1f4630" stroke-width="20"/>';
+    // Back half of the ring, then the candles, then the front half over their feet (so they stand in the wreath).
+    function ring(back) {
+      var x0 = back ? 32 : 288, x1 = back ? 288 : 32, arc = function (dy, w, paint) { return '<path d="M' + x0 + ' ' + (146 + dy) + ' A128 38 0 0 1 ' + x1 + ' ' + (146 + dy) + '" fill="none" stroke-width="' + w + '" ' + paint + '/>'; };
+      return arc(-2, 20, 'stroke="#1f4630"') + arc(0, 14, 'stroke="#2f5a3c"') + arc(0, 7, 'stroke="#3e7350" stroke-dasharray="2 11" opacity=".9"');
+    }
+    function beads(back) {
+      var b = '';
+      for (var k = 1; k <= TOTAL; k++) {
+        var a = Math.PI / 2 + .35 + (k - 1) * 2 * Math.PI / TOTAL;
+        if ((Math.sin(a) < 0) !== back) continue;
+        b += '<circle cx="' + (160 + 128 * Math.cos(a)).toFixed(1) + '" cy="' + (146 + 38 * Math.sin(a)).toFixed(1) + '" r="4.4" fill="' + (k < n ? '#e2c57c' : 'rgba(255,255,255,.22)') + '"/>';
+      }
+      return b;
+    }
+    s += ring(true) + beads(true);
     [[106, 62, '#6a4a9c'], [142, 74, '#6a4a9c'], [178, 74, '#d07a9c'], [214, 62, '#6a4a9c']].forEach(function (c, i) {
-      var x = c[0], top = 146 - c[1];
+      var x = c[0], top = 146 - c[1], h = 178 - top;
       if (n >= i * 7 + 1) s += '<circle cx="' + x + '" cy="' + (top - 14) + '" r="30" fill="url(#hal)"/>';
-      s += '<rect x="' + (x - 9) + '" y="' + top + '" width="18" height="' + c[1] + '" rx="3" fill="' + c[2] + '"/><rect x="' + (x - 9) + '" y="' + top + '" width="6" height="' + c[1] + '" rx="3" fill="rgba(255,255,255,.18)"/>' +
+      s += '<rect x="' + (x - 9) + '" y="' + top + '" width="18" height="' + h + '" rx="3" fill="' + c[2] + '"/><rect x="' + (x - 9) + '" y="' + top + '" width="6" height="' + h + '" rx="3" fill="rgba(255,255,255,.18)"/>' +
         '<line x1="' + x + '" y1="' + top + '" x2="' + x + '" y2="' + (top - 6) + '" stroke="#2a2320" stroke-width="1.6"/>';
       if (n >= i * 7 + 1) s += '<path class="flame" d="M' + x + ' ' + (top - 26) + ' C' + (x + 6) + ' ' + (top - 17) + ' ' + (x + 6) + ' ' + (top - 9) + ' ' + x + ' ' + (top - 6) + ' C' + (x - 6) + ' ' + (top - 9) + ' ' + (x - 6) + ' ' + (top - 17) + ' ' + x + ' ' + (top - 26) + 'Z" fill="url(#flm)"/>';
     });
-    s += '<ellipse cx="160" cy="146" rx="128" ry="38" fill="none" stroke="#2f5a3c" stroke-width="14"/><ellipse cx="160" cy="146" rx="128" ry="38" fill="none" stroke="#3e7350" stroke-width="7" stroke-dasharray="2 11" opacity=".9"/>';
-    for (var k = 1; k <= TOTAL; k++) {
-      var a = Math.PI / 2 + .35 + (k - 1) * 2 * Math.PI / TOTAL;
-      s += '<circle cx="' + (160 + 128 * Math.cos(a)).toFixed(1) + '" cy="' + (146 + 38 * Math.sin(a)).toFixed(1) + '" r="4.4" fill="' + (k < n ? '#e2c57c' : 'rgba(255,255,255,.22)') + '"/>';
-    }
+    s += ring(false) + beads(false);
     document.getElementById('wreath').innerHTML = s;
   })();
 
