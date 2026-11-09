@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#14203f" />
+<title>Advent with Anchor · 26 days of prayer</title>
+<meta name="description" content="Pray through Advent with Anchor: a short Scripture, a reflection and one small practice each day from November 29 to Christmas Eve. Free, no account, no ads." />
+<link rel="canonical" href="https://faithanchor.net/advent/" />
+<link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Anchor" />
+<meta property="og:title" content="Advent with Anchor · 26 days of prayer" />
+<meta property="og:description" content="A short Scripture, a reflection and one small practice each day of Advent. Begins Sunday, November 29. Free, no account, no ads." />
+<meta property="og:url" content="https://faithanchor.net/advent/" />
+<meta property="og:image" content="https://faithanchor.net/icons/og-advent.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="An Advent wreath with four candles and the words Advent with Anchor, 26 days of prayer" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Advent with Anchor · 26 days of prayer" />
+<meta name="twitter:description" content="A short Scripture, a reflection and one small practice each day of Advent. Begins Sunday, November 29." />
+<meta name="twitter:image" content="https://faithanchor.net/icons/og-advent.jpg" />
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-41V16QZ641"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  // Visits from anywhere but the live site count as debug traffic (GA treats even debug_mode: false as on).
+  var gaConfig = {};
+  if (!/(^|\.)faithanchor\.net$|\.github\.io$/.test(location.hostname) || /[?&]ga_debug/.test(location.search)) gaConfig.debug_mode = true;
+  gtag('config', 'G-41V16QZ641', gaConfig);
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+  :root { --navy: #14203f; --gold: #d9b866; --gold-2: #e9cd86; --violet: #6d4f9e; --violet-l: #b9a0e6; --rose: #d07a9c; --ink: #fff; --ink-2: rgba(255,255,255,.78); --ink-3: rgba(255,255,255,.55); --line: rgba(255,255,255,.14); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--ink); line-height: 1.6;
+    background:
+      radial-gradient(110% 50% at 50% 0%, rgba(109,79,158,.42), transparent 62%),
+      radial-gradient(80% 40% at 50% 38%, rgba(217,184,102,.12), transparent 70%),
+      linear-gradient(180deg, #1a2850 0%, #111b38 45%, #0b1229 100%);
+    background-color: #0b1229; min-height: 100vh;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; padding: calc(env(safe-area-inset-top) + 28px) 20px 56px; }
+  .top { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+  .top img { width: 34px; height: 34px; border-radius: 9px; }
+  .top b { font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 600; }
+  .eyebrow { font-family: 'Cinzel', serif; font-weight: 600; font-size: .78rem; letter-spacing: .24em; text-transform: uppercase; color: var(--violet-l); }
+  .hero { text-align: center; padding: 26px 0 8px; }
+  .wreath { display: block; width: 100%; max-width: 360px; margin: 0 auto 6px; overflow: visible; }
+  .flame { transform-box: fill-box; transform-origin: 50% 100%; animation: flick 1.4s ease-in-out infinite alternate; }
+  @keyframes flick { to { transform: scale(.94, 1.08) skewX(2deg); } }
+  @media (prefers-reduced-motion: reduce) { .flame { animation: none; } }
+  h1 { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: clamp(2.4rem, 9vw, 3.4rem); line-height: 1.02; margin: 10px 0 14px; }
+  h1 em { color: var(--gold-2); }
+  .lede { font-size: 1.08rem; color: var(--ink-2); max-width: 30em; margin: 0 auto; }
+  .count { margin: 26px auto 0; max-width: 420px; padding: 16px 18px; border-radius: 20px; border: 1px solid rgba(185,160,230,.35); background: rgba(109,79,158,.16); }
+  .count .when { font-weight: 700; color: var(--violet-l); font-size: .82rem; letter-spacing: .12em; text-transform: uppercase; }
+  .count .t { display: flex; justify-content: center; gap: 18px; margin-top: 8px; }
+  .count .t div { min-width: 56px; }
+  .count .t b { display: block; font-family: 'Cormorant Garamond', serif; font-size: 2.3rem; font-weight: 600; line-height: 1; font-variant-numeric: lining-nums tabular-nums; }
+  .count .t span { font-size: .72rem; color: var(--ink-3); text-transform: uppercase; letter-spacing: .1em; }
+  .count .today { font-family: 'Cormorant Garamond', serif; font-size: 1.45rem; font-weight: 600; margin-top: 4px; }
+  .cta { display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 24px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 240px; padding: 16px 28px; border-radius: 999px; font-weight: 700; font-size: 1.05rem; text-decoration: none; }
+  .btn-gold { background: linear-gradient(180deg, var(--gold-2), #b8913a); color: var(--navy); box-shadow: 0 12px 30px -10px rgba(184,145,58,.7); }
+  .btn-ghost { color: var(--gold-2); font-size: .95rem; padding: 8px; }
+  .free { margin-top: 10px; font-size: .86rem; color: var(--ink-3); }
+  section { margin-top: 52px; }
+  h2 { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 2rem; line-height: 1.1; margin: 8px 0 18px; }
+  .grid { display: grid; gap: 12px; }
+  .card { border: 1px solid var(--line); background: rgba(255,255,255,.05); border-radius: 20px; padding: 18px 20px; }
+  .card h3 { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 1.35rem; line-height: 1.15; margin-bottom: 4px; }
+  .card p { color: var(--ink-2); font-size: .95rem; }
+  .verse { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.3rem; line-height: 1.4; border-left: 3px solid var(--gold); padding-left: 14px; margin-top: 10px; color: #fff; }
+  .verse cite { display: block; font-family: 'DM Sans', sans-serif; font-style: normal; font-size: .78rem; font-weight: 700; color: var(--gold); margin-top: 6px; }
+  .weeks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .wk { border-radius: 18px; padding: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.04); }
+  .wk i { display: block; width: 12px; height: 34px; border-radius: 3px; background: var(--violet); margin-bottom: 10px; box-shadow: 0 -10px 16px -4px rgba(255,214,140,.5); }
+  .wk.rose i { background: var(--rose); }
+  .wk b { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 600; display: block; line-height: 1.1; }
+  .wk span { font-size: .82rem; color: var(--ink-3); }
+  .steps { display: grid; gap: 12px; }
+  .steps ol { padding-left: 1.2em; color: var(--ink-2); font-size: .95rem; }
+  .steps li { margin-bottom: 4px; }
+  .note { font-size: .86rem; color: var(--ink-3); margin-top: 12px; }
+  a { color: var(--gold-2); }
+  .parish { text-align: center; }
+  footer { margin-top: 56px; text-align: center; color: var(--ink-3); font-size: .86rem; }
+  footer q { display: block; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.15rem; color: var(--ink-2); margin-bottom: 14px; }
+  footer nav { display: flex; gap: 18px; justify-content: center; }
+  @media (min-width: 560px) { .grid { grid-template-columns: repeat(3, 1fr); } .steps { grid-template-columns: 1fr 1fr; } .weeks { grid-template-columns: repeat(4, 1fr); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="top" href="/"><img src="/icons/icon.svg" alt="" width="34" height="34"><b>Anchor</b></a>
+
+  <div class="hero">
+    <svg class="wreath" viewBox="0 0 320 200" role="img" aria-label="An Advent wreath with four candles" id="wreath"></svg>
+    <div class="eyebrow">Advent with Anchor</div>
+    <h1>26 days to prepare <em>your heart</em></h1>
+    <p class="lede">A short Scripture, a reflection and one small practice for each day of Advent, from Sunday, November 29 to Christmas Eve.</p>
+    <div class="count" id="count" aria-live="polite">
+      <div class="when">Begins Sunday, November 29</div>
+      <div class="t"><div><b data-d>–</b><span>days</span></div><div><b data-h>–</b><span>hours</span></div><div><b data-m>–</b><span>min</span></div></div>
+    </div>
+    <div class="cta">
+      <a class="btn btn-gold" id="start" href="/?open=advent">Start Advent with Anchor</a>
+      <a class="btn btn-ghost" href="#install">How to put it on your phone</a>
+    </div>
+    <p class="free">Free · No account · No ads · Works offline</p>
+  </div>
+
+  <section>
+    <div class="eyebrow">Each day</div>
+    <h2>A few minutes with God</h2>
+    <div class="grid">
+      <div class="card"><h3>Scripture</h3><p>A verse chosen for the day, from the prophets, the Gospels and Mary’s own words.</p></div>
+      <div class="card"><h3>A reflection</h3><p>Two or three sentences to carry with you. Nothing long, nothing preachy.</p></div>
+      <div class="card"><h3>One practice</h3><p>Pray a decade, sit in silence, prepare for Confession. Anchor opens each one for you.</p></div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <div class="eyebrow" style="font-size:.7rem">Day 1 · Sunday, November 29</div>
+      <p class="verse">“Take ye heed, watch and pray. For ye know not when the time is.”<cite>Mark 13:33</cite></p>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Four weeks, four candles</div>
+    <h2>Light your wreath as you go</h2>
+    <div class="weeks">
+      <div class="wk"><i></i><b>Hope</b><span>Nov 29 – Dec 5</span></div>
+      <div class="wk"><i></i><b>Peace</b><span>Dec 6 – 12</span></div>
+      <div class="wk rose"><i></i><b>Joy</b><span>Dec 13 – 19 · Gaudete</span></div>
+      <div class="wk"><i></i><b>Love</b><span>Dec 20 – 24</span></div>
+    </div>
+    <p class="note">Each day you pray lights a bead on your wreath, and each Sunday lights a candle. Miss a day? You can catch up. Share your day with a friend and pray Advent together.</p>
+  </section>
+
+  <section id="install">
+    <div class="eyebrow">Get Anchor</div>
+    <h2>Put it on your home screen</h2>
+    <p class="note" style="margin:-6px 0 14px">Anchor is a web app, so there’s no app store and nothing to sign up for. It takes about ten seconds.</p>
+    <div class="steps">
+      <div class="card"><h3>iPhone or iPad</h3><ol><li>Open <b>faithanchor.net</b> in Safari.</li><li>Tap <b>Share</b> (on newer iOS, tap ••• first).</li><li>Tap <b>Add to Home Screen</b>, then <b>Add</b>.</li></ol></div>
+      <div class="card"><h3>Android</h3><ol><li>Open <b>faithanchor.net</b> in Chrome.</li><li>Tap <b>Install</b> when Anchor offers it, or ⋮ → <b>Install app</b>.</li></ol></div>
+    </div>
+    <p class="note">Opened this from Instagram, Facebook or TikTok? Tap ••• or ⋮ and choose <b>Open in browser</b> first; their built-in browsers can’t install apps.</p>
+  </section>
+
+  <section class="parish">
+    <div class="eyebrow">Parishes &amp; groups</div>
+    <h2>Pray Advent together</h2>
+    <p class="note" style="font-size:.95rem">Lead a parish, youth group, school or Bible study? Email <a href="mailto:support@faithanchor.net?subject=Advent%20bulletin%20insert">support@faithanchor.net</a> for a free bulletin insert and flyer with a QR code.</p>
+  </section>
+
+  <footer>
+    <q>We have this as a sure and steadfast anchor of the soul.</q>
+    <nav><a href="/">Open Anchor</a><a href="/faq.html">FAQ</a><a href="/privacy.html">Privacy</a></nav>
+    <p style="margin-top:14px">Anchor is an independent project, not an official app of the Church or any diocese.</p>
+  </footer>
+</div>
+
+<script>
+  // Advent 2026: Sun Nov 29 – Thu Dec 24 (local time).
+  var START = new Date(2026, 10, 29), CHRISTMAS = new Date(2026, 11, 25), TOTAL = 26;
+  var TITLES = ['Stay awake','Come, follow Me','A great light','Strength renewed','Waiting for God','Wait in silence','From the root of Jesse','Prepare the way','Prince of Peace','Full of grace','Come to Me','My peace I give you','Peace beyond understanding','My soul magnifies the Lord','Rejoice','The desert will bloom','He rejoices over you','Be it done to me','God with us','Do not be afraid','Nothing is impossible','Fear not, Mary','Blessed is she who believed','He has done great things','He loved us first','Born for you'];
+  function dayNum(now) { var d = new Date(now.getFullYear(), now.getMonth(), now.getDate()); return Math.round((d - START) / 864e5) + 1; }
+
+  // Wreath: candles light as each Sunday arrives (same drawing as the app's).
+  (function () {
+    var n = dayNum(new Date()), s = '';
+    s += '<defs><radialGradient id="flm" cx=".5" cy=".7" r=".6"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="#ffe39a"/><stop offset="1" stop-color="#f6a53c"/></radialGradient>' +
+      '<radialGradient id="hal" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="rgba(255,214,140,.55)"/><stop offset="1" stop-color="rgba(255,214,140,0)"/></radialGradient></defs>';
+    s += '<ellipse cx="160" cy="144" rx="128" ry="38" fill="none" stroke="#1f4630" stroke-width="20"/>';
+    [[106, 62, '#6a4a9c'], [142, 74, '#6a4a9c'], [178, 74, '#d07a9c'], [214, 62, '#6a4a9c']].forEach(function (c, i) {
+      var x = c[0], top = 146 - c[1];
+      if (n >= i * 7 + 1) s += '<circle cx="' + x + '" cy="' + (top - 14) + '" r="30" fill="url(#hal)"/>';
+      s += '<rect x="' + (x - 9) + '" y="' + top + '" width="18" height="' + c[1] + '" rx="3" fill="' + c[2] + '"/><rect x="' + (x - 9) + '" y="' + top + '" width="6" height="' + c[1] + '" rx="3" fill="rgba(255,255,255,.18)"/>' +
+        '<line x1="' + x + '" y1="' + top + '" x2="' + x + '" y2="' + (top - 6) + '" stroke="#2a2320" stroke-width="1.6"/>';
+      if (n >= i * 7 + 1) s += '<path class="flame" d="M' + x + ' ' + (top - 26) + ' C' + (x + 6) + ' ' + (top - 17) + ' ' + (x + 6) + ' ' + (top - 9) + ' ' + x + ' ' + (top - 6) + ' C' + (x - 6) + ' ' + (top - 9) + ' ' + (x - 6) + ' ' + (top - 17) + ' ' + x + ' ' + (top - 26) + 'Z" fill="url(#flm)"/>';
+    });
+    s += '<ellipse cx="160" cy="146" rx="128" ry="38" fill="none" stroke="#2f5a3c" stroke-width="14"/><ellipse cx="160" cy="146" rx="128" ry="38" fill="none" stroke="#3e7350" stroke-width="7" stroke-dasharray="2 11" opacity=".9"/>';
+    for (var k = 1; k <= TOTAL; k++) {
+      var a = Math.PI / 2 + .35 + (k - 1) * 2 * Math.PI / TOTAL;
+      s += '<circle cx="' + (160 + 128 * Math.cos(a)).toFixed(1) + '" cy="' + (146 + 38 * Math.sin(a)).toFixed(1) + '" r="4.4" fill="' + (k < n ? '#e2c57c' : 'rgba(255,255,255,.22)') + '"/>';
+    }
+    document.getElementById('wreath').innerHTML = s;
+  })();
+
+  // Countdown before Advent; today's day during it; Christmas after.
+  (function tick() {
+    var now = new Date(), box = document.getElementById('count'), n = dayNum(now);
+    if (n < 1) {
+      var ms = START - now;
+      box.querySelector('[data-d]').textContent = Math.floor(ms / 864e5);
+      box.querySelector('[data-h]').textContent = Math.floor(ms / 36e5) % 24;
+      box.querySelector('[data-m]').textContent = Math.floor(ms / 6e4) % 60;
+      setTimeout(tick, 30000);
+    } else if (n <= TOTAL) {
+      box.innerHTML = '<div class="when">Today · Day ' + n + ' of ' + TOTAL + '</div><div class="today">' + TITLES[n - 1] + '</div>';
+      document.getElementById('start').textContent = 'Pray Day ' + n + ' with Anchor';
+    } else {
+      box.innerHTML = '<div class="when">Merry Christmas</div><div class="today">Christ is born. Keep praying with Anchor.</div>';
+      document.getElementById('start').textContent = 'Open Anchor';
+      document.getElementById('start').href = '/';
+    }
+  })();
+
+  // Carry the campaign source (utm_*) into the app link.
+  (function () {
+    var q = new URLSearchParams(location.search), a = document.getElementById('start'), u = new URL(a.href, location.href);
+    q.forEach(function (v, k) { if (/^utm_/.test(k)) u.searchParams.set(k, v); });
+    a.href = u.pathname + u.search;
+  })();
+</script>
+</body>
+</html>

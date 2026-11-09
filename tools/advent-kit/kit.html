@@ -1,0 +1,121 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Advent kit</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=block" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; }
+  .eyebrow { font-family: 'Cinzel', serif; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; }
+  .serif { font-family: 'Cormorant Garamond', serif; }
+  .navy { background:
+      radial-gradient(110% 55% at 50% 0%, rgba(109,79,158,.5), transparent 62%),
+      radial-gradient(80% 40% at 50% 40%, rgba(217,184,102,.12), transparent 70%),
+      linear-gradient(180deg, #1a2850 0%, #111b38 50%, #0b1229 100%); color: #fff; }
+  em { font-style: italic; color: #e2c57c; }
+  .qr svg { display: block; width: 100%; height: 100%; }
+  .page { position: relative; overflow: hidden; }
+
+  /* Flyer: US Letter portrait */
+  .flyer { width: 816px; height: 1056px; padding: 64px 70px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+  .flyer .eyebrow { font-size: 17px; color: #c8b3ef; }
+  .flyer .wreath { width: 430px; margin: 14px 0 0; }
+  .flyer h1 { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 78px; line-height: 1; margin: 6px 0 18px; }
+  .flyer .lede { font-size: 22px; line-height: 1.45; color: rgba(255,255,255,.85); max-width: 600px; }
+  .flyer .date { margin-top: 22px; font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 600; color: #e2c57c; }
+  .flyer .weeks { display: flex; gap: 12px; margin-top: 22px; }
+  .flyer .wk { width: 140px; padding: 12px 8px; border-radius: 16px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.05); }
+  .flyer .wk b { display: block; font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; line-height: 1.1; }
+  .flyer .wk span { font-size: 13px; color: rgba(255,255,255,.6); }
+  .flyer .scan { margin-top: auto; display: flex; align-items: center; gap: 28px; padding: 22px 28px; border-radius: 26px; background: #fff; color: #14203f; text-align: left; }
+  .flyer .scan .qr { width: 168px; height: 168px; flex: none; }
+  .flyer .scan b { display: block; font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 700; line-height: 1.05; }
+  .flyer .scan .url { font-size: 24px; font-weight: 700; color: #8a6a24; margin-top: 6px; }
+  .flyer .scan .small { font-size: 15px; color: #555; margin-top: 8px; line-height: 1.4; }
+  .flyer .foot { margin-top: 20px; font-size: 13px; color: rgba(255,255,255,.55); }
+
+  /* Bulletin insert: half letter, landscape, prints fine in black and white */
+  .insert { width: 816px; height: 528px; padding: 40px 44px; background: #fff; color: #14203f; display: flex; gap: 34px; border: 2px solid #14203f; }
+  .insert .l { flex: 1; display: flex; flex-direction: column; }
+  .insert .eyebrow { font-size: 14px; color: #5a4485; }
+  .insert h1 { font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 50px; line-height: 1; margin: 8px 0 12px; }
+  .insert p { font-size: 16.5px; line-height: 1.5; color: #2a2f3d; }
+  .insert ul { list-style: none; margin-top: 12px; }
+  .insert li { font-size: 16px; line-height: 1.45; padding-left: 20px; position: relative; margin-bottom: 4px; }
+  .insert li::before { content: '✦'; position: absolute; left: 0; color: #8a6a24; font-size: 12px; top: 3px; }
+  .insert .foot { margin-top: auto; font-size: 12px; color: #666; }
+  .insert .r { width: 250px; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border-left: 1px solid #d9d4c7; padding-left: 30px; }
+  .insert .r .qr { width: 200px; height: 200px; }
+  .insert .r b { font-family: 'Cormorant Garamond', serif; font-size: 26px; margin-top: 14px; line-height: 1.1; }
+  .insert .r .url { font-size: 18px; font-weight: 700; color: #8a6a24; margin-top: 4px; }
+  .insert .r .date { font-size: 14px; color: #555; margin-top: 10px; }
+
+  /* Social post 1080x1350 (rendered at 540x675 @2x) and link preview 1200x630 (600x315 @2x) */
+  .social { width: 540px; height: 675px; padding: 40px 36px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+  .social .eyebrow { font-size: 12.5px; color: #c8b3ef; }
+  .social .wreath { width: 300px; margin-top: 18px; }
+  .social h1 { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 50px; line-height: 1; margin: 6px 0 12px; }
+  .social .lede { font-size: 15.5px; line-height: 1.45; color: rgba(255,255,255,.82); max-width: 400px; }
+  .social .date { margin-top: 16px; font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; color: #e2c57c; }
+  .social .url { margin-top: auto; background: linear-gradient(180deg, #e9cd86, #b8913a); color: #14203f; font-weight: 700; font-size: 20px; padding: 13px 28px; border-radius: 999px; }
+  .social .foot { margin-top: 12px; font-size: 12px; color: rgba(255,255,255,.6); }
+  .og { width: 600px; height: 315px; padding: 26px 30px; display: flex; align-items: center; gap: 22px; }
+  .og .wreath { width: 250px; flex: none; }
+  .og .eyebrow { font-size: 10.5px; color: #c8b3ef; }
+  .og h1 { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 40px; line-height: 1; margin: 8px 0 10px; }
+  .og p { font-size: 13.5px; line-height: 1.45; color: rgba(255,255,255,.82); }
+  .og .date { margin-top: 12px; font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: #e2c57c; }
+</style></head>
+<body>
+<div id="root"></div>
+<script>
+  const item = new URLSearchParams(location.search).get('item') || 'flyer';
+  function wreath(cls = 'wreath') {
+    let s = `<svg class="${cls}" viewBox="0 0 320 200"><defs><radialGradient id="flm" cx=".5" cy=".7" r=".6"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="#ffe39a"/><stop offset="1" stop-color="#f6a53c"/></radialGradient>
+      <radialGradient id="hal" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="rgba(255,214,140,.6)"/><stop offset="1" stop-color="rgba(255,214,140,0)"/></radialGradient></defs>
+      <ellipse cx="160" cy="144" rx="128" ry="38" fill="none" stroke="#1f4630" stroke-width="20"/>`;
+    [[106, 62, '#6a4a9c'], [142, 74, '#6a4a9c'], [178, 74, '#d07a9c'], [214, 62, '#6a4a9c']].forEach(([x, h, c]) => {
+      const top = 146 - h;
+      s += `<circle cx="${x}" cy="${top - 14}" r="30" fill="url(#hal)"/><rect x="${x - 9}" y="${top}" width="18" height="${h}" rx="3" fill="${c}"/><rect x="${x - 9}" y="${top}" width="6" height="${h}" rx="3" fill="rgba(255,255,255,.18)"/>
+        <line x1="${x}" y1="${top}" x2="${x}" y2="${top - 6}" stroke="#2a2320" stroke-width="1.6"/>
+        <path d="M${x} ${top - 26} C${x + 6} ${top - 17} ${x + 6} ${top - 9} ${x} ${top - 6} C${x - 6} ${top - 9} ${x - 6} ${top - 17} ${x} ${top - 26}Z" fill="url(#flm)"/>`;
+    });
+    s += `<ellipse cx="160" cy="146" rx="128" ry="38" fill="none" stroke="#2f5a3c" stroke-width="14"/><ellipse cx="160" cy="146" rx="128" ry="38" fill="none" stroke="#3e7350" stroke-width="7" stroke-dasharray="2 11" opacity=".9"/>`;
+    for (let k = 0; k < 26; k++) { const a = Math.PI / 2 + .35 + k * 2 * Math.PI / 26; s += `<circle cx="${(160 + 128 * Math.cos(a)).toFixed(1)}" cy="${(146 + 38 * Math.sin(a)).toFixed(1)}" r="4.4" fill="#e2c57c"/>`; }
+    return s + '</svg>';
+  }
+  const LEDE = 'A short Scripture, a reflection and one small practice for each day of Advent, on your phone.';
+  const T = {
+    flyer: () => `<div class="page flyer navy">
+      <div class="eyebrow">Advent with Anchor</div>
+      ${wreath()}
+      <h1>26 days to prepare <em>your heart</em></h1>
+      <p class="lede">${LEDE} Pray a few minutes a day, light your wreath as you go, and arrive at Christmas ready to welcome Him.</p>
+      <div class="date">Begins Sunday, November 29</div>
+      <div class="weeks"><div class="wk"><b>Hope</b><span>Week 1</span></div><div class="wk"><b>Peace</b><span>Week 2</span></div><div class="wk"><b><em>Joy</em></b><span>Week 3 · Gaudete</span></div><div class="wk"><b>Love</b><span>Week 4</span></div></div>
+      <div class="scan"><div class="qr" id="qr"></div><div><b>Scan to begin</b><div class="url">faithanchor.net/advent</div>
+        <div class="small">Free · No account · No ads · Works offline.<br>Open it, then add it to your home screen.</div></div></div>
+      <div class="foot">Anchor is an independent project, not an official app of the Church or any diocese.</div></div>`,
+    insert: () => `<div class="page insert">
+      <div class="l"><div class="eyebrow">Advent with Anchor</div>
+        <h1>26 days to prepare your heart</h1>
+        <p>${LEDE}</p>
+        <ul><li>A verse from Scripture for each day</li><li>A short reflection to carry with you</li><li>One small practice: a decade, silence, Confession</li><li>Free, with no account and no ads</li></ul>
+        <div class="foot">Anchor is an independent project, not an official app of the Church or any diocese.</div></div>
+      <div class="r"><div class="qr" id="qr"></div><b>Scan to begin</b><div class="url">faithanchor.net/advent</div><div class="date">Begins Sunday, November 29</div></div></div>`,
+    social: () => `<div class="page social navy">
+      <div class="eyebrow">Advent with Anchor</div>
+      ${wreath()}
+      <h1>26 days to prepare <em>your heart</em></h1>
+      <p class="lede">${LEDE}</p>
+      <div class="date">Begins Sunday, November 29</div>
+      <div class="url">faithanchor.net/advent</div>
+      <div class="foot">Free · No account · No ads</div></div>`,
+    og: () => `<div class="page og navy">${wreath()}
+      <div><div class="eyebrow">Advent with Anchor</div><h1>26 days to prepare <em>your heart</em></h1>
+      <p>${LEDE}</p><div class="date">Begins Sunday, November 29</div></div></div>`,
+  };
+  document.getElementById('root').innerHTML = T[item]();
+  window.setQR = svg => { const q = document.getElementById('qr'); if (q) q.innerHTML = svg; };
+  window.ready = document.fonts.ready;
+</script>
+</body></html>
