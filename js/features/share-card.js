@@ -17,7 +17,7 @@ function wrap(ctx, text, maxWidth) {
   return lines;
 }
 
-async function draw({ kind, title, text, cite }) {
+async function draw({ kind, title, text, cite, day, done = [], christmas = false }) {
   await Promise.all([
     document.fonts.load('italic 500 60px "Cormorant Garamond"'),
     document.fonts.load('600 30px "Cinzel"'),
@@ -61,10 +61,21 @@ async function draw({ kind, title, text, cite }) {
   ctx.textAlign = 'center';
   ctx.fillStyle = '#e9cb87';
   ctx.font = '600 30px "Cinzel", serif';
-  const eyebrow = kind === 'verse' ? 'VERSE OF THE DAY' : kind === 'saint' ? 'SAINT OF THE DAY' : 'TODAY I PRAYED';
+  const eyebrow = kind === 'verse' ? 'VERSE OF THE DAY' : kind === 'saint' ? 'SAINT OF THE DAY'
+    : kind === 'advent' ? (christmas ? 'I KEPT ADVENT' : `ADVENT · DAY ${day}`) : 'TODAY I PRAYED';
   ctx.fillText(eyebrow.split('').join(String.fromCharCode(8202)), W / 2, 220);
-  ctx.font = '400 40px "Cormorant Garamond", serif';
-  ctx.fillText('✦', W / 2, 290);
+  if (kind === 'advent') {
+    // One bead per day of Advent: gold for each day prayed.
+    const n = 26, gap = 26, x0 = W / 2 - (n - 1) * gap / 2, got = new Set(done);
+    for (let i = 1; i <= n; i++) {
+      ctx.beginPath(); ctx.arc(x0 + (i - 1) * gap, 284, got.has(i) ? 8 : 6, 0, Math.PI * 2);
+      if (got.has(i)) { ctx.fillStyle = '#e9cb87'; ctx.shadowColor = 'rgba(233,203,135,.8)'; ctx.shadowBlur = 14; ctx.fill(); ctx.shadowBlur = 0; }
+      else { ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 2; ctx.stroke(); }
+    }
+  } else {
+    ctx.font = '400 40px "Cormorant Garamond", serif';
+    ctx.fillText('✦', W / 2, 290);
+  }
 
   // Body text, sized to fit
   let size = 76, lines;
@@ -110,7 +121,7 @@ export async function shareCard(opts) {
   track('share', { kind: opts.kind });
   try {
     if (navigator.canShare?.({ files: [file] })) {
-      await navigator.share({ files: [file], title: 'Anchor', text: opts.kind === 'verse' ? `${opts.text} — ${opts.cite}` : opts.title });
+      await navigator.share({ files: [file], title: 'Anchor', text: opts.kind === 'verse' ? `${opts.text} — ${opts.cite}` : opts.kind === 'advent' ? `${opts.title} — pray along at faithanchor.net` : opts.title });
       return;
     }
   } catch (e) { if (e.name === 'AbortError') return; }

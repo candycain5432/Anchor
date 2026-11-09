@@ -28,7 +28,8 @@ export function isFeria(day) { return !day?.name || !day.type || day.type === 'F
 export function litColor(day) {
   const s = season(day?.season).key;
   const name = String(day?.name || '');
-  const feria = isFeria(day);
+  // Sundays take the season's color (violet in Advent/Lent, green in Ordinary Time), not a feast's white.
+  const feria = isFeria(day) || day?.type === 'SUNDAY';
 
   if (/Palm Sunday|Good Friday|Pentecost|Holy Cross|Passion/i.test(name)) return 'red';
   if (/Holy Thursday|Easter|Holy Saturday/i.test(name)) return 'white';

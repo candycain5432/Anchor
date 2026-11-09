@@ -7,6 +7,7 @@ import { icon } from '../icons.js';
 import { isStandalone, platform, inAppBrowser, canPrompt, installHTML, installDemoHTML, playDemos, onInstallChange } from '../install.js';
 import { PRACTICES, rule, dayLog, streak, launch, onChange, complete } from '../practices.js';
 import { season, rank, isFeria, litColor, isSaint, saintFallback, COLOR_NAMES, COLOR_HEX, mysterySet } from '../liturgy.js';
+import { cardHTML as adventCardHTML, adventVisible, openAdvent } from '../features/advent.js';
 
 let root, day = null, bound = false;
 
@@ -28,6 +29,7 @@ export function mount(el) {
     <div class="page">
      <div class="cols">
       <div class="col col-main stagger">
+      <div class="card now-card advent-card" role="button" tabindex="0" data-advent hidden></div>
       <div class="card now-card" role="button" tabindex="0" data-now></div>
       <div class="card rule-card" data-rule></div>
       <div class="card" data-confession hidden></div>
@@ -71,7 +73,7 @@ export function mount(el) {
     </div>`;
 
   el.addEventListener('click', onClick);
-  el.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('[data-now],[data-saint]')) onClick(e); });
+  el.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('[data-now],[data-saint],[data-advent]')) onClick(e); });
   if (!bound) { onChange(() => { renderPractice(); renderConfession(); }); onInstallChange(setupInstall); bound = true; }
 
   renderPractice();
@@ -113,6 +115,10 @@ function renderPractice() {
   const st = root.querySelector('[data-streak]');
   st.innerHTML = `${icon('flame')}<span>${s}</span>`;
   st.setAttribute('aria-label', `${s} day prayer streak`);
+
+  const adv = root.querySelector('[data-advent]');
+  adv.hidden = !adventVisible();
+  if (!adv.hidden) adv.innerHTML = adventCardHTML();
 
   const now = root.querySelector('[data-now]');
   const sug = suggestion();
@@ -370,6 +376,8 @@ async function onClick(e) {
   const t = e.target;
   const go = t.closest('[data-go]');
   if (go) return (await import('../app.js')).navigate(go.dataset.go);
+
+  if (t.closest('[data-advent]')) return openAdvent({ source: 'today_card' });
 
   const now = t.closest('[data-now]');
   if (now) return launch(now.dataset.now);

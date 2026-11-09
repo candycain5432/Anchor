@@ -113,6 +113,10 @@ export const MILESTONES = [
   { id: 'intercessor', glyph: 'heart', name: 'Intercessor',       desc: 'Prayed for intentions 10 times',          test: s => s.c.intentionPrayed >= 10 },
   { id: 'answered',   glyph: 'dove', name: 'Answered',           desc: 'Marked a prayer as answered',            test: s => s.c.answered >= 1 },
   { id: 'grateful',   glyph: 'sprout', name: 'Grateful Heart',     desc: 'Wrote gratitude on 7 days',              test: s => s.c.gratitude >= 7 },
+  // Advent with Anchor (seasonal: only listed in Me while Advent is on, or once earned)
+  { id: 'advent1',    glyph: 'candle', name: 'First Candle',       desc: 'Prayed your first day of Advent',        test: s => s.c.adventDays >= 1, seasonal: true },
+  { id: 'gaudete',    glyph: 'rose', name: 'Gaudete',              desc: 'Prayed 15 days of Advent, to the rose candle', test: s => s.c.adventDays >= 15, seasonal: true },
+  { id: 'advent20',   glyph: 'star', name: 'Prepared the Way',     desc: 'Prayed 20 days of Advent',               test: s => s.c.adventDays >= 20, seasonal: true },
 ];
 
 export function unlocked() { return store.get('milestones', {}); }
@@ -157,5 +161,6 @@ export async function launch(id, opts = {}) {
     case 'morning':  return (await import('./features/reader.js')).openPrayer('Morning Offering', { practice: 'morning' });
     case 'angelus':  return (await import('./features/reader.js')).openPrayer('Angelus', { practice: 'angelus' });
     case 'night':    return (await import('./features/reader.js')).openPrayer('Evening Prayer', { practice: 'night' });
+    case 'advent':   return (await import('./features/advent.js')).openAdvent(opts);
   }
 }

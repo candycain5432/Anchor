@@ -7,9 +7,16 @@ import * as push from '../push.js';
 import { donateBanner } from '../donate.js';
 import { isStandalone, openInstallSheet, shareApp } from '../install.js';
 import { event, updateUserProperties } from '../analytics.js';
+import { adventDay, DAYS as ADVENT_DAYS } from '../data/advent.js';
+
+/** Seasonal seals (Advent) are listed only while the season is on, or once earned. */
+const shownMilestones = () => {
+  const got = unlocked(), inAdvent = adventDay(store.isoDate()) <= ADVENT_DAYS.length;
+  return MILESTONES.filter(m => !m.seasonal || got[m.id] || inAdvent);
+};
 const settingEvent = (setting, value) => { event('setting_change', { setting, value: String(value) }); updateUserProperties(); };
 
-export const VERSION = '10.0';
+export const VERSION = '10.1';
 const SUPPORT_EMAIL = 'support@faithanchor.net';
 let root, bound = false;
 
@@ -48,8 +55,8 @@ function render() {
       </div>
 
       <div class="card">
-        <div class="card-label">Milestones<span class="spacer"></span><span class="faint" style="letter-spacing:.04em">${Object.keys(unlocked()).length}/${MILESTONES.length}</span></div>
-        <div class="seal-grid">${MILESTONES.map(m => `
+        <div class="card-label">Milestones<span class="spacer"></span><span class="faint" style="letter-spacing:.04em">${Object.keys(unlocked()).length}/${shownMilestones().length}</span></div>
+        <div class="seal-grid">${shownMilestones().map(m => `
           <button class="seal-cell ${unlocked()[m.id] ? '' : 'locked'}" data-milestone="${m.id}">${sealSVG(m.glyph)}<div class="sn">${esc(m.name)}</div></button>`).join('')}</div>
       </div>
       </div>

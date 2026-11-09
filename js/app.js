@@ -103,7 +103,7 @@ export async function openTarget(target, how = 'in_app') {
   if (screens.includes(target)) return navigate(target);
   await navigate('today');
   analytics.via(how); // the practice sheet is what they came for
-  launch(target);
+  launch(target, target === 'advent' ? { source: how } : undefined);
 }
 
 /** Opens ?open=… if present. Returns true when the visit came through a deep link. */

@@ -1244,3 +1244,40 @@ ol.steps-list li { margin: 0 0 10px; line-height: 1.5; font-size: .92rem; }
   .tab:not(.active):not(.tab-ask):hover { background: color-mix(in srgb, var(--surface) 65%, transparent); color: var(--ink); }
   .tab-ask:hover { filter: brightness(1.12); }
 }
+
+/* ---------- Advent with Anchor (js/features/advent.js) ---------- */
+.advent-card {
+  background: radial-gradient(120% 140% at 0% 0%, rgba(109,79,158,.22) 0%, transparent 62%), var(--surface);
+  border-color: rgba(109,79,158,.4);
+}
+.advent-card .now-kicker, .advent-eyebrow { color: #6d4f9e; }
+:root[data-theme="dark"] .advent-card .now-kicker, :root[data-theme="dark"] .advent-eyebrow { color: #b9a0e6; }
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] .advent-card .now-kicker, :root[data-theme="auto"] .advent-eyebrow { color: #b9a0e6; }
+}
+.advent-sheet.rose .advent-eyebrow { color: #c46b8d; }
+.advent-mini { flex: none; width: 78px; height: 46px; }
+.advent-mini svg { width: 100%; height: 100%; }
+.wreath { display: block; width: 100%; max-width: 340px; margin: 0 auto; overflow: visible; }
+.wreath .d-done { fill: #e2c57c; filter: drop-shadow(0 0 3px rgba(226,197,124,.9)); }
+.wreath .d-today { fill: rgba(226,197,124,.25); stroke: #e2c57c; stroke-width: 2; }
+.wreath .d-missed { fill: none; stroke: rgba(255,255,255,.6); stroke-width: 1.2; }
+.wreath .d-future { fill: rgba(255,255,255,.2); }
+.wreath .flame { transform-box: fill-box; transform-origin: 50% 100%; animation: advent-flicker 1.4s ease-in-out infinite alternate; }
+@keyframes advent-flicker { from { transform: scale(1, 1); } to { transform: scale(.94, 1.08) skewX(2deg); } }
+@media (prefers-reduced-motion: reduce) { .wreath .flame { animation: none; } }
+.advent-eyebrow { text-align: center; margin-top: 10px; }
+.advent-title { text-align: center; font-size: 2rem; font-weight: 600; line-height: 1.1; margin: 10px 0 16px; }
+.advent-verse {
+  margin: 0 0 16px; padding: 16px 18px; border-left: 3px solid var(--gold);
+  background: var(--surface-2); border-radius: 0 var(--r-md) var(--r-md) 0;
+  font-style: italic; font-size: 1.28rem; line-height: 1.45;
+}
+.advent-verse cite { display: block; margin-top: 8px; font-style: normal; font-family: var(--font-ui); font-size: .8rem; font-weight: 700; color: var(--gold); letter-spacing: .04em; }
+.advent-reflection { font-size: 1rem; line-height: 1.6; color: var(--ink-2); margin: 0 0 16px; }
+.advent-practice { margin-bottom: 0; }
+.advent-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; max-width: 380px; }
+.advent-days .ad { aspect-ratio: 1; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); font: 700 .8rem var(--font-ui); padding: 0; }
+.advent-days .ad.done { background: linear-gradient(140deg, var(--gold-2), var(--gold)); color: #fff; border-color: transparent; }
+.advent-days .ad.sel { outline: 2px solid #6d4f9e; outline-offset: 2px; }
+.advent-days .ad.locked { opacity: .35; }

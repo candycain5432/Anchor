@@ -1,4 +1,4 @@
-const CACHE_NAME = 'anchor-v10.0';
+const CACHE_NAME = 'anchor-v10.1';
 
 // App shell. index.html is network-first (below) but precached for offline use.
 const STATIC_ASSETS = [
@@ -26,9 +26,11 @@ const STATIC_ASSETS = [
   './js/push.js',
   './js/store.js',
   './js/ui.js',
+  './js/data/advent.js',
   './js/data/novenas.js',
   './js/data/prayers.js',
   './js/data/saints.js',
+  './js/features/advent.js',
   './js/features/beads.js',
   './js/features/examen.js',
   './js/features/lectio.js',
