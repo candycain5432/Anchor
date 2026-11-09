@@ -173,6 +173,22 @@
 </div>
 
 <script>
+  // Testing only (same as the app): ?today=2026-12-13 acts as that date on localhost / home-network addresses.
+  (function () {
+    if (!/^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)|\.local$/.test(location.hostname)) return;
+    try {
+      var m = /[?&]today=([^&]+)/.exec(location.search);
+      if (m) m[1] === 'off' ? sessionStorage.removeItem('anchor:today') : sessionStorage.setItem('anchor:today', m[1]);
+      var d = sessionStorage.getItem('anchor:today');
+      if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
+      var R = Date, now = new R(), target = new R(d + 'T00:00:00');
+      target.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
+      var off = target - now;
+      window.Date = class extends R { constructor(...a) { a.length ? super(...a) : super(R.now() + off); } static now() { return R.now() + off; } };
+    } catch (e) {}
+  })();
+</script>
+<script>
   // Advent 2026: Sun Nov 29 – Thu Dec 24 (local time).
   var START = new Date(2026, 10, 29), CHRISTMAS = new Date(2026, 11, 25), TOTAL = 26;
   var TITLES = ['Stay awake','Come, follow Me','A great light','Strength renewed','Waiting for God','Wait in silence','From the root of Jesse','Prepare the way','Prince of Peace','Full of grace','Come to Me','My peace I give you','Peace beyond understanding','My soul magnifies the Lord','Rejoice','The desert will bloom','He rejoices over you','Be it done to me','God with us','Do not be afraid','Nothing is impossible','Fear not, Mary','Blessed is she who believed','He has done great things','He loved us first','Born for you'];
